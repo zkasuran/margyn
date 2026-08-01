@@ -28,17 +28,27 @@ async function paint() {
     : "not signed in";
   el("login").hidden = signedIn;
   el("logout").hidden = !signedIn;
-  el("buy").hidden = !signedIn || access;
+  for (const b of document.querySelectorAll("[data-product]")) b.hidden = !signedIn || access;
   el("scan").disabled = !signedIn;
   return { signedIn, access };
 }
 
 el("login").onclick = () => tiun.login();
 el("logout").onclick = async () => { await tiun.logout(); paint(); };
-el("buy").onclick = () => {
-  const productId = cfg.productId ?? window.prompt("Tiun product id for the Fix pack");
-  if (productId) tiun.checkout({ productId });
-};
+/** One button per configured product, so nothing is prompted for at runtime. */
+function mountBuyButtons() {
+  const host = el("buy").parentElement;
+  for (const product of cfg.products ?? []) {
+    const b = document.createElement("button");
+    b.textContent = `Buy ${product.name}`;
+    b.title = product.blurb;
+    b.dataset.product = product.key;
+    b.onclick = () => tiun.checkout({ productId: product.id });
+    host.insertBefore(b, el("logout"));
+  }
+  el("buy").remove();
+}
+mountBuyButtons();
 
 for (const event of ["login", "logout", "checkout:complete", "user:updated"]) {
   tiun.on?.(event, paint);

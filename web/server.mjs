@@ -35,6 +35,25 @@ const SANDBOX = process.env.TIUN_ENV !== "live";
 // So picking the wrong one fails closed rather than quietly charging money.
 const API_KEY = SANDBOX ? process.env.TIUN_SANDBOX_API_KEY : process.env.TIUN_API_KEY;
 const SNIPPET_ID = SANDBOX ? process.env.TIUN_SANDBOX_SNIPPET_ID : process.env.TIUN_SNIPPET_ID;
+/**
+ * Product ids are per environment: `p-test-` only works with `sandbox: true`,
+ * `p-live-` only without it. Kept in env so the live switch is configuration
+ * rather than a code change.
+ */
+const PRODUCTS = [
+  {
+    key: "fixpack",
+    name: "Fix pack",
+    blurb: "The generated patch for every finding, each with a test that fails before and passes after. One-time, 19.",
+    id: SANDBOX ? process.env.TIUN_SANDBOX_PRODUCT_FIXPACK : process.env.TIUN_PRODUCT_FIXPACK,
+  },
+  {
+    key: "watch",
+    name: "Watch",
+    blurb: "Continuous auditing plus a CI gate that fails the build when a check goes hollow. 9 a month per repository.",
+    id: SANDBOX ? process.env.TIUN_SANDBOX_PRODUCT_WATCH : process.env.TIUN_PRODUCT_WATCH,
+  },
+].filter((p) => Boolean(p.id));
 const API_BASE = SANDBOX ? "https://api-sandbox.tiun.live" : "https://api.tiun.live";
 // The path prefix is `live_api` on both hosts, and the SDK source confirms it:
 // @tiun/sdk@0.9.1 hardcodes "https://api.tiun.live/live_api" and
@@ -82,7 +101,7 @@ const server = createServer(async (req, res) => {
 
   if (url.pathname === "/api/config") {
     // The snippet id is a public client value. The API key is not, and is absent here.
-    return json(res, 200, { snippetId: SNIPPET_ID ?? null, sandbox: SANDBOX });
+    return json(res, 200, { snippetId: SNIPPET_ID ?? null, sandbox: SANDBOX, products: PRODUCTS });
   }
 
   if (url.pathname === "/api/verify" && req.method === "POST") {
@@ -124,4 +143,5 @@ server.listen(PORT, () => {
   console.log(`  tiun env   ${SANDBOX ? "sandbox" : "LIVE"}  (${API_BASE})`);
   console.log(`  snippet    ${SNIPPET_ID ? `${SNIPPET_ID.slice(0, 8)}...` : "MISSING, set TIUN_SANDBOX_SNIPPET_ID"}`);
   console.log(`  api key    ${API_KEY ? "loaded, server-side only" : "MISSING, /api/verify will refuse"}`);
+  console.log(`  products   ${PRODUCTS.length ? PRODUCTS.map((p) => `${p.name}=${p.id}`).join("  ") : "none configured"}`);
 });
