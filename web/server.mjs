@@ -33,9 +33,12 @@ const API_KEY = process.env.TIUN_API_KEY;
 const SNIPPET_ID = process.env.TIUN_SANDBOX_SNIPPET_ID;
 const SANDBOX = process.env.TIUN_ENV !== "live";
 const API_BASE = SANDBOX ? "https://api-sandbox.tiun.live" : "https://api.tiun.live";
-// The path prefix is `live_api` on both hosts. Probed 2026-08-01: the sandbox
-// host answers `live_api` with 401 when the key is wrong, and `sandbox_api`
-// with 404, so the environment is chosen by hostname and by which key you hold.
+// The path prefix is `live_api` on both hosts, and the SDK source confirms it:
+// @tiun/sdk@0.9.1 hardcodes "https://api.tiun.live/live_api" and
+// "https://api-sandbox.tiun.live/live_api", picking between them on the sandbox
+// flag. So the environment is the hostname plus which key you hold, never the
+// path. Probing agrees: the sandbox host answers `live_api` with 401 for a
+// wrong key and `sandbox_api` with 404.
 const API_PREFIX = "live_api";
 
 const MIME = { ".html": "text/html", ".mjs": "text/javascript", ".js": "text/javascript", ".css": "text/css", ".json": "application/json", ".svg": "image/svg+xml" };
