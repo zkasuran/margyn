@@ -17,6 +17,10 @@ Exit code is 1 when anything was found, so it works as a CI gate.
 
 ## What it checks today
 
+Five checks. Three are static and safe to run anywhere; the mutation proof is
+opt-in behind `--mutate` because it executes the real test suite once per
+mutation.
+
 **`ignored-source`, high.** Files the repository reads that git never
 committed. A path matched by an ignore rule is absent from a clean clone, so the
 local run is green because the file is sitting on your disk untracked, and CI is
@@ -30,6 +34,41 @@ reads as coverage in the repository and contributes none.
 rather than their own config. The exclusion is a side effect, so a path that
 becomes tracked silently enters the tool's scope. That can rewrite vendored bytes
 whose hash was the thing proving they came from upstream.
+
+**`no-assertion`, high.** Tests that assert nothing. The body runs the code,
+throws nothing, and reports green whatever the code returns. Assertions reached
+through a local helper count, so a test whose whole body is
+`expectTreeError(...)` is not reported.
+
+**`mutation`, high, opt-in.** The strongest evidence this tool has. It inverts a
+line, runs the suite, and reports the suite that stayed green anyway. There is no
+arguing with a test that passed while the thing it guards was inverted. A red
+baseline aborts the run rather than producing meaningless results, mutations are
+capped, each run is timed out, and the file is restored in a `finally` block and
+on `SIGINT`, so an interrupted scan cannot leave a mutated tree behind.
+
+## Precision, measured
+
+A scanner that cries wolf is itself a placebo, so false positives were treated as
+defects. First run across five real repositories produced 132 findings on one of
+them, nearly all noise. Four fixes:
+
+- A `package.json` declaring its own build output in `main` or `exports` is not
+  reading it. Only source code counts as a reader.
+- Matching on a bare basename reported every `dist/index.js` in a monorepo.
+  Matching now needs a path suffix carrying at least one parent directory, which
+  is how the real defect was found in the first place: `dist/abis/IPool.mjs`.
+- Dependency trees an install step fetches, `forge install` into
+  `contracts/lib`, are ignored on purpose and recreated on demand. Detected by a
+  manifest of their own inside an untracked ancestor.
+- A sibling script calling a gate as `pnpm check:web` counts as running it.
+
+Result on the same five repositories: 132 to 0, 51 to 2, 20 to 2, 6 to 2, 12 to
+0. The remaining findings are true: an unrun `lint:fix`, and biome inheriting its
+exclusions from `.gitignore`.
+
+The true positive still fires. Reconstructed against moss `c6cbb45` it reports
+both vendored modules with the correct reader, `scripts/abis.ts`.
 
 ## Proof it catches a real failure
 

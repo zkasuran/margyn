@@ -6,11 +6,13 @@
  */
 import assert from "node:assert/strict";
 import { execFileSync } from "node:child_process";
-import { mkdtempSync, mkdirSync, writeFileSync, rmSync } from "node:fs";
+import { mkdtempSync, mkdirSync, readFileSync, writeFileSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { test } from "node:test";
 import { ignoredSource } from "../src/checks/ignored-source.mjs";
+import { mutationProof } from "../src/checks/mutation.mjs";
+import { noAssertion } from "../src/checks/no-assertion.mjs";
 import { unrunChecks } from "../src/checks/unrun-checks.mjs";
 import { scan } from "../src/scan.mjs";
 
@@ -124,6 +126,77 @@ test("scan drops any finding that arrives without a reproduction", () => {
     r.write("README.md", "clean repo\n");
     r.commit();
     for (const f of scan(r.dir)) assert.ok(f.reproduction?.length, `${f.check} reported without a reproduction`);
+  } finally {
+    r.cleanup();
+  }
+});
+
+test("no-assertion catches a test that checks nothing and spares one that does", () => {
+  const r = repo();
+  try {
+    r.write("test/a.test.mjs", [
+      'import { test } from "node:test";',
+      'import assert from "node:assert";',
+      'test("real", () => { assert.equal(1, 1); });',
+      'test("hollow", () => { const x = compute(); console.log(x); });',
+    ].join("\n"));
+    r.commit();
+
+    const found = noAssertion(r.dir);
+    assert.equal(found.length, 1, "only the assertionless test is a finding");
+    assert.match(found[0].summary, /"hollow"/);
+    assert.equal(found[0].severity, "high");
+  } finally {
+    r.cleanup();
+  }
+});
+
+test("no-assertion leaves a compile-time fixture alone", () => {
+  const r = repo();
+  try {
+    r.write("test/types.test.ts", [
+      'test("rejects a bad call", () => {',
+      '  // @ts-expect-error wrong arity',
+      '  build(1, 2, 3);',
+      '});',
+    ].join("\n"));
+    r.commit();
+
+    assert.deepEqual(noAssertion(r.dir), [], "a type fixture has nothing to assert at runtime");
+  } finally {
+    r.cleanup();
+  }
+});
+
+test("mutation refuses to draw conclusions from a red baseline", () => {
+  const r = repo();
+  try {
+    r.write("package.json", JSON.stringify({ name: "x", scripts: { test: "exit 1" } }, null, 2));
+    r.write("src/a.mjs", "export const ok = () => { return true; };\n");
+    r.commit();
+
+    const found = mutationProof(r.dir, { command: "exit 1", max: 1, timeoutMs: 20_000 });
+    assert.equal(found.length, 1);
+    assert.equal(found[0].check, "mutation");
+    assert.match(found[0].summary, /skipped/);
+  } finally {
+    r.cleanup();
+  }
+});
+
+test("mutation reports a line no test observes, and restores the file", () => {
+  const r = repo();
+  try {
+    r.write("src/a.mjs", "export const ok = () => { return true; };\n");
+    // A suite that passes without ever calling ok(), so mutating it changes nothing.
+    r.write("run-tests.mjs", 'process.exit(0);\n');
+    r.commit();
+    const before = readFileSync(join(r.dir, "src/a.mjs"), "utf8");
+
+    const found = mutationProof(r.dir, { command: "node run-tests.mjs", max: 1, timeoutMs: 20_000 });
+    assert.equal(found.length, 1, "the unobserved mutation must be reported");
+    assert.match(found[0].summary, /still passed/);
+    assert.equal(readFileSync(join(r.dir, "src/a.mjs"), "utf8"), before, "the file must be restored");
   } finally {
     r.cleanup();
   }

@@ -63,7 +63,11 @@ export function unrunChecks(root) {
       // nothing calls is a different conversation.
       if (!/^(test|lint|typecheck|check|verify|audit|e2e)/i.test(name)) continue;
       const calledByCi = ci.includes(name);
-      const calledByPeer = new RegExp(`run [^\\n]*\\b${name}\\b|--filter [^\\n]*\\b${name}\\b`).test(allScriptBodies);
+      // A sibling calls it however the package manager spells it: `pnpm check:web`,
+      // `npm run check:web`, `turbo run check:web`. Any mention in another
+      // script's body counts, which is why the name is matched bare.
+      const peers = Object.entries(scripts).filter(([n]) => n !== name).map(([, b]) => b).join("\n");
+      const calledByPeer = new RegExp(`\\b${name.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\b`).test(peers);
       if (calledByCi || calledByPeer) continue;
       findings.push({
         check: "unrun-check",
