@@ -29,9 +29,12 @@ for (const candidate of [join(here, "..", "..", "tiun-hackathon", ".env"), join(
   }
 }
 
-const API_KEY = process.env.TIUN_API_KEY;
-const SNIPPET_ID = process.env.TIUN_SANDBOX_SNIPPET_ID;
 const SANDBOX = process.env.TIUN_ENV !== "live";
+// Keys are environment-scoped, verified 2026-08-01: the sandbox key returns 200
+// on api-sandbox and 401 on api.tiun.live, and the live key does the reverse.
+// So picking the wrong one fails closed rather than quietly charging money.
+const API_KEY = SANDBOX ? process.env.TIUN_SANDBOX_API_KEY : process.env.TIUN_API_KEY;
+const SNIPPET_ID = SANDBOX ? process.env.TIUN_SANDBOX_SNIPPET_ID : process.env.TIUN_SNIPPET_ID;
 const API_BASE = SANDBOX ? "https://api-sandbox.tiun.live" : "https://api.tiun.live";
 // The path prefix is `live_api` on both hosts, and the SDK source confirms it:
 // @tiun/sdk@0.9.1 hardcodes "https://api.tiun.live/live_api" and
@@ -63,7 +66,7 @@ const readBody = (req) =>
 
 /** Exchanges the browser's short-lived token for a user, server-side only. */
 async function verify(token) {
-  if (!API_KEY) return { ok: false, error: "TIUN_API_KEY is not set on the server" };
+  if (!API_KEY) return { ok: false, error: `${SANDBOX ? "TIUN_SANDBOX_API_KEY" : "TIUN_API_KEY"} is not set on the server` };
   const res = await fetch(`${API_BASE}/${API_PREFIX}/s2s/v1/users/verification`, {
     method: "POST",
     headers: { "X-TIUN-API-KEY": API_KEY, "content-type": "application/json" },
