@@ -1,8 +1,8 @@
-# Placebo
+# Margyn
 
 Proves your checks do not check anything.
 
-Placebo does not review your code. It audits the machinery that is supposed to
+Margyn does not review your code. It audits the machinery that is supposed to
 catch your bugs, and it reports only what it can prove. Every finding ships a
 reproduction you can run. No reproduction, no finding.
 
@@ -49,7 +49,7 @@ on `SIGINT`, so an interrupted scan cannot leave a mutated tree behind.
 
 ## Precision, measured
 
-A scanner that cries wolf is itself a placebo, so false positives were treated as
+A scanner that cries wolf is hollow itself, so false positives were treated as
 defects. First run across five real repositories produced 132 findings on one of
 them, nearly all noise. Four fixes:
 
@@ -81,7 +81,7 @@ from the commit while sitting on disk untracked. Locally: 26 tests green. In CI:
 two tests failed reading files that had never been pushed. The diff was
 innocent, the absence was the bug, and no diff reviewer could have seen it.
 
-Reconstructed against that exact commit, Placebo returns:
+Reconstructed against that exact commit, Margyn returns:
 
 ```
 1. packages/protocols/aave/abis-src/dist/AaveV3Monad.mjs is read by

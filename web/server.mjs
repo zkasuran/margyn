@@ -1,5 +1,5 @@
 /**
- * Placebo web: the smallest honest surface that shows the product working.
+ * Margyn web: the smallest honest surface that shows the product working.
  *
  * Serves the frontend, and owns the two things a browser must not:
  *   POST /api/verify  exchanges the SDK's userVerificationToken for a user
@@ -50,7 +50,7 @@ const PRODUCTS = [
   {
     key: "watch",
     name: "Watch",
-    blurb: "Continuous auditing plus a CI gate that fails the build when a check goes hollow. 9 a month per repository.",
+    blurb: "Continuous auditing plus a CI gate that fails the build when a check goes hollow. 8.99 a month per repository.",
     id: SANDBOX ? process.env.TIUN_SANDBOX_PRODUCT_WATCH : process.env.TIUN_PRODUCT_WATCH,
   },
 ].filter((p) => Boolean(p.id));
@@ -139,7 +139,7 @@ const server = createServer(async (req, res) => {
 });
 
 server.listen(PORT, () => {
-  console.log(`placebo web  http://localhost:${PORT}`);
+  console.log(`margyn web  http://localhost:${PORT}`);
   console.log(`  tiun env   ${SANDBOX ? "sandbox" : "LIVE"}  (${API_BASE})`);
   console.log(`  snippet    ${SNIPPET_ID ? `${SNIPPET_ID.slice(0, 8)}...` : "MISSING, set TIUN_SANDBOX_SNIPPET_ID"}`);
   console.log(`  api key    ${API_KEY ? "loaded, server-side only" : "MISSING, /api/verify will refuse"}`);

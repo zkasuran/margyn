@@ -22,7 +22,7 @@ function report() {
     return;
   }
 
-  console.log(`${C.b}placebo${C.x} ${root}\n`);
+  console.log(`${C.b}margyn${C.x} ${root}\n`);
 
   if (findings.length === 0) {
     console.log("Nothing hollow found. Every check this tool knows how to test held up.");

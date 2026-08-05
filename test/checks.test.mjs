@@ -17,7 +17,7 @@ import { unrunChecks } from "../src/checks/unrun-checks.mjs";
 import { scan } from "../src/scan.mjs";
 
 function repo() {
-  const dir = mkdtempSync(join(tmpdir(), "placebo-"));
+  const dir = mkdtempSync(join(tmpdir(), "margyn-"));
   const run = (...args) => execFileSync("git", args, { cwd: dir, stdio: "pipe" });
   run("init", "-q");
   run("config", "user.email", "t@example.com");

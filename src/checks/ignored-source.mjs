@@ -1,5 +1,5 @@
 /**
- * Placebo: finds defects in the verification layer, not in the diff.
+ * Margyn: finds defects in the verification layer, not in the diff.
  *
  * The rule the whole product rests on: a finding is only reported when it
  * carries a reproduction someone else can run. No reproduction, no finding.
