@@ -43,6 +43,7 @@
     <span class="who" id="who">checking session…</span>
     <button id="login" class="ghost" hidden>Sign in</button>
     <button id="buy" hidden>Unlock scanning</button>
+    <button id="licence" class="ghost" hidden>Get my licence</button>
     <button id="logout" class="ghost" hidden>Sign out</button>
   </div>
 
@@ -56,6 +57,8 @@
   <p class="note">
     The scanner runs on the server against a local path. The secret API key never reaches this page:
     the browser holds a short-lived <code>userVerificationToken</code> and the server exchanges it.
+    A licence is signed server-side and checked offline, so <code>margyn --mutate</code> works on a
+    CI runner with no network.
   </p>
 </main>
 <script type="module" src="/app.mjs"></script>

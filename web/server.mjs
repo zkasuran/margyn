@@ -1,11 +1,16 @@
 /**
  * Margyn web: the smallest honest surface that shows the product working.
  *
- * Serves the frontend, and owns the two things a browser must not:
- *   POST /api/verify  exchanges the SDK's userVerificationToken for a user
- *                     object, using the secret API key. This is the only place
- *                     the key is ever read.
- *   POST /api/scan    runs the scanner, gated on that verification.
+ * Serves the frontend, and owns the three things a browser must not:
+ *   POST /api/verify   exchanges the SDK's userVerificationToken for a user
+ *                      object, using the secret API key. This is the only place
+ *                      the key is ever read.
+ *   POST /api/licence  mints a signed licence for a user Tiun says has paid.
+ *                      The private key lives here and never leaves.
+ *   POST /api/scan     runs the scanner, gated on that verification. LOCAL ONLY:
+ *                      it takes a path from the caller, so it is deliberately
+ *                      absent from the deployed worker. Scanning belongs on the
+ *                      user's machine.
  *
  * Zero dependencies beyond the SDK the frontend loads. Node 22 or newer.
  */
@@ -14,6 +19,7 @@ import { readFileSync, existsSync } from "node:fs";
 import { createServer } from "node:http";
 import { dirname, extname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
+import { mintLicence } from "../src/licence.mjs";
 import { scan } from "../src/scan.mjs";
 
 const here = dirname(fileURLToPath(import.meta.url));
@@ -44,13 +50,13 @@ const PRODUCTS = [
   {
     key: "fixpack",
     name: "Fix pack",
-    blurb: "The generated patch for every finding, each with a test that fails before and passes after. One-time, 19.",
+    blurb: "Everything in Watch, plus the generated patch for every finding, each carrying a test that fails before the fix and passes after.",
     id: SANDBOX ? process.env.TIUN_SANDBOX_PRODUCT_FIXPACK : process.env.TIUN_PRODUCT_FIXPACK,
   },
   {
     key: "watch",
     name: "Watch",
-    blurb: "Continuous auditing plus a CI gate that fails the build when a check goes hollow. 8.99 a month per repository.",
+    blurb: "Continuous auditing plus a CI gate that fails the build when a check goes hollow. Unlocks the mutation proof in the CLI.",
     id: SANDBOX ? process.env.TIUN_SANDBOX_PRODUCT_WATCH : process.env.TIUN_PRODUCT_WATCH,
   },
 ].filter((p) => Boolean(p.id));
@@ -62,6 +68,8 @@ const API_BASE = SANDBOX ? "https://api-sandbox.tiun.live" : "https://api.tiun.l
 // path. Probing agrees: the sandbox host answers `live_api` with 401 for a
 // wrong key and `sandbox_api` with 404.
 const API_PREFIX = "live_api";
+/** Signs licences. Server-side only, and absent in a build that cannot mint. */
+const SIGNING_KEY = process.env.MARGYN_LICENCE_KEY;
 
 const MIME = { ".html": "text/html", ".mjs": "text/javascript", ".js": "text/javascript", ".css": "text/css", ".json": "application/json", ".svg": "image/svg+xml" };
 
@@ -96,6 +104,32 @@ async function verify(token) {
   return { ok: Boolean(body.isAuthenticated), user: body.userInfo ?? null };
 }
 
+/** A licence lasts 31 days, so a lapsed subscription stops working on its own. */
+const LICENCE_DAYS = 31;
+
+/**
+ * Turns "Tiun says this user has paid" into a signed licence the CLI can check
+ * offline. `productAccess` is Tiun's own record of what was bought, so the
+ * entitlement decision is theirs and this only writes it down in a form that
+ * survives being carried to a CI runner with no network.
+ */
+function licenceFor(user) {
+  const owned = Object.keys(user?.productAccess ?? {});
+  if (owned.length === 0) return { ok: false, error: "this account has not bought anything yet" };
+  // Map Tiun product ids back to our own names, so the token never carries an id
+  // that changes when the live products are created.
+  const products = PRODUCTS.filter((p) => owned.includes(p.id)).map((p) => p.key);
+  if (products.length === 0) return { ok: false, error: "the products on this account are not ones this build knows about" };
+  if (!SIGNING_KEY) return { ok: false, error: "MARGYN_LICENCE_KEY is not set on the server, so no licence can be signed" };
+  const expires = Date.now() + LICENCE_DAYS * 86_400_000;
+  return {
+    ok: true,
+    licence: mintLicence({ product: products, email: user.email ?? null, issued: Date.now(), expires }, SIGNING_KEY),
+    products,
+    expires,
+  };
+}
+
 const server = createServer(async (req, res) => {
   const url = new URL(req.url, `http://localhost:${PORT}`);
 
@@ -109,6 +143,19 @@ const server = createServer(async (req, res) => {
       const { token } = await readBody(req);
       if (!token) return json(res, 400, { error: "token is required" });
       return json(res, 200, await verify(token));
+    } catch (e) {
+      return json(res, 400, { error: String(e.message ?? e) });
+    }
+  }
+
+  if (url.pathname === "/api/licence" && req.method === "POST") {
+    try {
+      const { token } = await readBody(req);
+      if (!token) return json(res, 400, { error: "token is required" });
+      const seen = await verify(token);
+      if (!seen.ok) return json(res, 401, { error: seen.error ?? "not authenticated with tiun" });
+      const minted = licenceFor(seen.user);
+      return json(res, minted.ok ? 200 : 402, minted.ok ? minted : { error: minted.error });
     } catch (e) {
       return json(res, 400, { error: String(e.message ?? e) });
     }
@@ -143,5 +190,6 @@ server.listen(PORT, () => {
   console.log(`  tiun env   ${SANDBOX ? "sandbox" : "LIVE"}  (${API_BASE})`);
   console.log(`  snippet    ${SNIPPET_ID ? `${SNIPPET_ID.slice(0, 8)}...` : "MISSING, set TIUN_SANDBOX_SNIPPET_ID"}`);
   console.log(`  api key    ${API_KEY ? "loaded, server-side only" : "MISSING, /api/verify will refuse"}`);
+  console.log(`  signing    ${SIGNING_KEY ? "loaded, server-side only" : "MISSING, /api/licence will refuse"}`);
   console.log(`  products   ${PRODUCTS.length ? PRODUCTS.map((p) => `${p.name}=${p.id}`).join("  ") : "none configured"}`);
 });

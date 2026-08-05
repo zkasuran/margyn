@@ -105,22 +105,51 @@ Run against the fixed tree, the two high findings are gone and only the two
 medium advisories remain. A checker that cannot be shown to go quiet is as
 useless as the hollow checks it hunts, so that direction is tested too.
 
+## Paying for it, and why the check works offline
+
+The static checks are free and always will be. The mutation proof is part of
+**Watch**, because it is the check that costs real machine time: it edits your
+tree and runs your suite once per mutation.
+
+The scanner runs on your machine, so your machine decides whether that check is
+unlocked. It never calls home. A licence check that needs the network is a new way
+for a build to go red for reasons that have nothing to do with the code. A CI
+runner on a private network would fail it every time.
+
+So the server signs a short licence with Ed25519 and the CLI verifies it against a
+public key compiled into the binary:
+
+```bash
+export MARGYN_LICENCE=$(cat licence.txt)   # or ~/.margyn/licence
+margyn /path/to/repo --mutate
+```
+
+A refusal never fails your run. Ask for a paid check without a licence and you are
+told why, then the free scan runs in full and exits on its own findings. Billing is
+not a reason to break someone's build.
+
+A tampered licence cannot be made to work: the signature covers the payload, so
+editing the product name or the expiry invalidates it, and forging one would need a
+private key that is not in this repository. `test/licence.test.mjs` proves both
+attacks fail using signatures made by the real signer.
+
 ## Tests
 
 ```bash
 npm test
 ```
 
-Six tests, no dependencies. Each one builds a real git repository in a temp
-directory, plants exactly one defect, asserts the check finds it, then plants the
-fixed shape and asserts the check stays silent.
+Twenty-one tests, no dependencies. The check tests each build a real git
+repository in a temp directory, plant exactly one defect, assert the check finds
+it, then plant the fixed shape and assert the check stays silent. The licence
+tests carry real signatures from the production key and prove that a flipped
+signature byte, a payload swapped under a real signature, an expired licence and a
+licence for the wrong product are all refused with the reason named.
 
 ## Not done yet
 
-- Mutation proof: break a line on purpose and report the tests that stayed
-  green. That is the strongest evidence form and it is the next check.
-- Assertions that cannot fail, for example a fixture hash written by hand
-  instead of generated. We hit exactly this on 2026-08-01 and it is not
-  automated yet.
+- Assertions that cannot fail for a subtler reason than having none, for example
+  a fixture hash written by hand instead of generated. We hit exactly this on
+  2026-08-01 and it is not automated yet.
 - Local versus CI environment divergence.
-- The hosted product: auth, checkout and the dashboard, built Tiun-native.
+- Fix pack: generating the patch, not just naming the defect.

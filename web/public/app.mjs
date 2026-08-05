@@ -29,12 +29,46 @@ async function paint() {
   el("login").hidden = signedIn;
   el("logout").hidden = !signedIn;
   for (const b of document.querySelectorAll("[data-product]")) b.hidden = !signedIn || access;
+  // The licence is only worth offering to someone who has actually bought
+  // something, since minting one for a free account can only ever be refused.
+  el("licence").hidden = !access;
   el("scan").disabled = !signedIn;
   return { signedIn, access };
 }
 
 el("login").onclick = () => tiun.login();
 el("logout").onclick = async () => { await tiun.logout(); paint(); };
+
+/**
+ * Hands over the CLI licence. Shown rather than downloaded: the copy the user
+ * needs is one line they paste into a file or a CI secret, and a downloaded file
+ * in the wrong place is a support ticket.
+ */
+el("licence").onclick = async () => {
+  el("licence").disabled = true;
+  try {
+    const token = await tiun.getUserVerificationToken();
+    const res = await fetch("/api/licence", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ token }),
+    });
+    const body = await res.json();
+    if (!res.ok) throw new Error(body.error ?? `server returned ${res.status}`);
+    const until = new Date(body.expires).toISOString().slice(0, 10);
+    out.innerHTML = `<div class="f">
+      <p class="meta">licence · ${escape(body.products.join(", "))} · valid until ${until}</p>
+      <h3>Save this as <code>~/.margyn/licence</code></h3>
+      <p class="why">Or set it as <code>MARGYN_LICENCE</code> in CI. It is checked offline, so a runner
+        with no network still verifies it. It expires on ${until}, and a renewed subscription mints a new one.</p>
+      <pre>${escape(body.licence)}</pre>
+    </div>`;
+  } catch (error) {
+    out.innerHTML = `<div class="empty">${escape(String(error.message ?? error))}</div>`;
+  } finally {
+    el("licence").disabled = false;
+  }
+};
 /** One button per configured product, so nothing is prompted for at runtime. */
 function mountBuyButtons() {
   const host = el("buy").parentElement;
