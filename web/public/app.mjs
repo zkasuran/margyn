@@ -67,6 +67,18 @@ function checkoutUnavailable(why) {
 const cfg = await (await fetch("/api/config")).json().catch(() => ({}));
 const who = el("who");
 
+/**
+ * Says which Tiun environment the buttons are wired to. Sandbox means a card is
+ * not charged, which someone about to press a buy button is owed rather than
+ * left to discover. It disappears on its own when the server reports live.
+ */
+const sandboxNote = el("sandboxnote");
+if (sandboxNote && cfg.sandbox) {
+  sandboxNote.textContent =
+    "Checkout is running in Tiun's sandbox while the live account finishes onboarding, so no card is charged yet. The price and the trial above are the real ones.";
+  sandboxNote.hidden = false;
+}
+
 if (!cfg.snippetId) {
   checkoutUnavailable("");
   throw new Error("no snippet id configured");

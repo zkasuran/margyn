@@ -48,6 +48,7 @@ export default {
         <button id="buy" hidden>Start the 3 day trial</button>
       </p>
       <p class="sm" id="buynote">3 days free, then $8.99 a month. Checkout runs on Tiun.</p>
+      <p class="sm note" id="sandboxnote" hidden></p>
     </div>
   </div>
 </div></section>

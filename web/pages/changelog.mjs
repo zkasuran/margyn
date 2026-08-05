@@ -30,6 +30,13 @@ export default {
       <p>The CLI grew <code>--help</code>, <code>--version</code> and <code>--max</code>. The last
         one is what makes "raise the cap" a sentence you can act on rather than an option only
         reachable by importing the checker.</p>
+      <p>Two pages scrolled sideways on a phone. Measured in a headless browser at 360 and 390
+        pixels: the docs grid took its width from the 680 pixel prose measure, then the pricing card
+        took its width from the nowrap install command. Both are fixed, both were re-measured, so
+        all eight pages now fit a 360 pixel screen.</p>
+      <p>The pricing page now says which Tiun environment its buttons are wired to. While the live
+        account finishes onboarding, checkout runs in the sandbox, so the page says that where
+        someone is about to press a buy button rather than leaving them to find out.</p>
       <p>The site went from one page to eight, all built through one shell: docs, pricing,
         changelog, security, terms, privacy and a real 404. Paths are served without the
         <code>.html</code>. Both <code>sitemap.xml</code> and <code>robots.txt</code> are generated

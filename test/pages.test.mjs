@@ -113,6 +113,24 @@ test("robots.txt points at the sitemap that exists", () => {
   assert.ok(existsSync(join(PUBLIC, "sitemap.xml")), "robots.txt names a sitemap that is not there");
 });
 
+test("the phone overflow guards are still in the stylesheet", () => {
+  // A pin rather than a proof. Two pages scrolled sideways at 360px and 390px:
+  // the docs grid took its width from the 680px prose measure, then the pricing
+  // card took its width from the nowrap install command. Both were measured in a
+  // headless browser before and after. This asserts the fix is still declared,
+  // because nothing else in this suite runs a layout engine.
+  const css = readFileSync(join(here, "..", "web", "style.css"), "utf8");
+  for (const guard of [
+    ".doc { display: grid",
+    "grid-template-columns: minmax(0, 1fr) }",
+    ".tiers { display: grid",
+    "padding: 22px; display: flex; flex-direction: column; min-width: 0",
+  ]) {
+    assert.ok(css.includes(guard), `the stylesheet no longer carries: ${guard}`);
+  }
+  assert.equal((css.match(/min-width: 0/g) ?? []).length >= 3, true, "the min-width guards are gone");
+});
+
 test("the styles are one file, so two pages cannot drift apart", () => {
   const styleOf = (doc) => doc.slice(doc.indexOf("<style>"), doc.indexOf("</style>"));
   const first = styleOf(html.get("/"));

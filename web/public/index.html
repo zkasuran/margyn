@@ -185,9 +185,9 @@ button.ghost:hover, .btn.ghost:hover { background: var(--rais); color: var(--ink
 .hero-links a { text-decoration-color: var(--strong) }
 .run { display: flex; align-items: stretch; border: 1px solid var(--strong);
        border-radius: var(--r-in); background: var(--card); overflow: hidden;
-       max-width: 460px; margin: 24px 0 14px }
+       max-width: 460px; margin: 24px 0 14px; min-width: 0 }
 .run code { background: none; padding: 13px 14px; font-size: 13.5px; white-space: nowrap;
-            overflow-x: auto; flex: 1; border-radius: 0 }
+            overflow-x: auto; flex: 1; border-radius: 0; min-width: 0 }
 .run button { border: 0; border-left: 1px solid var(--line); border-radius: 0;
               background: transparent; color: var(--mut); min-width: 84px; justify-content: center }
 .run button:hover { background: var(--rais); color: var(--ink); opacity: 1 }
@@ -207,6 +207,9 @@ button.ghost:hover, .btn.ghost:hover { background: var(--rais); color: var(--ink
 .faq details[open] summary::before { content: "\2212" }
 .faq details p { margin: 0 0 15px; padding-left: 21px; color: var(--mut); font-size: 14.5px }
 .cta { margin: 0 0 9px; display: flex; gap: 9px; flex-wrap: wrap }
+/* A state the visitor is owed, so it gets the attention colour the findings use
+   rather than a new one the contrast gate has never seen. */
+.note { border-left: 3px solid var(--hi); padding-left: 12px; margin-top: 10px }
 
 /* ---- the five checks ---- */
 .checks { list-style: none; padding: 0; margin: 0 }
@@ -225,10 +228,12 @@ button.ghost:hover, .btn.ghost:hover { background: var(--rais); color: var(--ink
         color: var(--accent) }
 
 /* ---- pricing ---- */
-.tiers { display: grid; gap: 16px; margin: 0 }
-@media (min-width: 760px) { .tiers { grid-template-columns: 1fr 1fr } }
+.tiers { display: grid; gap: 16px; margin: 0; grid-template-columns: minmax(0, 1fr) }
+@media (min-width: 760px) { .tiers { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) } }
+/* min-width: 0 on the card and on the copy row, because the install command is
+   nowrap: its min-content size made the card 395px wide inside a 320px column. */
 .tier { background: var(--card); border: 1px solid var(--line); border-radius: var(--r);
-        padding: 22px; display: flex; flex-direction: column }
+        padding: 22px; display: flex; flex-direction: column; min-width: 0 }
 .tier.pick { border-color: var(--strong) }
 .tier .tag { font-size: 10.5px; font-weight: 700; letter-spacing: .08em;
              text-transform: uppercase; color: var(--faint); margin-bottom: 10px }
@@ -255,8 +260,12 @@ button.ghost:hover, .btn.ghost:hover { background: var(--rais); color: var(--ink
 .st th { font-weight: 600; color: var(--ink) }
 
 /* ---- docs ---- */
-.doc { display: grid; gap: 34px; padding: var(--band) 0 }
-@media (min-width: 1024px) { .doc { grid-template-columns: 200px 1fr; gap: 56px } }
+/* Two containers, never one, so `minmax(0, 1fr)` rather than `1fr`: an auto grid
+   column is sized by its items, so .docbody's 680px prose measure made the single
+   column 680 wide and the whole page scrolled sideways on a 360px screen.
+   Measured at 360 and 390 before and after. */
+.doc { display: grid; gap: 34px; padding: var(--band) 0; grid-template-columns: minmax(0, 1fr) }
+@media (min-width: 1024px) { .doc { grid-template-columns: 200px minmax(0, 1fr); gap: 56px } }
 .toc { align-self: start; position: sticky; top: 84px; font-size: 13.5px }
 .toc p { font-size: 11.5px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase;
          color: var(--faint); margin-bottom: 10px }
