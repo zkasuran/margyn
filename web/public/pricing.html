@@ -3,14 +3,14 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Margyn: prove your test suite actually tests something</title>
-<meta name="description" content="Margyn audits the machinery that is supposed to catch your bugs. It finds tests that assert nothing, files git never committed and gates nothing invokes. Every finding ships a reproduction you can run.">
-<link rel="canonical" href="https://margyn.xyz/">
+<title>Margyn pricing: four checks free, the mutation proof from $8.99 a month</title>
+<meta name="description" content="The four static checks are free with no account and no licence. Watch is $8.99 a month, adds the mutation proof and mints a licence your CI verifies offline. Three days free.">
+<link rel="canonical" href="https://margyn.xyz/pricing">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Margyn">
-<meta property="og:url" content="https://margyn.xyz/">
-<meta property="og:title" content="Your tests pass. That is not the same as working.">
-<meta property="og:description" content="Margyn audits the machinery that is supposed to catch your bugs. It finds tests that assert nothing, files git never committed and gates nothing invokes. Every finding ships a reproduction you can run.">
+<meta property="og:url" content="https://margyn.xyz/pricing">
+<meta property="og:title" content="Four checks are free. The fifth runs your suite, so it costs money.">
+<meta property="og:description" content="The four static checks are free with no account and no licence. Watch is $8.99 a month, adds the mutation proof and mints a licence your CI verifies offline. Three days free.">
 <meta property="og:image" content="https://margyn.xyz/og.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
@@ -21,19 +21,7 @@
 <link rel="alternate icon" href="/favicon.ico" sizes="16x16 32x32">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
 <link rel="preconnect" href="https://esm.sh" crossorigin>
-<script type="application/ld+json">
-{"@context":"https://schema.org","@type":"SoftwareApplication","name":"Margyn",
-"applicationCategory":"DeveloperApplication","operatingSystem":"Linux, macOS, Windows",
-"url":"https://margyn.xyz/","codeRepository":"https://github.com/zkasuran/margyn",
-"description":"Audits the verification layer of a repository. Finds tests that assert nothing, files the repo reads that git never committed, gates no workflow invokes and linter exclusions that live in the ignore file. Every finding ships a runnable reproduction.",
-"softwareRequirements":"Node.js 22 or newer, git","license":"https://opensource.org/licenses/MIT",
-"offers":[{"@type":"Offer","name":"Free scan","price":"0","priceCurrency":"USD",
-"description":"Four static checks, no account and no licence."},
-{"@type":"Offer","name":"Watch","price":"8.99","priceCurrency":"USD",
-"description":"Adds the mutation proof, with a 3 day free trial.",
-"priceSpecification":{"@type":"UnitPriceSpecification","price":"8.99","priceCurrency":"USD",
-"billingDuration":1,"billingIncrement":1,"unitCode":"MON"}}]}
-</script>
+
 <script>
 /* Applies a stored theme choice before first paint. A classic inline script on
    purpose: defer, async and type=module all run after paint, so any of them
@@ -315,7 +303,7 @@ footer nav a:hover { color: var(--accent) }
 
   <nav class="barnav" aria-label="Main">
     <a href="/docs">Docs</a>
-    <a href="/pricing">Pricing</a>
+    <a href="/pricing" aria-current="page">Pricing</a>
     <a href="/changelog">Changelog</a>
   </nav>
 
@@ -338,152 +326,143 @@ footer nav a:hover { color: var(--accent) }
 <main id="main">
 <div class="wrap"><div class="out" id="out" role="region" aria-label="Your licence"></div></div>
 
-<section class="hero"><div class="wrap">
-  <h1 class="prose">Your tests pass. That is not the same as working.</h1>
-  <p class="lede prose">Margyn audits the machinery that is supposed to catch your bugs. It
-    does not review your code. Every finding ships a reproduction you can run. No reproduction,
-    no finding.</p>
+<section class="phead"><div class="wrap">
+  <h1 class="prose">Four checks are free. The fifth runs your suite, so it costs money.</h1>
+  <p class="lede prose">Watch is $8.99 a month. It adds the mutation proof, which is the check that
+    edits your tree and runs your whole suite once per mutation. The four static checks stay free
+    with no account, no licence and no network.</p>
+</div></section>
 
-  <div class="run">
-    <code id="cmd">npx margyn /path/to/repo</code>
-    <button id="copy" data-copy="cmd">Copy</button>
+<section><div class="wrap">
+  <div class="tiers">
+    <div class="tier">
+      <p class="tag">Free scan</p>
+      <p class="amt">$0<span class="per"> forever</span></p>
+      <ul>
+        <li>Four static checks: ignored-source, no-assertion, unrun-check, lint-blindspot</li>
+        <li>No account, no licence, no network call at any point</li>
+        <li>Every finding carries a command that reproduces it</li>
+        <li>Exit code 1 on findings, so it works as a CI gate today</li>
+      </ul>
+      <div class="fill"></div>
+      <div class="run">
+        <code id="cmd-free">npx margyn /path/to/repo</code>
+        <button data-copy="cmd-free">Copy</button>
+      </div>
+    </div>
+
+    <div class="tier pick">
+      <p class="tag">Watch</p>
+      <p class="amt">$8.99<span class="per"> a month, 3 days free</span></p>
+      <ul>
+        <li>Everything in the free scan</li>
+        <li>The mutation proof: it inverts a line, runs your suite, then reports the suite that
+          stayed green anyway</li>
+        <li>A licence your CI verifies offline, so a paid check runs on a runner with no network</li>
+        <li>Cancel whenever you like. The four free checks keep working either way</li>
+      </ul>
+      <div class="fill"></div>
+      <p class="cta">
+        <button id="buylogin">Sign in to start the trial</button>
+        <button id="buy" hidden>Start the 3 day trial</button>
+      </p>
+      <p class="sm" id="buynote">3 days free, then $8.99 a month. Checkout runs on Tiun.</p>
+    </div>
   </div>
-  <p class="sm prose">Zero dependencies. Node 22 and git. Exit code 1 on findings, so it works
-    as a CI gate. Your code never leaves your machine.</p>
-  <p class="hero-links sm"><a href="#proof">See a real finding</a><a href="/docs">Documentation</a><a
-    href="/pricing">Pricing</a></p>
-</div></section>
-
-<section id="proof"><div class="wrap">
-  <p class="eyebrow">A real run</p>
-  <h2>Against the commit that broke</h2>
-  <p class="prose">Eight vendored modules sat under a path containing <code>dist/</code>, which
-    the root <code>.gitignore</code> excludes at any depth, so git dropped all eight while they
-    sat on disk. Locally: 26 tests green. In CI: two failed, reading files never pushed. The
-    diff was innocent. The absence was the bug.</p>
-<pre tabindex="0" role="group" aria-label="Terminal output from a real scan"><b>margyn /tmp/moss</b>
-
-2 findings, each with a reproduction you can run.
-
-<b>1. packages/protocols/aave/abis-src/dist/AaveV3Monad.mjs is read by</b>
-<b>   packages/protocols/aave/README.md but git ignores it</b>
-   <span class="r">HIGH</span>  <span class="d">ignored-source     ignore rule: .gitignore:2:dist/</span>
-   <span class="d">reproduce:</span>
-     git archive HEAD | tar -t | grep -qx '&lt;path&gt;' || echo 'ABSENT from HEAD'
-     test -f '&lt;path&gt;' &amp;&amp; echo 'PRESENT on disk'</pre>
-  <p class="sm prose" style="margin-top:14px">Two facts about one file that disagree. Against
-    the fixed tree both findings are gone, because a checker that cannot be shown to go quiet
-    is as hollow as what it hunts.</p>
 </div></section>
 
 <section><div class="wrap">
-  <p class="eyebrow">We ran it on ourselves</p>
-  <h2>Margyn finds holes in Margyn</h2>
-  <p class="prose">The mutation proof inverts one line, runs the suite, then reports the suite
-    that stayed green anyway. Pointed at our own repository at the default cap of four
-    mutations, all four survived. Raise the cap to twelve and six do.</p>
-<pre tabindex="0" role="group" aria-label="Four surviving mutations in Margyn's own suite">bin/build-pages.mjs            === -&gt; !==             <span class="r">suite still passed</span>
-bin/contrast.mjs               === -&gt; !==             <span class="r">suite still passed</span>
-src/checks/ignored-source.mjs  return true -&gt; false   <span class="r">suite still passed</span>
-src/checks/mutation.mjs        return true -&gt; false   <span class="r">suite still passed</span></pre>
-  <p class="prose" style="margin-top:16px">The last one is the mutation checker. Our own tool
-    inverted a line inside our own mutation checker and 41 tests reported success. We publish
-    the number rather than the cap that flatters it.</p>
-  <p class="sm prose">Check it on our repository rather than taking it from us. The paid gate is on
-    the CLI flag, not on the code, so a clone reproduces this without a licence:</p>
-<pre tabindex="0" role="group" aria-label="Reproducing the self audit from a clone">git clone https://github.com/zkasuran/margyn &amp;&amp; cd margyn &amp;&amp; npm test
-node --input-type=module -e 'import { mutationProof } from "./src/checks/mutation.mjs";
-console.log(mutationProof(process.cwd(), { max: 12 }).map(f =&gt; f.summary));'</pre>
+  <h2>Why this is the one you pay for</h2>
+  <p class="prose">The static checks read your tree once and finish in under a second. The mutation
+    proof inverts a line, runs your entire test suite, restores the file, then does it again. That
+    is real machine time and it is the honest line between the two. The free four are not crippled
+    versions of anything.</p>
+  <p class="prose">It is also the check with the most to go wrong, so it is bounded. A red baseline
+    aborts the run instead of producing results that would mean nothing. Each run is timed out. The
+    file is restored in a <code>finally</code> block and on <code>SIGINT</code>, so an interrupted
+    scan cannot leave a mutated tree behind. It is capped at four mutations by default, which means
+    it under-reports on purpose. Raise the cap to find more.</p>
+  <p class="sm prose">We never print a mutation score. If you want a score across a whole codebase
+    that is <a href="https://stryker-mutator.io/">Stryker</a>, free and better at it than we are.
+    Margyn sells the sentence instead: we inverted this line, ran your suite and it passed.</p>
+</div></section>
+
+<section id="licence"><div class="wrap">
+  <h2>What you get is a licence, not a login</h2>
+  <p class="prose">After checkout, the button in the top bar hands you a signed licence. Put it
+    anywhere the CLI can read it:</p>
+<pre tabindex="0" role="group" aria-label="Installing a licence"><b>$ margyn /path/to/repo --mutate</b>
+The mutation proof is part of Watch and it is locked: no licence found.
+Everything below is the free scan, which ran in full.
+
+<b>$ mkdir -p ~/.margyn &amp;&amp; pbpaste &gt; ~/.margyn/licence</b>   <span class="d"># or export MARGYN_LICENCE=...</span>
+<b>$ margyn /path/to/repo --mutate</b>
+4 findings, each with a reproduction you can run.</pre>
+  <p class="prose" style="margin-top:16px">The licence is signed with Ed25519 and checked against a
+    public key compiled into the CLI, so verifying it needs no network. That is the whole reason
+    this works on a locked-down runner. A licence check that phones home is a new way for a build
+    to go red for a reason that has nothing to do with the code.</p>
+  <p class="prose">A refusal never fails your run. Ask for a paid check without a licence and
+    Margyn prints why, runs the free scan in full, then exits on its own findings. Billing is not
+    a reason to break someone's build.</p>
+  <p class="sm"><a href="/docs#licence">How the licence is installed and verified</a> &middot; <a
+    href="/security">The security model</a></p>
 </div></section>
 
 <section><div class="wrap">
-  <h2>Your AI wrote 400 tests last month. How many can fail?</h2>
-  <p class="prose">Test volume went up and nobody audited the tests. The tools that generate
-    them cannot check them, since they wrote them. Coverage will not tell you either: Codecov's
-    own blog concedes that
-    <a href="https://about.codecov.io/blog/mutation-testing-how-to-ensure-code-coverage-isnt-a-vanity-metric/">it
-    is too easy to write high-coverage tests that don't deliver value</a>. The product still
-    centres the percentage.</p>
-  <p class="prose">Margyn is the other half. It reads what your repository claims to verify,
-    then proves which of those claims are empty.</p>
-  <p class="sm prose">Want a mutation score for a whole codebase? That is
-    <a href="https://stryker-mutator.io/">Stryker</a>, free and better at it than we are. Margyn
-    runs a capped mutation proof as one check in a five check audit, then prints the surviving
-    line. We never print a score.</p>
-</div></section>
-
-<section><div class="wrap">
-  <h2>What it looks for</h2>
-  <ul class="checks prose">
-    <li>
-      <div class="top"><span class="nm">ignored-source</span><span class="sev high">high</span></div>
-      <p>Files the repo reads that git never committed. Green on your laptop because the file
-        is on your disk untracked, red in CI reading something that was never pushed.</p>
-    </li>
-    <li>
-      <div class="top"><span class="nm">no-assertion</span><span class="sev high">high</span></div>
-      <p>Tests that assert nothing. The body runs, throws nothing and reports green whatever
-        the code returned. Assertions reached through a helper still count.</p>
-    </li>
-    <li>
-      <div class="top"><span class="nm">mutation</span><span class="sev high">high</span><span class="paid">part of Watch</span></div>
-      <p>Inverts a line, runs the suite, reports the suite that stayed green anyway. There is
-        no arguing with a test that passed while the thing it guards was inverted.</p>
-    </li>
-    <li>
-      <div class="top"><span class="nm">unrun-check</span><span class="sev med">medium</span></div>
-      <p>A <code>test:online</code> or <code>verify</code> script that no workflow invokes and
-        no sibling script calls. It reads as coverage in the repository and cannot fail.</p>
-    </li>
-    <li>
-      <div class="top"><span class="nm">lint-blindspot</span><span class="sev med">medium</span></div>
-      <p>Linters whose exclusions come from <code>.gitignore</code> instead of their own
-        config, so a newly tracked path silently enters the tool's scope.</p>
-    </li>
-  </ul>
-  <p class="sm" style="margin-top:22px"><a href="/docs#checks">What fires each check, what
-    deliberately does not</a></p>
-</div></section>
-
-<section><div class="wrap">
-  <h2>It belongs in CI. At most it costs $8.99 a month.</h2>
-  <p class="prose">Exit code 1 when anything was found, so there is no wrapper to write:</p>
-<pre tabindex="0" role="group" aria-label="Margyn as a GitHub Actions step">- run: npx margyn .</pre>
-  <p class="prose" style="margin-top:16px">The four static checks are free forever, with no account
-    and no licence. <strong>Watch is $8.99 a month</strong> and adds the mutation proof, which is the
-    check that costs real machine time: it edits your tree and runs your whole suite once per
-    mutation. Three days free.</p>
-  <p class="prose">The licence is signed and verified offline, so the paid check runs on a runner with
-    no network. Ask for it without one and Margyn prints the reason, runs the free scan in full, then
-    exits on your findings. Billing is not a reason to break someone's build.</p>
-  <p class="sm"><a href="/pricing">Pricing and what a licence is</a> &middot; <a href="/docs#ci">The
-    CI setup</a> &middot; <a href="/security">Why there is no hosted scan</a></p>
-</div></section>
-
-<section><div class="wrap">
-  <h2>Where this actually is</h2>
-  <p class="prose">Margyn went public this month. It has no customers yet. This page carries no
-    testimonials, no logos and no download count, because there are none to report and a
-    placeholder version of those would be the exact thing this tool was built to catch.</p>
+  <h2>Billing, stated plainly</h2>
   <table class="st">
-    <tr><td>Finished</td><td>All five checks. 41 tests, zero dependencies. Each check proves
-      it fires on a planted defect, then proves it goes quiet on the fixed shape.</td></tr>
-    <tr><td>Measured</td><td>Precision. Five real repositories went from 132, 51, 20, 6 and 12
-      findings to 0, 2, 2, 2 and 0 after four fixes. The eight that remain are true.</td></tr>
-    <tr><td>Honest about</td><td>The mutation proof is the newest check. Capped at four
-      mutations by default, so it under-reports on purpose.</td></tr>
-    <tr><td>Not built</td><td>Generating the fix rather than naming the defect. Local versus
-      CI environment divergence.</td></tr>
+    <tr><th>Price</th><td>8.99 USD per month, per repository owner. No per seat and no per
+      committer billing: a CI gate has no seats, so charging for engineers who never open the tool
+      would be charging for nothing.</td></tr>
+    <tr><th>Trial</th><td>Three days at no charge. Checkout tells you what it needs before you
+      confirm anything.</td></tr>
+    <tr><th>Renewal</th><td>Monthly, until you cancel.</td></tr>
+    <tr><th>Cancelling</th><td>Any time. The licence on your disk keeps working until it expires
+      and the four free checks are unaffected.</td></tr>
+    <tr><th>Refunds</th><td>Ask within 14 days of a charge and it is refunded. See the
+      <a href="/terms">terms</a>.</td></tr>
+    <tr><th>Cards</th><td>Handled by <a href="https://tiun.business">Tiun</a>, which runs sign in
+      and checkout. We never see a card number.</td></tr>
+    <tr><th>Licence validity</th><td>31 days from the moment it is issued. Take a new one whenever
+      you like while the subscription is active, which is also how it stops working on its own if
+      the subscription lapses.</td></tr>
   </table>
-  <p class="sm prose" style="margin-top:18px">You do not have to believe any of it. Run it on
-    your own repository.</p>
 </div></section>
 
 <section><div class="wrap">
-  <h2>Run it on your own repository</h2>
+  <h2>Questions people actually ask</h2>
+  <div class="faq prose">
+    <details><summary>Do I need an account to try it?</summary>
+      <p>No. <code>npx margyn /path/to/repo</code> needs no sign in, no key and no network. An
+        account exists to buy the mutation proof and collect a licence, nothing else.</p></details>
+    <details><summary>What happens if my licence expires during a build?</summary>
+      <p>The mutation proof is skipped and the reason is printed. The free scan still runs in full
+        and the exit code still reflects your findings rather than your billing.</p></details>
+    <details><summary>Is my code uploaded anywhere?</summary>
+      <p>No. There is nowhere for it to go. Margyn is a local CLI. The deployed site has no
+        scan endpoint on purpose, which you can check: <code>POST /api/scan</code> answers 404.</p></details>
+    <details><summary>Mutation testing already exists. Why would I pay you for it?</summary>
+      <p>You would not, if a mutation score is what you want. Stryker gives that away and does it
+        better. Margyn runs a capped mutation proof as one check inside a five check audit. The
+        other four catch things a mutation framework structurally cannot: a file that is not in the
+        commit, a gate nobody invokes, a linter whose scope comes from the ignore file.</p></details>
+    <details><summary>It edits my files?</summary>
+      <p>Only under <code>--mutate</code>, only one file at a time, only after your suite has
+        passed unmutated. Each file is restored in a <code>finally</code> block and on
+        <code>SIGINT</code>. Leave the flag off and nothing is ever written.</p></details>
+    <details><summary>What if you disappear?</summary>
+      <p>The CLI is MIT licensed with no runtime dependencies, so it is readable and forkable. It
+        is a CLI rather than a service, so there is nothing to go dark and nothing to migrate off.
+        The licence is verified offline, so a scan never needs us to be reachable.</p></details>
+  </div>
+</div></section>
+
+<section><div class="wrap">
+  <h2>Run it before you decide</h2>
   <div class="run">
-    <code id="cmd-end">npx margyn /path/to/repo</code>
-    <button data-copy="cmd-end">Copy</button>
+    <code id="cmd-close">npx margyn /path/to/repo</code>
+    <button data-copy="cmd-close">Copy</button>
   </div>
   <p class="sm prose">If it finds nothing, you learned that for free. If it finds something, every
     line comes with a command that proves it.</p>

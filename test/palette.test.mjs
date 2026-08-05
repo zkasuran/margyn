@@ -17,13 +17,17 @@ import { DARK, LIGHT, audit, contrast } from "../bin/contrast.mjs";
 const here = dirname(fileURLToPath(import.meta.url));
 const PAGE = join(here, "..", "web", "public", "index.html");
 
-/** Pulls `--name: #hex;` pairs out of one CSS block. */
+/** Pulls `--name: light-dark(#light, #dark);` pairs out of the token block. */
 function tokensIn(css) {
-  const found = {};
-  for (const [, name, hex] of css.matchAll(/--([a-z0-9-]+)\s*:\s*(#[0-9a-fA-F]{6})\b/g)) {
-    found[name] = hex.toUpperCase();
+  const light = {};
+  const dark = {};
+  for (const [, name, l, d] of css.matchAll(
+    /--([a-z0-9-]+)\s*:\s*light-dark\(\s*(#[0-9a-fA-F]{6})\s*,\s*(#[0-9a-fA-F]{6})\s*\)/g,
+  )) {
+    light[name] = l.toUpperCase();
+    dark[name] = d.toUpperCase();
   }
-  return found;
+  return { light, dark };
 }
 
 test("the contrast gate agrees with itself on known WCAG values", () => {
@@ -46,20 +50,18 @@ test("every text pair clears 4.5 to 1 in both modes", () => {
 
 test("the page's own custom properties match the audited palette", () => {
   const html = readFileSync(PAGE, "utf8");
-  // The light tokens live in :root, the dark ones in the dark-mode block. Both
-  // are matched by their opening selector so a renamed block fails loudly.
-  const light = html.match(/:root\s*\{([^}]*)\}/);
-  assert.ok(light, "no :root block found in index.html");
-  const dark = html.match(/\[data-theme=["']dark["']\]\s*\{([^}]*)\}/);
-  assert.ok(dark, "no [data-theme='dark'] block found in index.html");
+  // One block holds both modes, because light-dark() reads the used colour
+  // scheme. That is the point: there is no second block to drift out of step.
+  const root = html.match(/:root\s*\{([\s\S]*?)\}/);
+  assert.ok(root, "no :root block found in index.html");
+  const got = tokensIn(root[1]);
 
-  for (const [mode, block, want] of [["light", light[1], LIGHT], ["dark", dark[1], DARK]]) {
-    const got = tokensIn(block);
+  for (const [mode, want] of [["light", LIGHT], ["dark", DARK]]) {
     for (const [name, hex] of Object.entries(want)) {
       assert.equal(
-        got[name],
+        got[mode][name],
         hex.toUpperCase(),
-        `${mode} --${name} is ${got[name] ?? "missing"} in index.html but ${hex} in the contrast gate`,
+        `${mode} --${name} is ${got[mode][name] ?? "missing"} in index.html but ${hex} in the contrast gate`,
       );
     }
   }

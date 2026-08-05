@@ -1,22 +1,45 @@
 {
   "name": "margyn",
-  "version": "0.0.1",
-  "private": true,
+  "version": "0.1.0",
   "type": "module",
-  "description": "Proves your checks do not check anything. Every finding ships a reproduction.",
+  "description": "Audits your test suite instead of your code. Finds tests that assert nothing, files git never committed and gates nothing invokes. Every finding ships a reproduction you can run.",
   "license": "MIT",
+  "homepage": "https://margyn.xyz",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/zkasuran/margyn.git"
+  },
+  "bugs": {
+    "url": "https://github.com/zkasuran/margyn/issues"
+  },
+  "keywords": [
+    "testing",
+    "test-suite",
+    "mutation-testing",
+    "ci",
+    "audit",
+    "static-analysis"
+  ],
   "engines": {
     "node": ">=22"
   },
   "bin": {
     "margyn": "./src/cli.mjs"
   },
+  "files": [
+    "src",
+    "README.md",
+    "LICENSE"
+  ],
   "scripts": {
     "test": "node --test test/*.test.mjs",
     "scan": "node src/cli.mjs",
     "dev": "node web/server.mjs",
-    "worker:dev": "npm run worker:bundle && wrangler dev",
-    "worker:deploy": "npm run worker:bundle && wrangler deploy",
+    "pages": "node bin/build-pages.mjs",
+    "assets": "node bin/assets.mjs",
+    "build": "npm run pages && npm run worker:bundle",
+    "worker:dev": "npm run build && wrangler dev",
+    "worker:deploy": "npm run build && wrangler deploy",
     "worker:bundle": "node bin/bundle-static.mjs",
     "contrast": "node bin/contrast.mjs"
   },

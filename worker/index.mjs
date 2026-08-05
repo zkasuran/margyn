@@ -151,18 +151,32 @@ export default {
       return minted.ok ? json(minted) : json({ error: minted.error }, minted.status);
     }
 
-    // Everything else is the frontend, bundled into this script. `/` is the page,
-    // and an unknown path is a 404 rather than the page, so a typo in an asset
-    // URL fails loudly instead of returning HTML to something expecting a module.
-    const path = url.pathname === "/" ? "/index.html" : url.pathname;
-    const asset = STATIC[path];
-    if (!asset) return new Response("not found", { status: 404 });
-    return new Response(asset.body, {
+    // Everything else is the frontend, bundled into this script. Pages are served
+    // without their extension, so `/pricing` finds `pricing.html` while an asset
+    // is still looked up by its exact name. A path that matches neither is a 404
+    // rather than the home page, so a typo in an asset URL fails loudly instead
+    // of returning HTML to something expecting a module.
+    const clean = url.pathname === "/" ? "/index.html" : url.pathname.replace(/\/+$/, "");
+    const asset = STATIC[clean] ?? STATIC[`${clean}.html`];
+    if (!asset) {
+      const missing = STATIC["/404.html"];
+      return missing
+        ? new Response(missing.body, {
+            status: 404,
+            headers: { "content-type": missing.type, "cache-control": "no-store" },
+          })
+        : new Response("not found", { status: 404 });
+    }
+    // Images are stored base64 and decoded here. Serving the base64 text would be
+    // a 200 with a broken body, which is worse than a 404.
+    const body = asset.binary ? Uint8Array.from(atob(asset.body), (c) => c.charCodeAt(0)) : asset.body;
+    return new Response(body, {
       headers: {
         "content-type": asset.type,
-        // Short, because the page and the API deploy together and a stale page
-        // against a new API is the one failure this design rules out.
-        "cache-control": "public, max-age=60",
+        // Short on the page, because the page and the API deploy together and a
+        // stale page against a new API is the one failure this design rules out.
+        // Long on the images, which are content-addressed by their own bytes.
+        "cache-control": asset.binary ? "public, max-age=604800" : "public, max-age=60",
       },
     });
   },

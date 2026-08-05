@@ -3,14 +3,14 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Margyn: prove your test suite actually tests something</title>
-<meta name="description" content="Margyn audits the machinery that is supposed to catch your bugs. It finds tests that assert nothing, files git never committed and gates nothing invokes. Every finding ships a reproduction you can run.">
-<link rel="canonical" href="https://margyn.xyz/">
+<title>Margyn privacy: the CLI collects nothing and never connects</title>
+<meta name="description" content="The scanner makes no network call at any point. The site holds an email address through Tiun and nothing else. No analytics, no trackers, no code, no scan results.">
+<link rel="canonical" href="https://margyn.xyz/privacy">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Margyn">
-<meta property="og:url" content="https://margyn.xyz/">
-<meta property="og:title" content="Your tests pass. That is not the same as working.">
-<meta property="og:description" content="Margyn audits the machinery that is supposed to catch your bugs. It finds tests that assert nothing, files git never committed and gates nothing invokes. Every finding ships a reproduction you can run.">
+<meta property="og:url" content="https://margyn.xyz/privacy">
+<meta property="og:title" content="Margyn privacy: the CLI collects nothing and never connects">
+<meta property="og:description" content="The scanner makes no network call at any point. The site holds an email address through Tiun and nothing else. No analytics, no trackers, no code, no scan results.">
 <meta property="og:image" content="https://margyn.xyz/og.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
@@ -20,20 +20,8 @@
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <link rel="alternate icon" href="/favicon.ico" sizes="16x16 32x32">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
-<link rel="preconnect" href="https://esm.sh" crossorigin>
-<script type="application/ld+json">
-{"@context":"https://schema.org","@type":"SoftwareApplication","name":"Margyn",
-"applicationCategory":"DeveloperApplication","operatingSystem":"Linux, macOS, Windows",
-"url":"https://margyn.xyz/","codeRepository":"https://github.com/zkasuran/margyn",
-"description":"Audits the verification layer of a repository. Finds tests that assert nothing, files the repo reads that git never committed, gates no workflow invokes and linter exclusions that live in the ignore file. Every finding ships a runnable reproduction.",
-"softwareRequirements":"Node.js 22 or newer, git","license":"https://opensource.org/licenses/MIT",
-"offers":[{"@type":"Offer","name":"Free scan","price":"0","priceCurrency":"USD",
-"description":"Four static checks, no account and no licence."},
-{"@type":"Offer","name":"Watch","price":"8.99","priceCurrency":"USD",
-"description":"Adds the mutation proof, with a 3 day free trial.",
-"priceSpecification":{"@type":"UnitPriceSpecification","price":"8.99","priceCurrency":"USD",
-"billingDuration":1,"billingIncrement":1,"unitCode":"MON"}}]}
-</script>
+
+
 <script>
 /* Applies a stored theme choice before first paint. A classic inline script on
    purpose: defer, async and type=module all run after paint, so any of them
@@ -329,165 +317,83 @@ footer nav a:hover { color: var(--accent) }
     <label for="t-dark" title="Dark"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 14.5A8.5 8.5 0 1 1 9.5 4a7 7 0 0 0 10.5 10.5z"/></svg><span class="sr">Dark</span></label>
   </fieldset>
 
-  <p class="who" id="who" role="status" aria-live="polite"></p>
-  <button id="login" class="ghost" hidden>Sign in</button>
-  <button id="licence" hidden>Get my licence</button>
-  <button id="logout" class="ghost" hidden>Sign out</button>
+  <a class="btn sm" href="/pricing">Get Watch</a>
 </div></header>
 
 <main id="main">
-<div class="wrap"><div class="out" id="out" role="region" aria-label="Your licence"></div></div>
 
-<section class="hero"><div class="wrap">
-  <h1 class="prose">Your tests pass. That is not the same as working.</h1>
-  <p class="lede prose">Margyn audits the machinery that is supposed to catch your bugs. It
-    does not review your code. Every finding ships a reproduction you can run. No reproduction,
-    no finding.</p>
+<section class="phead"><div class="wrap">
+  <h1 class="prose">Privacy</h1>
+  <p class="lede prose">Last updated 2026-08-06. The short version: the tool that reads your code
+    never connects to anything, so there is no data from it to have a policy about.</p>
+</div></section>
 
-  <div class="run">
-    <code id="cmd">npx margyn /path/to/repo</code>
-    <button id="copy" data-copy="cmd">Copy</button>
+<div class="wrap"><div class="doc">
+  <nav class="toc" aria-label="On this page">
+    <p>Contents</p>
+    <a href="#cli">The command line tool</a>
+    <a href="#site">The site</a>
+    <a href="#licence">What is inside a licence</a>
+    <a href="#browser">Cookies and storage</a>
+    <a href="#third">Who else is involved</a>
+    <a href="#rights">Your data, your call</a>
+  </nav>
+  <div class="docbody">
+
+<h2 id="cli">The command line tool</h2>
+<p>It collects nothing and it sends nothing. No telemetry, no version ping, no crash reporting, no
+  licence call home. It reads your working tree, shells out to git, then under
+  <code>--mutate</code> it runs your own test command. That is the whole surface.</p>
+<p>You do not have to take that on trust. It is one directory of ES modules with no runtime
+  dependencies, so grep it for <code>fetch</code> and <code>http</code> and see for yourself. The
+  <a href="/security">security page</a> lists every process it starts.</p>
+
+<h2 id="site">The site</h2>
+<p>The pages you are reading are static files served from a Cloudflare Worker. There is no analytics
+  script, no tag manager, no session recorder and no advertising pixel on any page of this site.
+  View source and the only JavaScript is one module that switches the colour theme, copies a command
+  to your clipboard and, on two pages, loads the sign in SDK.</p>
+<p>If you sign in, an email address enters the picture. <a href="https://tiun.business">Tiun</a>
+  holds the account and the payment record. We ask it two questions: is this browser signed in,
+  and has this account bought anything. That answer is what a licence is minted from.</p>
+<p>Cloudflare sees the request itself, the way any host does: an IP address, a path, a user agent, a
+  timestamp. We do not build a profile from it and we run no reporting on it.</p>
+
+<h2 id="licence">What is inside a licence</h2>
+<p>A licence is a signed payload. It carries the product names it unlocks, the account email, the
+  issue time and the expiry. Nothing else. It is signed rather than encrypted, so treat the
+  email in it as visible to anyone you hand the licence to. That is deliberate: a licence that
+  turns up in a public repository is traceable back to the account it was issued for.</p>
+
+<h2 id="browser">Cookies and storage</h2>
+<p>One key in <code>localStorage</code>, <code>margyn-theme</code>, holding the word light or dark
+  when you pick one. It never leaves your browser and clearing site data removes it.</p>
+<p>Sign in and checkout set whatever cookies Tiun's session needs. Those are theirs. They are only
+  set once you sign in, so reading these pages sets none of them.</p>
+
+<h2 id="third">Who else is involved</h2>
+<table class="st">
+  <tr><th>Tiun</th><td>Authentication, subscriptions and card handling. Holds your email and your
+    payment record. We never receive card details.</td></tr>
+  <tr><th>Cloudflare</th><td>Serves every page and runs the licence endpoint, so it sees the
+    request metadata for any visit.</td></tr>
+  <tr><th>esm.sh</th><td>Delivers the sign in SDK to your browser on the home page and the pricing
+    page, which means it sees your IP address when one of those two pages loads. The other pages do
+    not load it.</td></tr>
+  <tr><th>npm</th><td>When you run <code>npx margyn</code>, npm fetches the package. That request
+    goes to npm rather than to us, so we get no report of it.</td></tr>
+</table>
+
+<h2 id="rights">Your data, your call</h2>
+<p>To see or delete what is held about you, the account lives with Tiun, so start there. If a
+  request needs us, <a href="https://github.com/zkasuran/margyn/issues">open an issue</a> and say
+  what you want done. There is no dataset here to export beyond the account record and the payment
+  history that Tiun keeps.</p>
+<p>We do not sell anything to anyone. There is no list, no data sharing arrangement and no third
+  party in the chain beyond the four named above.</p>
+
   </div>
-  <p class="sm prose">Zero dependencies. Node 22 and git. Exit code 1 on findings, so it works
-    as a CI gate. Your code never leaves your machine.</p>
-  <p class="hero-links sm"><a href="#proof">See a real finding</a><a href="/docs">Documentation</a><a
-    href="/pricing">Pricing</a></p>
-</div></section>
-
-<section id="proof"><div class="wrap">
-  <p class="eyebrow">A real run</p>
-  <h2>Against the commit that broke</h2>
-  <p class="prose">Eight vendored modules sat under a path containing <code>dist/</code>, which
-    the root <code>.gitignore</code> excludes at any depth, so git dropped all eight while they
-    sat on disk. Locally: 26 tests green. In CI: two failed, reading files never pushed. The
-    diff was innocent. The absence was the bug.</p>
-<pre tabindex="0" role="group" aria-label="Terminal output from a real scan"><b>margyn /tmp/moss</b>
-
-2 findings, each with a reproduction you can run.
-
-<b>1. packages/protocols/aave/abis-src/dist/AaveV3Monad.mjs is read by</b>
-<b>   packages/protocols/aave/README.md but git ignores it</b>
-   <span class="r">HIGH</span>  <span class="d">ignored-source     ignore rule: .gitignore:2:dist/</span>
-   <span class="d">reproduce:</span>
-     git archive HEAD | tar -t | grep -qx '&lt;path&gt;' || echo 'ABSENT from HEAD'
-     test -f '&lt;path&gt;' &amp;&amp; echo 'PRESENT on disk'</pre>
-  <p class="sm prose" style="margin-top:14px">Two facts about one file that disagree. Against
-    the fixed tree both findings are gone, because a checker that cannot be shown to go quiet
-    is as hollow as what it hunts.</p>
-</div></section>
-
-<section><div class="wrap">
-  <p class="eyebrow">We ran it on ourselves</p>
-  <h2>Margyn finds holes in Margyn</h2>
-  <p class="prose">The mutation proof inverts one line, runs the suite, then reports the suite
-    that stayed green anyway. Pointed at our own repository at the default cap of four
-    mutations, all four survived. Raise the cap to twelve and six do.</p>
-<pre tabindex="0" role="group" aria-label="Four surviving mutations in Margyn's own suite">bin/build-pages.mjs            === -&gt; !==             <span class="r">suite still passed</span>
-bin/contrast.mjs               === -&gt; !==             <span class="r">suite still passed</span>
-src/checks/ignored-source.mjs  return true -&gt; false   <span class="r">suite still passed</span>
-src/checks/mutation.mjs        return true -&gt; false   <span class="r">suite still passed</span></pre>
-  <p class="prose" style="margin-top:16px">The last one is the mutation checker. Our own tool
-    inverted a line inside our own mutation checker and 41 tests reported success. We publish
-    the number rather than the cap that flatters it.</p>
-  <p class="sm prose">Check it on our repository rather than taking it from us. The paid gate is on
-    the CLI flag, not on the code, so a clone reproduces this without a licence:</p>
-<pre tabindex="0" role="group" aria-label="Reproducing the self audit from a clone">git clone https://github.com/zkasuran/margyn &amp;&amp; cd margyn &amp;&amp; npm test
-node --input-type=module -e 'import { mutationProof } from "./src/checks/mutation.mjs";
-console.log(mutationProof(process.cwd(), { max: 12 }).map(f =&gt; f.summary));'</pre>
-</div></section>
-
-<section><div class="wrap">
-  <h2>Your AI wrote 400 tests last month. How many can fail?</h2>
-  <p class="prose">Test volume went up and nobody audited the tests. The tools that generate
-    them cannot check them, since they wrote them. Coverage will not tell you either: Codecov's
-    own blog concedes that
-    <a href="https://about.codecov.io/blog/mutation-testing-how-to-ensure-code-coverage-isnt-a-vanity-metric/">it
-    is too easy to write high-coverage tests that don't deliver value</a>. The product still
-    centres the percentage.</p>
-  <p class="prose">Margyn is the other half. It reads what your repository claims to verify,
-    then proves which of those claims are empty.</p>
-  <p class="sm prose">Want a mutation score for a whole codebase? That is
-    <a href="https://stryker-mutator.io/">Stryker</a>, free and better at it than we are. Margyn
-    runs a capped mutation proof as one check in a five check audit, then prints the surviving
-    line. We never print a score.</p>
-</div></section>
-
-<section><div class="wrap">
-  <h2>What it looks for</h2>
-  <ul class="checks prose">
-    <li>
-      <div class="top"><span class="nm">ignored-source</span><span class="sev high">high</span></div>
-      <p>Files the repo reads that git never committed. Green on your laptop because the file
-        is on your disk untracked, red in CI reading something that was never pushed.</p>
-    </li>
-    <li>
-      <div class="top"><span class="nm">no-assertion</span><span class="sev high">high</span></div>
-      <p>Tests that assert nothing. The body runs, throws nothing and reports green whatever
-        the code returned. Assertions reached through a helper still count.</p>
-    </li>
-    <li>
-      <div class="top"><span class="nm">mutation</span><span class="sev high">high</span><span class="paid">part of Watch</span></div>
-      <p>Inverts a line, runs the suite, reports the suite that stayed green anyway. There is
-        no arguing with a test that passed while the thing it guards was inverted.</p>
-    </li>
-    <li>
-      <div class="top"><span class="nm">unrun-check</span><span class="sev med">medium</span></div>
-      <p>A <code>test:online</code> or <code>verify</code> script that no workflow invokes and
-        no sibling script calls. It reads as coverage in the repository and cannot fail.</p>
-    </li>
-    <li>
-      <div class="top"><span class="nm">lint-blindspot</span><span class="sev med">medium</span></div>
-      <p>Linters whose exclusions come from <code>.gitignore</code> instead of their own
-        config, so a newly tracked path silently enters the tool's scope.</p>
-    </li>
-  </ul>
-  <p class="sm" style="margin-top:22px"><a href="/docs#checks">What fires each check, what
-    deliberately does not</a></p>
-</div></section>
-
-<section><div class="wrap">
-  <h2>It belongs in CI. At most it costs $8.99 a month.</h2>
-  <p class="prose">Exit code 1 when anything was found, so there is no wrapper to write:</p>
-<pre tabindex="0" role="group" aria-label="Margyn as a GitHub Actions step">- run: npx margyn .</pre>
-  <p class="prose" style="margin-top:16px">The four static checks are free forever, with no account
-    and no licence. <strong>Watch is $8.99 a month</strong> and adds the mutation proof, which is the
-    check that costs real machine time: it edits your tree and runs your whole suite once per
-    mutation. Three days free.</p>
-  <p class="prose">The licence is signed and verified offline, so the paid check runs on a runner with
-    no network. Ask for it without one and Margyn prints the reason, runs the free scan in full, then
-    exits on your findings. Billing is not a reason to break someone's build.</p>
-  <p class="sm"><a href="/pricing">Pricing and what a licence is</a> &middot; <a href="/docs#ci">The
-    CI setup</a> &middot; <a href="/security">Why there is no hosted scan</a></p>
-</div></section>
-
-<section><div class="wrap">
-  <h2>Where this actually is</h2>
-  <p class="prose">Margyn went public this month. It has no customers yet. This page carries no
-    testimonials, no logos and no download count, because there are none to report and a
-    placeholder version of those would be the exact thing this tool was built to catch.</p>
-  <table class="st">
-    <tr><td>Finished</td><td>All five checks. 41 tests, zero dependencies. Each check proves
-      it fires on a planted defect, then proves it goes quiet on the fixed shape.</td></tr>
-    <tr><td>Measured</td><td>Precision. Five real repositories went from 132, 51, 20, 6 and 12
-      findings to 0, 2, 2, 2 and 0 after four fixes. The eight that remain are true.</td></tr>
-    <tr><td>Honest about</td><td>The mutation proof is the newest check. Capped at four
-      mutations by default, so it under-reports on purpose.</td></tr>
-    <tr><td>Not built</td><td>Generating the fix rather than naming the defect. Local versus
-      CI environment divergence.</td></tr>
-  </table>
-  <p class="sm prose" style="margin-top:18px">You do not have to believe any of it. Run it on
-    your own repository.</p>
-</div></section>
-
-<section><div class="wrap">
-  <h2>Run it on your own repository</h2>
-  <div class="run">
-    <code id="cmd-end">npx margyn /path/to/repo</code>
-    <button data-copy="cmd-end">Copy</button>
-  </div>
-  <p class="sm prose">If it finds nothing, you learned that for free. If it finds something, every
-    line comes with a command that proves it.</p>
-</div></section>
+</div></div>
 
 </main>
 
@@ -516,6 +422,6 @@ console.log(mutationProof(process.cwd(), { max: 12 }).map(f =&gt; f.summary));'<
   <p class="sm footnote">Margyn. MIT licensed. Every number on this site was measured on the
     shipped product, not estimated.</p>
 </div></footer>
-<script type="module" src="/app.mjs"></script>
+<script type="module" src="/theme.mjs"></script>
 </body>
 </html>

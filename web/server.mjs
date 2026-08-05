@@ -71,7 +71,7 @@ const API_PREFIX = "live_api";
 /** Signs licences. Server-side only, and absent in a build that cannot mint. */
 const SIGNING_KEY = process.env.MARGYN_LICENCE_KEY;
 
-const MIME = { ".html": "text/html", ".mjs": "text/javascript", ".js": "text/javascript", ".css": "text/css", ".json": "application/json", ".svg": "image/svg+xml" };
+const MIME = { ".html": "text/html", ".mjs": "text/javascript", ".js": "text/javascript", ".css": "text/css", ".json": "application/json", ".svg": "image/svg+xml", ".xml": "application/xml", ".txt": "text/plain", ".png": "image/png", ".ico": "image/x-icon" };
 
 const json = (res, code, body) => {
   const payload = JSON.stringify(body);
@@ -175,9 +175,18 @@ const server = createServer(async (req, res) => {
     }
   }
 
-  const file = url.pathname === "/" ? "index.html" : url.pathname.slice(1);
-  const abs = join(PUBLIC, file);
-  if (!abs.startsWith(PUBLIC) || !existsSync(abs)) {
+  // Pages are served without their extension, the same way the deployed worker
+  // does it, so a link that works here cannot 404 in production.
+  const file = url.pathname === "/" ? "index.html" : url.pathname.replace(/\/+$/, "").slice(1);
+  const candidates = [join(PUBLIC, file), join(PUBLIC, `${file}.html`)];
+  const abs = candidates.find((p) => p.startsWith(PUBLIC) && existsSync(p) && !p.endsWith("/"));
+  if (!abs) {
+    const missing = join(PUBLIC, "404.html");
+    if (existsSync(missing)) {
+      res.writeHead(404, { "content-type": "text/html" });
+      res.end(readFileSync(missing));
+      return;
+    }
     res.writeHead(404).end("not found");
     return;
   }
