@@ -41,11 +41,16 @@ through a local helper count, so a test whose whole body is
 `expectTreeError(...)` is not reported.
 
 **`mutation`, high, opt-in.** The strongest evidence this tool has. It inverts a
-line, runs the suite, and reports the suite that stayed green anyway. There is no
+line, runs the suite, then reports the suite that stayed green anyway. There is no
 arguing with a test that passed while the thing it guards was inverted. A red
-baseline aborts the run rather than producing meaningless results, mutations are
-capped, each run is timed out, and the file is restored in a `finally` block and
-on `SIGINT`, so an interrupted scan cannot leave a mutated tree behind.
+baseline aborts the run rather than producing meaningless results, each run is
+timed out, then the file is restored in a `finally` block and on `SIGINT`, so an
+interrupted scan cannot leave a mutated tree behind.
+
+It is **capped at four mutations by default**, so it under-reports on purpose:
+one pass costs one full test run per mutation. Raise the cap to find more. Run it
+against Margyn's own repository at the default cap and three of the four survive,
+one of them in the mutation checker itself.
 
 ## Precision, measured
 
@@ -169,7 +174,7 @@ both valid. A licence therefore works the same whichever host issued it.
 npm test
 ```
 
-Twenty-one tests, no dependencies. The check tests each build a real git
+Twenty-six tests, no dependencies. The check tests each build a real git
 repository in a temp directory, plant exactly one defect, assert the check finds
 it, then plant the fixed shape and assert the check stays silent. The licence
 tests carry real signatures from the production key and prove that a flipped

@@ -36,7 +36,7 @@ Two things live in the Tiun dashboard and cannot be changed from code:
 `node src/cli.mjs /path/to/repo`, zero dependencies, exit 1 on any finding. Five
 checks: `ignored-source` (high), `no-assertion` (high), `unrun-check`,
 `lint-blindspot`, plus `mutation` (high, opt-in behind `--mutate`). `npm test` is
-**10 passing, 0 failing**, re-run 2026-08-05 after the rename. Each test proves the
+**26 passing, 0 failing**, re-run 2026-08-05. Each test proves the
 check fires on a planted defect and goes quiet on the fixed shape.
 
 Validated against a real failure: reconstructed moss `c6cbb45` in a detached
