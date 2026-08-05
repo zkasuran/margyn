@@ -526,7 +526,7 @@ Fetched 2026-08-05. The pattern is consistent and none of them apologise.
 
 **Ghostty** is the cleanest example. Its about page calls the moment "the initial
 public release", says outright "I am not trying to claim that Ghostty is the best
-(i.e. the fastest, most feature-rich, or most native)", admits `libghostty` "is
+(i.e. the fastest, most feature-rich or most native)", admits `libghostty` "is
 not yet a stable API and has not been released as a standalone, stable library",
 defers benchmarks to the future rather than showing weak ones and concedes that
 "native" on Linux is a compromise because GTK4 is only the closest thing to a

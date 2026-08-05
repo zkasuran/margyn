@@ -17,7 +17,8 @@
     "dev": "node web/server.mjs",
     "worker:dev": "npm run worker:bundle && wrangler dev",
     "worker:deploy": "npm run worker:bundle && wrangler deploy",
-    "worker:bundle": "node bin/bundle-static.mjs"
+    "worker:bundle": "node bin/bundle-static.mjs",
+    "contrast": "node bin/contrast.mjs"
   },
   "devDependencies": {
     "wrangler": "^4.118.0"
