@@ -23,6 +23,7 @@ Audits the machinery that is supposed to catch your bugs. Every finding ships a
 reproduction you can run.
 
 usage: margyn [path] [options]
+       npx margyn-scan [path] [options]     (zero install)
 
   path         repository to scan. Defaults to the current directory
   --mutate     run the mutation proof too. Part of Watch, so it needs a licence

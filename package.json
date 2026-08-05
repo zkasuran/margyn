@@ -1,6 +1,6 @@
 {
-  "name": "margyn",
-  "version": "0.1.0",
+  "name": "margyn-scan",
+  "version": "0.1.1",
   "type": "module",
   "description": "Audits your test suite instead of your code. Finds tests that assert nothing, files git never committed and gates nothing invokes. Every finding ships a reproduction you can run.",
   "license": "MIT",
@@ -24,7 +24,8 @@
     "node": ">=22"
   },
   "bin": {
-    "margyn": "./src/cli.mjs"
+    "margyn": "./src/cli.mjs",
+    "margyn-scan": "./src/cli.mjs"
   },
   "files": [
     "src",

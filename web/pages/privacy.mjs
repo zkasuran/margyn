@@ -63,7 +63,7 @@ export default {
   <tr><th>esm.sh</th><td>Delivers the sign in SDK to your browser on the home page and the pricing
     page, which means it sees your IP address when one of those two pages loads. The other pages do
     not load it.</td></tr>
-  <tr><th>npm</th><td>When you run <code>npx margyn</code>, npm fetches the package. That request
+  <tr><th>npm</th><td>When you run <code>npx margyn-scan</code>, npm fetches the package. That request
     goes to npm rather than to us, so we get no report of it.</td></tr>
 </table>
 

@@ -9,15 +9,16 @@ no finding.
 Zero dependencies. Node 22 or newer, plus git.
 
 ```bash
-npx margyn /path/to/repo
-npx margyn /path/to/repo --json
-npm install -g margyn        # or keep it pinned: npm install -D margyn
+npx margyn-scan /path/to/repo
+npx margyn-scan /path/to/repo --json
+npm install -g margyn-scan   # then the command on your path is: margyn
 ```
 
 Exit code is 1 when anything was found, so it works as a CI gate with no wrapper.
 
 ```
-margyn [path] [options]
+npx margyn-scan [path] [options]     # zero install
+margyn [path] [options]              # once it is on your path
 
   path         repository to scan. Defaults to the current directory
   --mutate     run the mutation proof too. Part of Watch, so it needs a licence
@@ -26,6 +27,9 @@ margyn [path] [options]
   --version    print the version
   --help       print the usage above
 ```
+
+The package is `margyn-scan` because npm refuses `margyn` as too close to an
+existing package called morgan. The command it installs is `margyn`.
 
 Site: [margyn.xyz](https://margyn.xyz). Documentation:
 [margyn.xyz/docs](https://margyn.xyz/docs). Pricing:
@@ -162,7 +166,7 @@ public key compiled into the source:
 
 ```bash
 export MARGYN_LICENCE=$(cat licence.txt)   # or ~/.margyn/licence
-margyn /path/to/repo --mutate
+npx margyn-scan /path/to/repo --mutate
 ```
 
 A refusal never fails your run. Ask for a paid check without a licence and you are

@@ -21,7 +21,7 @@ export default {
     <li><a href="/security">Security model</a></li>
   </ul>
   <div class="run">
-    <code id="cmd-404">npx margyn /path/to/repo</code>
+    <code id="cmd-404">npx margyn-scan /path/to/repo</code>
     <button data-copy="cmd-404">Copy</button>
   </div>
 </div></section>

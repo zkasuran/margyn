@@ -345,7 +345,7 @@ footer nav a:hover { color: var(--accent) }
     no finding.</p>
 
   <div class="run">
-    <code id="cmd">npx margyn /path/to/repo</code>
+    <code id="cmd">npx margyn-scan /path/to/repo</code>
     <button id="copy" data-copy="cmd">Copy</button>
   </div>
   <p class="sm prose">Zero dependencies. Node 22 and git. Exit code 1 on findings, so it works
@@ -448,7 +448,7 @@ console.log(mutationProof(process.cwd(), { max: 12 }).map(f =&gt; f.summary));'<
 <section><div class="wrap">
   <h2>It belongs in CI. At most it costs $8.99 a month.</h2>
   <p class="prose">Exit code 1 when anything was found, so there is no wrapper to write:</p>
-<pre tabindex="0" role="group" aria-label="Margyn as a GitHub Actions step">- run: npx margyn .</pre>
+<pre tabindex="0" role="group" aria-label="Margyn as a GitHub Actions step">- run: npx margyn-scan .</pre>
   <p class="prose" style="margin-top:16px">The four static checks are free forever, with no account
     and no licence. <strong>Watch is $8.99 a month</strong> and adds the mutation proof, which is the
     check that costs real machine time: it edits your tree and runs your whole suite once per
@@ -482,7 +482,7 @@ console.log(mutationProof(process.cwd(), { max: 12 }).map(f =&gt; f.summary));'<
 <section><div class="wrap">
   <h2>Run it on your own repository</h2>
   <div class="run">
-    <code id="cmd-end">npx margyn /path/to/repo</code>
+    <code id="cmd-end">npx margyn-scan /path/to/repo</code>
     <button data-copy="cmd-end">Copy</button>
   </div>
   <p class="sm prose">If it finds nothing, you learned that for free. If it finds something, every
@@ -494,7 +494,7 @@ console.log(mutationProof(process.cwd(), { max: 12 }).map(f =&gt; f.summary));'<
 <footer><div class="wrap">
   <div class="foot">
     <div class="footlead">
-      <p class="footcmd"><code>npx margyn /path/to/repo</code></p>
+      <p class="footcmd"><code>npx margyn-scan /path/to/repo</code></p>
       <p>If it finds nothing, you learned that for free. If it finds something, every line
         comes with a command that proves it.</p>
     </div>

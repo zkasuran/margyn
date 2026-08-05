@@ -41,13 +41,18 @@ export default {
 
 <h2 id="install">Install</h2>
 <p>There is nothing to install. This is the whole quickstart:</p>
-<pre tabindex="0" role="group" aria-label="Running Margyn with npx">npx margyn /path/to/repo</pre>
+<pre tabindex="0" role="group" aria-label="Running Margyn with npx">npx margyn-scan /path/to/repo</pre>
 <p>If you would rather have it on the path or pinned in a repository:</p>
-<pre tabindex="0" role="group" aria-label="Installing Margyn">npm install -g margyn          # global
-npm install -D margyn          # as a dev dependency, then: npx margyn .</pre>
+<pre tabindex="0" role="group" aria-label="Installing Margyn">npm install -g margyn-scan     # then the command on your path is: margyn
+npm install -D margyn-scan     # then, inside that repo: npx margyn .</pre>
+<p>The package is <code>margyn-scan</code> because npm refuses the name
+  <code>margyn</code> as too close to an existing package called morgan. The command it installs
+  is <code>margyn</code>, so the tool and the command agree even though the package name has to
+  carry a suffix.</p>
 
 <h2 id="usage">Usage</h2>
-<pre tabindex="0" role="group" aria-label="Command line options">margyn [path] [options]
+<pre tabindex="0" role="group" aria-label="Command line options">npx margyn-scan [path] [options]     # zero install
+margyn [path] [options]              # once it is on your path
 
   path         repository to scan. Defaults to the current directory
   --mutate     run the mutation proof too. Part of Watch, so it needs a licence
@@ -154,8 +159,8 @@ npm install -D margyn          # as a dev dependency, then: npx margyn .</pre>
   section.</p>
 
 <h2 id="mutate">The mutation proof</h2>
-<pre tabindex="0" role="group" aria-label="Running the mutation proof">margyn . --mutate            # four mutations, the default
-margyn . --mutate --max=12    # more mutations, more full test runs</pre>
+<pre tabindex="0" role="group" aria-label="Running the mutation proof">npx margyn-scan . --mutate            # four mutations, the default
+npx margyn-scan . --mutate --max=12   # more mutations, more full test runs</pre>
 <p>How a candidate is picked, in order:</p>
 <ol>
   <li>Your suite must pass unmutated. If the baseline is red the check aborts and says so, because a
@@ -200,10 +205,10 @@ this licence covers watch, not fixpack</pre>
 - uses: actions/setup-node@v4
   with:
     node-version: 22
-- run: npx margyn .</pre>
+- run: npx margyn-scan .</pre>
 <p>With the mutation proof, pass the licence as a secret. Keep it on a schedule or on pull requests to
   main rather than on every push, because it runs your suite once per mutation:</p>
-<pre tabindex="0" role="group" aria-label="GitHub Actions, with the mutation proof">- run: npx margyn . --mutate --max=8
+<pre tabindex="0" role="group" aria-label="GitHub Actions, with the mutation proof">- run: npx margyn-scan . --mutate --max=8
   env:
     MARGYN_LICENCE: \${{ secrets.MARGYN_LICENCE }}</pre>
 <p>Two things worth knowing before you add it to a required check. Margyn reads the repository as it
@@ -233,7 +238,8 @@ this licence covers watch, not fixpack</pre>
   code is unchanged by <code>--json</code>.</p>
 
 <h2 id="nothing">When it finds nothing</h2>
-<pre tabindex="0" role="group" aria-label="A clean result">margyn /path/to/repo
+<pre tabindex="0" role="group" aria-label="A clean result"><b>$ npx margyn-scan /path/to/repo</b>
+margyn /path/to/repo
 
 Nothing hollow found. Every check this tool knows how to test held up.</pre>
 <p>Then your verification layer held up on the five things this tool knows how to test, which is worth

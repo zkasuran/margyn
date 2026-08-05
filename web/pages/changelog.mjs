@@ -18,11 +18,18 @@ export default {
 
 <section><div class="wrap">
   <div class="rel">
-    <p class="when">0.1.0<br>2026-08-06</p>
+    <p class="when">0.1.1<br>2026-08-06</p>
     <div>
       <h3>First published release, plus a site instead of a page</h3>
-      <p>On npm, so <code>npx margyn /path/to/repo</code> resolves for anyone. The published
-        tarball carries <code>src</code>, the README and the licence, nothing else.</p>
+      <p>On npm as <code>margyn-scan</code>, so <code>npx margyn-scan /path/to/repo</code> resolves
+        for anyone. npm refuses the name <code>margyn</code> as too close to an existing package
+        called morgan, so the package carries a suffix while the command it installs stays
+        <code>margyn</code>. 0.1.0 went out first then was replaced within the hour, because its
+        README still printed the name we turned out not to be allowed. The tarball carries
+        <code>src</code>, the README and the licence, nothing else.</p>
+      <p>The CLI grew <code>--help</code>, <code>--version</code> and <code>--max</code>. The last
+        one is what makes "raise the cap" a sentence you can act on rather than an option only
+        reachable by importing the checker.</p>
       <p>The site went from one page to eight, all built through one shell: docs, pricing,
         changelog, security, terms, privacy and a real 404. Paths are served without the
         <code>.html</code>. Both <code>sitemap.xml</code> and <code>robots.txt</code> are generated

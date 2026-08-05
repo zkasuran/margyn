@@ -97,7 +97,7 @@ d.text((PAD, 384), "as working.", font=font(BOLD, 76), fill=INK)
 
 d.line([(PAD, 494), (W - PAD, 494)], fill=LINE, width=2)
 d.text((PAD, 522), "Every finding ships a reproduction you can run.", font=font(SANS, 30), fill=MUT)
-d.text((PAD, 566), "npx margyn /path/to/repo", font=font(MONO, 26), fill=ACCENT)
+d.text((PAD, 566), "npx margyn-scan /path/to/repo", font=font(MONO, 26), fill=ACCENT)
 
 # Flat colours quantise hard, so 16 colours is lossless here in practice and it
 # cuts the file by two thirds against truecolour.

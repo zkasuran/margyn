@@ -27,7 +27,7 @@ export default {
       </ul>
       <div class="fill"></div>
       <div class="run">
-        <code id="cmd-free">npx margyn /path/to/repo</code>
+        <code id="cmd-free">npx margyn-scan /path/to/repo</code>
         <button data-copy="cmd-free">Copy</button>
       </div>
     </div>
@@ -72,12 +72,12 @@ export default {
   <h2>What you get is a licence, not a login</h2>
   <p class="prose">After checkout, the button in the top bar hands you a signed licence. Put it
     anywhere the CLI can read it:</p>
-<pre tabindex="0" role="group" aria-label="Installing a licence"><b>$ margyn /path/to/repo --mutate</b>
+<pre tabindex="0" role="group" aria-label="Installing a licence"><b>$ npx margyn-scan /path/to/repo --mutate</b>
 The mutation proof is part of Watch and it is locked: no licence found.
 Everything below is the free scan, which ran in full.
 
 <b>$ mkdir -p ~/.margyn &amp;&amp; pbpaste &gt; ~/.margyn/licence</b>   <span class="d"># or export MARGYN_LICENCE=...</span>
-<b>$ margyn /path/to/repo --mutate</b>
+<b>$ npx margyn-scan /path/to/repo --mutate</b>
 4 findings, each with a reproduction you can run.</pre>
   <p class="prose" style="margin-top:16px">The licence is signed with Ed25519 and checked against a
     public key compiled into the CLI, so verifying it needs no network. That is the whole reason
@@ -115,7 +115,7 @@ Everything below is the free scan, which ran in full.
   <h2>Questions people actually ask</h2>
   <div class="faq prose">
     <details><summary>Do I need an account to try it?</summary>
-      <p>No. <code>npx margyn /path/to/repo</code> needs no sign in, no key and no network. An
+      <p>No. <code>npx margyn-scan /path/to/repo</code> needs no sign in, no key and no network. An
         account exists to buy the mutation proof and collect a licence, nothing else.</p></details>
     <details><summary>What happens if my licence expires during a build?</summary>
       <p>The mutation proof is skipped and the reason is printed. The free scan still runs in full
@@ -142,7 +142,7 @@ Everything below is the free scan, which ran in full.
 <section><div class="wrap">
   <h2>Run it before you decide</h2>
   <div class="run">
-    <code id="cmd-close">npx margyn /path/to/repo</code>
+    <code id="cmd-close">npx margyn-scan /path/to/repo</code>
     <button data-copy="cmd-close">Copy</button>
   </div>
   <p class="sm prose">If it finds nothing, you learned that for free. If it finds something, every
