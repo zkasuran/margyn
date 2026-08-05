@@ -13,6 +13,12 @@
   },
   "scripts": {
     "test": "node --test test/*.test.mjs",
-    "scan": "node src/cli.mjs"
+    "scan": "node src/cli.mjs",
+    "dev": "node web/server.mjs",
+    "worker:dev": "wrangler dev",
+    "worker:deploy": "wrangler deploy"
+  },
+  "devDependencies": {
+    "wrangler": "^4.118.0"
   }
 }

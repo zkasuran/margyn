@@ -1,0 +1,8 @@
+# Local wrangler dev reads this file. Copy to .dev.vars, which is gitignored.
+# The real values live in work/tiun-hackathon/.env, outside every repository.
+TIUN_ENV=sandbox
+TIUN_SANDBOX_SNIPPET_ID=
+TIUN_SANDBOX_API_KEY=
+TIUN_SANDBOX_PRODUCT_WATCH=
+TIUN_SANDBOX_PRODUCT_FIXPACK=
+MARGYN_LICENCE_KEY=

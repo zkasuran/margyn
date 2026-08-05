@@ -12,13 +12,14 @@
  * private key never leaves the server, so a licence is a fact anyone can check
  * and nobody can forge.
  *
- * Token shape is `base64url(payload).base64url(signature)`. That is a JWT in
- * spirit, without a library to parse a header whose two fields we already know.
+ * The token format lives in licence-format.mjs, because the deployed Worker
+ * mints the same tokens with WebCrypto and the two must not drift.
  */
 import { createPrivateKey, createPublicKey, sign, verify } from "node:crypto";
 import { existsSync, readFileSync } from "node:fs";
 import { homedir } from "node:os";
 import { join } from "node:path";
+import { bodyOf, bytesToSign, decode, payloadOf, splitToken, tokenOf } from "./licence-format.mjs";
 
 /**
  * The verifying half of the pair, SPKI DER in base64. Public by design: it
@@ -26,9 +27,6 @@ import { join } from "node:path";
  * release, which is the price of scans that need no network.
  */
 const PUBLIC_KEY_DER = "MCowBQYDK2VwAyEA/yodBs8rIx0kY4wXhgblL0rqJt+592jaJc9LlEzgasI=";
-
-const encode = (buf) => Buffer.from(buf).toString("base64url");
-const decode = (str) => Buffer.from(str, "base64url");
 
 let cachedKey = null;
 function publicKey() {
@@ -41,9 +39,9 @@ function publicKey() {
  * no private key to pass in.
  */
 export function mintLicence(payload, privateKeyDerBase64) {
-  const body = encode(JSON.stringify(payload));
+  const body = bodyOf(payload);
   const key = createPrivateKey({ key: decode(privateKeyDerBase64), format: "der", type: "pkcs8" });
-  return `${body}.${encode(sign(null, Buffer.from(body), key))}`;
+  return tokenOf(body, sign(null, bytesToSign(body), key));
 }
 
 /**
@@ -54,26 +52,20 @@ export function mintLicence(payload, privateKeyDerBase64) {
  * a user who cannot tell them apart files the wrong bug.
  */
 export function verifyLicence(token, now = Date.now()) {
-  if (typeof token !== "string" || !token.includes(".")) {
-    return { ok: false, reason: "not a licence token" };
-  }
-  const [body, signature, ...rest] = token.split(".");
-  if (!body || !signature || rest.length > 0) return { ok: false, reason: "licence token is malformed" };
+  const parts = splitToken(token);
+  if (parts.error) return { ok: false, reason: parts.error };
 
   let valid = false;
   try {
-    valid = verify(null, Buffer.from(body), publicKey(), decode(signature));
+    valid = verify(null, bytesToSign(parts.body), publicKey(), decode(parts.signature));
   } catch {
     return { ok: false, reason: "licence signature could not be checked" };
   }
   if (!valid) return { ok: false, reason: "licence signature does not match, so this licence was not issued by us" };
 
-  let payload;
-  try {
-    payload = JSON.parse(decode(body).toString("utf8"));
-  } catch {
-    return { ok: false, reason: "licence payload is not readable" };
-  }
+  const read = payloadOf(parts.body);
+  if (read.error) return { ok: false, reason: read.error };
+  const payload = read.payload;
 
   if (!payload.product) return { ok: false, reason: "licence names no product" };
   if (typeof payload.expires !== "number") return { ok: false, reason: "licence has no expiry" };

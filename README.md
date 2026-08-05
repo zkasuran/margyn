@@ -133,6 +133,36 @@ editing the product name or the expiry invalidates it, and forging one would nee
 private key that is not in this repository. `test/licence.test.mjs` proves both
 attacks fail using signatures made by the real signer.
 
+## Hosting
+
+The landing page, sign in, checkout and the licence endpoint deploy to Cloudflare
+Workers. The scanner does not, which is a decision rather than an omission:
+
+```bash
+npm run worker:dev      # local, no account needed
+npm run worker:deploy
+```
+
+`worker/index.mjs` serves `/api/config`, `/api/verify` and `/api/licence`. The
+three static files are uploaded as assets. **There is no `/api/scan` on the
+deployed worker.** The local server has one, because there the caller and the
+repository are the same machine. On a public host that route would take a
+filesystem path from a stranger and run git against it, which is a filesystem
+probe wearing a product's clothes. Your code never leaves your machine, which is
+also why the licence is verified offline.
+
+Secrets are set once per environment and never committed:
+
+```bash
+npx wrangler secret put TIUN_SANDBOX_API_KEY
+npx wrangler secret put MARGYN_LICENCE_KEY
+```
+
+The Worker signs with WebCrypto and the local server signs with `node:crypto`.
+Ed25519 is deterministic, so the same payload and key give the same bytes, and
+`test/worker.test.mjs` asserts the two tokens are identical rather than merely
+both valid. A licence therefore works the same whichever host issued it.
+
 ## Tests
 
 ```bash

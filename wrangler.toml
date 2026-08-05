@@ -1,0 +1,24 @@
+# The hosted half of Margyn. The scanner is not here on purpose: see worker/index.mjs.
+name = "margyn"
+main = "worker/index.mjs"
+compatibility_date = "2026-08-05"
+
+# The frontend is three static files and no build step, so the public directory
+# ships as-is. `run_worker_first` keeps the API on the script and lets the asset
+# server answer everything else without waking it.
+[assets]
+directory = "web/public"
+binding = "ASSETS"
+run_worker_first = ["/api/*"]
+
+# Sandbox by default. Getting this wrong towards live charges real money, so the
+# safe value is the one you get by forgetting to set it.
+[vars]
+TIUN_ENV = "sandbox"
+
+# Secrets are never in this file. Set them once per environment:
+#   npx wrangler secret put TIUN_SANDBOX_API_KEY
+#   npx wrangler secret put MARGYN_LICENCE_KEY
+# and the public ones too, since a var here would be committed:
+#   npx wrangler secret put TIUN_SANDBOX_SNIPPET_ID
+#   npx wrangler secret put TIUN_SANDBOX_PRODUCT_WATCH
