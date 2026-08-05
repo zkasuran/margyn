@@ -11,12 +11,20 @@
  * caller and the repository are the same machine. Here a scan route would take a
  * filesystem path from a stranger and run git against it, which is a filesystem
  * probe wearing a product's clothes. Scanning stays on the user's machine or in
- * their CI, which is also why the licence is verified offline.
+ * their CI, which is also why the licence is verified offline. `/api/config`
+ * reports `scan: false` so the page tells the truth about that rather than
+ * offering a button that 404s.
  *
- * WebCrypto signs, `node:crypto` signs locally, and both produce the same bytes
- * because the format lives in one module. Proven by test/worker.test.mjs.
+ * The frontend rides inside this script rather than as Workers Assets: the assets
+ * API returned a 500 on every attempt on 2026-08-05, and two files with no build
+ * step are far inside the script size limit. One upload also means the page and
+ * the API can never be deployed at different versions.
+ *
+ * WebCrypto signs here, `node:crypto` signs locally, and both produce the same
+ * bytes because the format lives in one module. Proven by test/worker.test.mjs.
  */
 import { bodyOf, bytesToSign, decode, tokenOf } from "../src/licence-format.mjs";
+import { STATIC } from "./static.generated.mjs";
 
 /** A licence lasts 31 days, so a lapsed subscription stops working on its own. */
 const LICENCE_DAYS = 31;
@@ -122,7 +130,8 @@ export default {
 
     if (url.pathname === "/api/config") {
       // The snippet id is a public client value. The API key is not, and is absent here.
-      return json({ snippetId: cfg.snippetId ?? null, sandbox: cfg.sandbox, products: cfg.products });
+      // `scan: false` tells the page there is no scan route on this host.
+      return json({ snippetId: cfg.snippetId ?? null, sandbox: cfg.sandbox, products: cfg.products, scan: false });
     }
 
     if (url.pathname === "/api/verify" || url.pathname === "/api/licence") {
@@ -142,8 +151,19 @@ export default {
       return minted.ok ? json(minted) : json({ error: minted.error }, minted.status);
     }
 
-    // Anything else is a static asset. `run_worker_first` in wrangler.toml keeps
-    // /api/* here and hands everything else to the asset server.
-    return env.ASSETS.fetch(request);
+    // Everything else is the frontend, bundled into this script. `/` is the page,
+    // and an unknown path is a 404 rather than the page, so a typo in an asset
+    // URL fails loudly instead of returning HTML to something expecting a module.
+    const path = url.pathname === "/" ? "/index.html" : url.pathname;
+    const asset = STATIC[path];
+    if (!asset) return new Response("not found", { status: 404 });
+    return new Response(asset.body, {
+      headers: {
+        "content-type": asset.type,
+        // Short, because the page and the API deploy together and a stale page
+        // against a new API is the one failure this design rules out.
+        "cache-control": "public, max-age=60",
+      },
+    });
   },
 };

@@ -3,13 +3,23 @@ name = "margyn"
 main = "worker/index.mjs"
 compatibility_date = "2026-08-05"
 
-# The frontend is three static files and no build step, so the public directory
-# ships as-is. `run_worker_first` keeps the API on the script and lets the asset
-# server answer everything else without waking it.
-[assets]
-directory = "web/public"
-binding = "ASSETS"
-run_worker_first = ["/api/*"]
+# The worker answers on the apex and on www. Cloudflare issues the certificate
+# and manages the DNS record, so there is nothing to renew by hand.
+routes = [
+  { pattern = "margyn.xyz", custom_domain = true },
+  { pattern = "www.margyn.xyz", custom_domain = true },
+]
+
+# Keep the workers.dev URL alive as a fallback. If DNS or the certificate is
+# mid-change, a submission link that resolves is worth more than a tidy config.
+workers_dev = true
+
+# No [assets] block. The frontend is bundled into the script by
+# bin/bundle-static.mjs, because Cloudflare's assets API answered every upload
+# with a 500 on 2026-08-05 and two files with no build step fit the script
+# limit comfortably. One upload also means the page and the API can never be
+# deployed at different versions. Run `npm run worker:bundle` after editing
+# anything in web/public.
 
 # Sandbox by default. Getting this wrong towards live charges real money, so the
 # safe value is the one you get by forgetting to set it.
@@ -22,3 +32,4 @@ TIUN_ENV = "sandbox"
 # and the public ones too, since a var here would be committed:
 #   npx wrangler secret put TIUN_SANDBOX_SNIPPET_ID
 #   npx wrangler secret put TIUN_SANDBOX_PRODUCT_WATCH
+#   npx wrangler secret put TIUN_SANDBOX_PRODUCT_FIXPACK

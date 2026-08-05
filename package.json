@@ -15,8 +15,9 @@
     "test": "node --test test/*.test.mjs",
     "scan": "node src/cli.mjs",
     "dev": "node web/server.mjs",
-    "worker:dev": "wrangler dev",
-    "worker:deploy": "wrangler deploy"
+    "worker:dev": "npm run worker:bundle && wrangler dev",
+    "worker:deploy": "npm run worker:bundle && wrangler deploy",
+    "worker:bundle": "node bin/bundle-static.mjs"
   },
   "devDependencies": {
     "wrangler": "^4.118.0"
