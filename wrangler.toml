@@ -24,7 +24,7 @@ workers_dev = true
 # Sandbox by default. Getting this wrong towards live charges real money, so the
 # safe value is the one you get by forgetting to set it.
 [vars]
-TIUN_ENV = "sandbox"
+TIUN_ENV = "live"
 
 # Secrets are never in this file. Set them once per environment:
 #   npx wrangler secret put TIUN_SANDBOX_API_KEY
