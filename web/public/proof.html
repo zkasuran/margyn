@@ -3,14 +3,14 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Margyn: prove your test suite actually tests something</title>
-<meta name="description" content="Margyn audits the machinery that is supposed to catch your bugs. It finds tests that assert nothing, files git never committed and gates nothing invokes. Every finding ships a reproduction you can run.">
-<link rel="canonical" href="https://margyn.xyz/">
+<title>Margyn proof: real findings on named commits, with the commands</title>
+<meta name="description" content="The pull request it was written from, a scan of five public repositories at named commits, then what it reports about its own suite. Each with the command to reproduce it.">
+<link rel="canonical" href="https://margyn.xyz/proof">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Margyn">
-<meta property="og:url" content="https://margyn.xyz/">
-<meta property="og:title" content="Your tests pass. That is not the same as working.">
-<meta property="og:description" content="Margyn audits the machinery that is supposed to catch your bugs. It finds tests that assert nothing, files git never committed and gates nothing invokes. Every finding ships a reproduction you can run.">
+<meta property="og:url" content="https://margyn.xyz/proof">
+<meta property="og:title" content="Every number on this site, with the command that checks it">
+<meta property="og:description" content="The pull request it was written from, a scan of five public repositories at named commits, then what it reports about its own suite. Each with the command to reproduce it.">
 <meta property="og:image" content="https://margyn.xyz/og.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
@@ -20,20 +20,8 @@
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <link rel="alternate icon" href="/favicon.ico" sizes="16x16 32x32">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
-<link rel="preconnect" href="https://esm.sh" crossorigin>
-<script type="application/ld+json">
-{"@context":"https://schema.org","@type":"SoftwareApplication","name":"Margyn",
-"applicationCategory":"DeveloperApplication","operatingSystem":"Linux, macOS, Windows",
-"url":"https://margyn.xyz/","codeRepository":"https://github.com/zkasuran/margyn",
-"description":"Audits the verification layer of a repository. Finds tests that assert nothing, files the repo reads that git never committed, gates no workflow invokes and linter exclusions that live in the ignore file. Every finding ships a runnable reproduction.",
-"softwareRequirements":"Node.js 22 or newer, git","license":"https://opensource.org/licenses/MIT",
-"offers":[{"@type":"Offer","name":"Free scan","price":"0","priceCurrency":"USD",
-"description":"Four static checks, no account and no licence."},
-{"@type":"Offer","name":"Watch","price":"8.99","priceCurrency":"USD",
-"description":"Adds the mutation proof, with a 3 day free trial.",
-"priceSpecification":{"@type":"UnitPriceSpecification","price":"8.99","priceCurrency":"USD",
-"billingDuration":1,"billingIncrement":1,"unitCode":"MON"}}]}
-</script>
+
+
 <script>
 /* Applies a stored theme choice before first paint. A classic inline script on
    purpose: defer, async and type=module all run after paint, so any of them
@@ -327,7 +315,7 @@ footer nav a:hover { color: var(--accent) }
     </svg>Margyn</a>
 
   <nav class="barnav" aria-label="Main">
-    <a href="/proof">Proof</a>
+    <a href="/proof" aria-current="page">Proof</a>
     <a href="/docs">Docs</a>
     <a href="/pricing">Pricing</a>
     <a href="/changelog">Changelog</a>
@@ -343,212 +331,140 @@ footer nav a:hover { color: var(--accent) }
     <label for="t-dark" title="Dark"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 14.5A8.5 8.5 0 1 1 9.5 4a7 7 0 0 0 10.5 10.5z"/></svg><span class="sr">Dark</span></label>
   </fieldset>
 
-  <p class="who" id="who" role="status" aria-live="polite"></p>
-  <button id="login" class="ghost" hidden>Sign in</button>
-  <button id="licence" hidden>Get my licence</button>
-  <button id="logout" class="ghost" hidden>Sign out</button>
+  <a class="btn sm" href="/pricing">Get Watch</a>
 </div></header>
 
 <main id="main">
-<div class="wrap"><div class="out" id="out" role="region" aria-label="Your licence"></div></div>
 
-<section class="hero"><div class="wrap">
-  <h1 class="prose">Your tests pass. That is not the same as working.</h1>
-  <p class="lede prose">Margyn audits the machinery that is supposed to catch your bugs. It
-    does not review your code. Every finding ships a reproduction you can run. No reproduction,
-    no finding.</p>
-
-  <div class="run">
-    <code id="cmd">npx margyn-scan /path/to/repo</code>
-    <button id="copy" data-copy="cmd">Copy</button>
-  </div>
-  <p class="sm prose">Zero dependencies. Node 22 and git. Exit code 1 on findings, so it works
-    as a CI gate. Your code never leaves your machine.</p>
-  <p class="cta">
-    <a class="btn" href="/pricing">Get Watch, 3 days free</a>
-    <a class="btn ghost" href="/proof">See the proof</a>
-  </p>
-  <ul class="chips" aria-label="Facts about the free scan">
-    <li>No account</li>
-    <li>No network call</li>
-    <li>Zero dependencies</li>
-    <li>MIT licensed</li>
-  </ul>
+<section class="phead"><div class="wrap">
+  <h1 class="prose">Proof, with the commands</h1>
+  <p class="lede prose">Three claims hold this product up. Each one is a real run against a named
+    commit, each one followed by the command that reproduces it. Dated 2026-08-06.</p>
 </div></section>
 
-<section id="proof"><div class="wrap">
-  <p class="eyebrow">A real run</p>
-  <h2>Against the commit that broke</h2>
-  <p class="prose">Eight vendored modules sat under a path containing <code>dist/</code>, which
-    the root <code>.gitignore</code> excludes at any depth, so git dropped all eight while they
-    sat on disk. Locally: 26 tests green. In CI: two failed, reading files never pushed. The
-    diff was innocent. The absence was the bug.</p>
-<pre tabindex="0" role="group" aria-label="Terminal output from a real scan"><b>margyn /tmp/moss</b>
+<section id="incident"><div class="wrap">
+  <p class="eyebrow">Claim one</p>
+  <h2>It was written from a pull request that went red</h2>
+  <p class="prose"><a href="https://github.com/nishuzumi/moss/pull/157">nishuzumi/moss PR #157</a>,
+    2026-08-01. Eight vendored modules lived under a path containing <code>dist/</code>. The root
+    <code>.gitignore</code> excludes <code>dist/</code> at any depth, so git dropped all eight from
+    the commit while they sat on disk untracked. Locally the suite was 26 tests green. In CI two
+    tests failed, reading files that had never been pushed.</p>
+  <p class="prose">The diff was innocent. The absence was the bug. Nothing in a diff shows you a
+    file that is not there.</p>
+<pre tabindex="0" role="group" aria-label="Margyn against the broken commit"><b>margyn /tmp/moss</b>   <span class="d"># reconstructed at c6cbb45, untracked files restored</span>
 
 2 findings, each with a reproduction you can run.
 
 <b>1. packages/protocols/aave/abis-src/dist/AaveV3Monad.mjs is read by</b>
 <b>   packages/protocols/aave/README.md but git ignores it</b>
    <span class="r">HIGH</span>  <span class="d">ignored-source     ignore rule: .gitignore:2:dist/</span>
-   <span class="d">reproduce:</span>
-     git archive HEAD | tar -t | grep -qx '&lt;path&gt;' || echo 'ABSENT from HEAD'
-     test -f '&lt;path&gt;' &amp;&amp; echo 'PRESENT on disk'</pre>
-  <p class="sm prose" style="margin-top:14px">Two facts about one file that disagree. Against
-    the fixed tree both findings are gone, because a checker that cannot be shown to go quiet
-    is as hollow as what it hunts.</p>
-  <p class="sm"><a href="/proof#incident">The whole incident, with the reproduction that answers</a></p>
+<b>2. packages/protocols/aave/abis-src/dist/abis/IPool.mjs is read by</b>
+<b>   packages/protocols/aave/abis-src/VENDOR.json but git ignores it</b>
+   <span class="r">HIGH</span>  <span class="d">ignored-source     ignore rule: .gitignore:2:dist/</span></pre>
+  <p class="prose" style="margin-top:16px">Both reproductions answer, which is what turns a finding
+    into a fact. Two statements about one path that disagree:</p>
+<pre tabindex="0" role="group" aria-label="The reproduction for a dropped file"><b>$ git archive HEAD | tar -t | grep -qx '&lt;path&gt;' || echo 'ABSENT from HEAD'</b>
+ABSENT from HEAD
+<b>$ test -f '&lt;path&gt;' &amp;&amp; echo 'PRESENT on disk'</b>
+PRESENT on disk</pre>
+  <p class="prose" style="margin-top:16px">Against the fixed tree at <code>0c743c2</code> both high
+    findings are gone and only the two medium advisories remain. A checker that cannot be shown to
+    go quiet is as hollow as the checks it hunts, so that direction is tested too.</p>
 </div></section>
 
-<section><div class="wrap">
-  <h2>Who runs this</h2>
+<section id="public"><div class="wrap">
+  <p class="eyebrow">Claim two</p>
+  <h2>What it says about five public repositories</h2>
+  <p class="prose">Run on 2026-08-06 against a shallow clone of each, at the commit named. Nothing
+    was tuned for these repositories and nothing was left out because the number was inconvenient.</p>
   <table class="st">
-    <tr><th>Your AI wrote most of last month's tests</th><td>Volume went up and nobody audited the
-      tests. The tools that generate them cannot check them, since they wrote them. Margyn reads
-      what the repository claims to verify, then proves which of those claims are empty.</td></tr>
-    <tr><th>You own a monorepo with vendored files</th><td>Ignore rules reach further than anyone
-      remembers, so a file the build reads can be missing from the commit while every local run
-      stays green. That is the defect this tool was written from.</td></tr>
-    <tr><th>You inherited the suite</th><td>Nobody left can say which tests are load bearing. Invert
-      a line and see which ones notice. The ones that do not are the answer.</td></tr>
-    <tr><th>You own the CI gate</th><td>A script nothing invokes reads as coverage in the repository
-      and cannot fail. Margyn names them, then fails your build on exit code 1 rather than filing a
-      dashboard nobody opens.</td></tr>
+    <tr><th>Repository</th><th>Commit</th><th>Findings</th></tr>
+    <tr><td>chalk/chalk</td><td><code>661317e</code></td><td>0</td></tr>
+    <tr><td>sindresorhus/execa</td><td><code>8017b27</code></td><td>0</td></tr>
+    <tr><td>sindresorhus/got</td><td><code>e3924aa</code></td><td>1 unrun gate</td></tr>
+    <tr><td>expressjs/express</td><td><code>a371447</code></td><td>3 unrun gates</td></tr>
+    <tr><td>fastify/fastify</td><td><code>39e87e8</code></td><td>6 tests with no assertion, 4 unrun gates</td></tr>
   </table>
+  <p class="sm prose" style="margin-top:18px">Reproduce any row in two commands. A clone is enough,
+    since the static checks need no account:</p>
+<pre tabindex="0" role="group" aria-label="Reproducing the public scan">git clone --depth 1 https://github.com/fastify/fastify.git /tmp/fastify
+npx margyn-scan /tmp/fastify</pre>
+
+  <h3 style="margin-top:34px">What a clean clone cannot show</h3>
+  <p class="prose"><code>ignored-source</code> found nothing on any of the five. It could not
+    have. It reports a file that is on disk and not in the commit, which by construction cannot
+    exist in a fresh clone. That check fires on a working tree, which is where the moss defect
+    lived. Saying so is the difference between a table and a claim.</p>
+
+  <h3 style="margin-top:30px">The four highest findings, named</h3>
+  <p class="prose">Each one is a file and a line anyone can open. These are tests whose only failure
+    mode is an exception: they run the code, assert nothing, then report green whatever came
+    back.</p>
+<pre tabindex="0" role="group" aria-label="Four named findings in fastify">fastify/fastify at 39e87e8
+
+test/decorator.test.js:869          plugin required decorators
+test/http2/closing.test.js:118      http/2 closes successfully with async await
+test/http2/closing.test.js:133      https/2 closes successfully with async await
+test/schema-special-usage.test.js:423   side effect on schema let the server crash</pre>
+  <p class="sm prose" style="margin-top:14px">Two of those are worth reading before you judge the
+    check: an <code>await close()</code> with no assertion is a deliberate smoke test in a lot of
+    suites. That is why the finding says what it says rather than "cannot fail". It is reported
+    with the line instead of a count for the same reason.</p>
+
+  <h3 style="margin-top:30px">The same run found seven false positives, so they were fixed</h3>
+  <p class="prose">The first pass reported 17 on fastify, not 10. Seven of those were in
+    <code>test/trust-proxy.test.js</code> and every one of them was wrong: the tests declare
+    <code>t.plan(11)</code> then assert through a helper that takes the test context. A planned
+    count fails the test when it comes up short, so a body carrying one cannot be hollow.</p>
+  <p class="prose">Both rules are now in the check and both directions are tested. That is the whole
+    reason the number above is 10. A scanner that cries wolf is hollow itself, so a false positive
+    is a defect here rather than a tuning preference.</p>
+  <p class="sm"><a href="/docs#no-assertion">What fires this check, what does not</a> &middot;
+    <a href="/changelog">The release it landed in</a></p>
 </div></section>
 
-<section><div class="wrap">
-  <p class="eyebrow">We ran it on ourselves</p>
-  <h2>Margyn finds holes in Margyn</h2>
-  <p class="prose">The mutation proof inverts one line, runs the suite, then reports the suite
-    that stayed green anyway. Pointed at our own repository at the default cap of four
-    mutations, all four survived. Raise the cap to twelve and six do.</p>
+<section id="itself"><div class="wrap">
+  <p class="eyebrow">Claim three</p>
+  <h2>What it says about itself</h2>
+  <p class="prose">The mutation proof inverts one line, runs the suite, then reports the suite that
+    stayed green anyway. Pointed at our own repository at the default cap of four, all four
+    survived. Raise the cap to twelve and six do.</p>
 <pre tabindex="0" role="group" aria-label="Four surviving mutations in Margyn's own suite">bin/build-pages.mjs            === -&gt; !==             <span class="r">suite still passed</span>
 bin/contrast.mjs               === -&gt; !==             <span class="r">suite still passed</span>
 src/checks/ignored-source.mjs  return true -&gt; false   <span class="r">suite still passed</span>
 src/checks/mutation.mjs        return true -&gt; false   <span class="r">suite still passed</span></pre>
   <p class="prose" style="margin-top:16px">The last one is the mutation checker. Our own tool
-    inverted a line inside our own mutation checker and 43 tests reported success. We publish
-    the number rather than the cap that flatters it.</p>
-  <p class="sm prose">Check it on our repository rather than taking it from us. The paid gate is on
-    the CLI flag, not on the code, so a clone reproduces this without a licence:</p>
-<pre tabindex="0" role="group" aria-label="Reproducing the self audit from a clone">git clone https://github.com/zkasuran/margyn &amp;&amp; cd margyn &amp;&amp; npm test
+    inverted a line inside our own mutation checker and 43 tests reported success. We publish the
+    number rather than the cap that flatters it.</p>
+  <p class="sm prose">The paid gate is on the CLI flag rather than on the code, so a clone
+    reproduces this without a licence:</p>
+<pre tabindex="0" role="group" aria-label="Reproducing the self audit">git clone https://github.com/zkasuran/margyn &amp;&amp; cd margyn &amp;&amp; npm test
 node --input-type=module -e 'import { mutationProof } from "./src/checks/mutation.mjs";
 console.log(mutationProof(process.cwd(), { max: 12 }).map(f =&gt; f.summary));'</pre>
 </div></section>
 
 <section><div class="wrap">
-  <h2>Your AI wrote 400 tests last month. How many can fail?</h2>
-  <p class="prose">Test volume went up and nobody audited the tests. The tools that generate
-    them cannot check them, since they wrote them. Coverage will not tell you either: Codecov's
-    own blog concedes that
-    <a href="https://about.codecov.io/blog/mutation-testing-how-to-ensure-code-coverage-isnt-a-vanity-metric/">it
-    is too easy to write high-coverage tests that don't deliver value</a>. The product still
-    centres the percentage.</p>
-  <p class="prose">Margyn is the other half. It reads what your repository claims to verify,
-    then proves which of those claims are empty.</p>
-</div></section>
-
-<section><div class="wrap">
-  <h2>What it looks for</h2>
-  <ul class="checks prose">
-    <li>
-      <div class="top"><span class="nm">ignored-source</span><span class="sev high">high</span></div>
-      <p>Files the repo reads that git never committed. Green on your laptop because the file
-        is on your disk untracked, red in CI reading something that was never pushed.</p>
-    </li>
-    <li>
-      <div class="top"><span class="nm">no-assertion</span><span class="sev high">high</span></div>
-      <p>Tests that assert nothing. The body runs, throws nothing and reports green whatever
-        the code returned. Assertions reached through a helper still count.</p>
-    </li>
-    <li>
-      <div class="top"><span class="nm">mutation</span><span class="sev high">high</span><span class="paid">part of Watch</span></div>
-      <p>Inverts a line, runs the suite, reports the suite that stayed green anyway. There is
-        no arguing with a test that passed while the thing it guards was inverted.</p>
-    </li>
-    <li>
-      <div class="top"><span class="nm">unrun-check</span><span class="sev med">medium</span></div>
-      <p>A <code>test:online</code> or <code>verify</code> script that no workflow invokes and
-        no sibling script calls. It reads as coverage in the repository and cannot fail.</p>
-    </li>
-    <li>
-      <div class="top"><span class="nm">lint-blindspot</span><span class="sev med">medium</span></div>
-      <p>Linters whose exclusions come from <code>.gitignore</code> instead of their own
-        config, so a newly tracked path silently enters the tool's scope.</p>
-    </li>
-  </ul>
-  <p class="sm" style="margin-top:22px"><a href="/docs#checks">What fires each check, what
-    deliberately does not</a></p>
-</div></section>
-
-<section><div class="wrap">
-  <h2>Where it sits next to the tools you already pay for</h2>
-  <p class="prose">None of this is a replacement. The right column is the whole argument: each of
-    these answers a different question. None of them answers ours.</p>
-  <table class="st">
-    <tr><th>Tool</th><th>What it answers</th></tr>
-    <tr><td><b>Margyn</b></td><td>Does this suite check anything, with a command that proves each
-      answer. Billed per repository owner, never per seat.</td></tr>
-    <tr><td>Coverage, Codecov for one</td><td>Did this line run while a test was in progress. Billed
-      per user.</td></tr>
-    <tr><td>Static analysis, Sonar or Codacy</td><td>Does this code match a rule set. Billed per
-      line of code or per committer.</td></tr>
-    <tr><td>AI reviewers, CodeRabbit or Qodo</td><td>Does this diff look wrong, plus here are more
-      tests. They manufacture the artefact we audit. Billed per user.</td></tr>
-    <tr><td>Mutation frameworks, Stryker or PIT</td><td>What percentage of mutants your suite kills.
-      Free and open source, better at scoring than we are, which is why we never print a
-      score.</td></tr>
-  </table>
-  <p class="sm prose" style="margin-top:18px">Billing models read from each vendor's own pricing
-    page on 2026-08-05. If a mutation score across a whole codebase is what you want, use
-    <a href="https://stryker-mutator.io/">Stryker</a>. Margyn runs a capped mutation proof as one
-    check inside a five check audit, then prints the surviving line.</p>
-</div></section>
-
-<section><div class="wrap">
-  <h2>It belongs in CI. At most it costs $8.99 a month.</h2>
-  <p class="prose">Exit code 1 when anything was found, so there is no wrapper to write:</p>
-<pre tabindex="0" role="group" aria-label="Margyn as a GitHub Actions step">- run: npx margyn-scan .</pre>
-  <p class="prose" style="margin-top:16px">The four static checks are free forever, with no account
-    and no licence. <strong>Watch is $8.99 a month</strong> and adds the mutation proof, which is the
-    check that costs real machine time: it edits your tree and runs your whole suite once per
-    mutation. Three days free.</p>
-  <p class="prose">The licence is signed and verified offline, so the paid check runs on a runner with
-    no network. Ask for it without one and Margyn prints the reason, runs the free scan in full, then
-    exits on your findings. Billing is not a reason to break someone's build.</p>
-  <p class="sm"><a href="/pricing">Pricing and what a licence is</a> &middot; <a href="/docs#ci">The
-    CI setup</a> &middot; <a href="/security">Why there is no hosted scan</a></p>
-</div></section>
-
-<section><div class="wrap">
-  <h2>Where this actually is</h2>
-  <p class="prose">Margyn went public this month. It has no customers yet. This page carries no
-    testimonials, no logos and no download count, because there are none to report and a
-    placeholder version of those would be the exact thing this tool was built to catch.</p>
-  <table class="st">
-    <tr><td>Finished</td><td>All five checks. 43 tests, zero dependencies. Each check proves
-      it fires on a planted defect, then proves it goes quiet on the fixed shape.</td></tr>
-    <tr><td>Measured</td><td>Five public repositories at named commits on 2026-08-06: 0, 0, 1, 3
-      and 10 findings, every one of them checkable. <a href="/proof#public">The table, with the
-      commits</a>.</td></tr>
-    <tr><td>Honest about</td><td>That same run reported seven findings that were wrong, all in one
-      file. The checker was fixed rather than the number, which is why it now reports 10 on fastify
-      instead of 17.</td></tr>
-    <tr><td>Not built</td><td>Generating the fix rather than naming the defect. Local versus
-      CI environment divergence.</td></tr>
-  </table>
-  <p class="sm prose" style="margin-top:18px">You do not have to believe any of it. Run it on
-    your own repository.</p>
+  <h2>The number this page does not have</h2>
+  <p class="prose">An earlier run across five other repositories went from 132, 51, 20, 6 and 12
+    findings to 0, 2, 2, 2 and 0 after four precision fixes. It is a true story about how the
+    matching rules were built. It is also the weakest number we have ever published, because those
+    five repositories were never written down, so nobody can re-run it. That is why the table above
+    exists and names every commit.</p>
+  <p class="prose">If you want the older number to mean something, the fix is not an argument, it is
+    a list of five repositories and a date. Until then this page carries the run you can repeat.</p>
 </div></section>
 
 <section><div class="wrap">
   <h2>Run it on your own repository</h2>
   <div class="run">
-    <code id="cmd-end">npx margyn-scan /path/to/repo</code>
-    <button data-copy="cmd-end">Copy</button>
+    <code id="cmd-proof">npx margyn-scan /path/to/repo</code>
+    <button data-copy="cmd-proof">Copy</button>
   </div>
-  <p class="sm prose">If it finds nothing, you learned that for free. If it finds something, every
-    line comes with a command that proves it.</p>
+  <p class="sm prose">Nothing is uploaded and no account is needed. If it finds nothing, you learned
+    that for free.</p>
+  <p class="sm"><a href="/pricing">Pricing</a> &middot; <a href="/docs">Documentation</a> &middot;
+    <a href="/security">Why there is no hosted scan</a></p>
 </div></section>
 
 </main>
@@ -579,6 +495,6 @@ console.log(mutationProof(process.cwd(), { max: 12 }).map(f =&gt; f.summary));'<
   <p class="sm footnote">Margyn. MIT licensed. Every number on this site was measured on the
     shipped product, not estimated.</p>
 </div></footer>
-<script type="module" src="/app.mjs"></script>
+<script type="module" src="/theme.mjs"></script>
 </body>
 </html>

@@ -18,6 +18,27 @@ export default {
 
 <section><div class="wrap">
   <div class="rel">
+    <p class="when">0.1.2<br>2026-08-06</p>
+    <div>
+      <h3>Seven false positives found on a real repository, then fixed</h3>
+      <p>The scan was run over five public repositories to replace a precision claim nobody could
+        reproduce. It reported 17 findings on fastify at <code>39e87e8</code>. Seven of them
+        were wrong: the tests in <code>test/trust-proxy.test.js</code> declare
+        <code>t.plan(11)</code> then assert through a helper that takes the test context. A planned
+        count fails the test when it comes up short, so a body carrying one cannot be hollow.</p>
+      <p><code>no-assertion</code> now counts a declared assertion count as an assertion, plus any
+        helper handed the test context. Both directions are tested. fastify reports 10 rather than
+        17. The six tests that remain each name a file and a line you can open.</p>
+      <p>The finding itself was overclaiming too. It said a test with no assertion "cannot fail",
+        which is wrong for a test whose failure mode is an exception. It now says nothing but a
+        thrown error can fail it, which is what is actually true.</p>
+      <p>The whole run, with every commit, is on the <a href="/proof">proof page</a>. It replaces
+        the older 132 to 0 precision table, which was true but named none of its repositories, so
+        nobody could repeat it.</p>
+    </div>
+  </div>
+
+  <div class="rel">
     <p class="when">0.1.1<br>2026-08-06</p>
     <div>
       <h3>First published release, plus a site instead of a page</h3>

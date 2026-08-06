@@ -1,6 +1,6 @@
 {
   "name": "margyn-scan",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "type": "module",
   "description": "Audits your test suite instead of your code. Finds tests that assert nothing, files git never committed and gates nothing invokes. Every finding ships a reproduction you can run.",
   "license": "MIT",

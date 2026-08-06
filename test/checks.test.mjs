@@ -168,6 +168,41 @@ test("no-assertion leaves a compile-time fixture alone", () => {
   }
 });
 
+test("no-assertion spares a planned count and a helper handed the context", () => {
+  const r = repo();
+  try {
+    // All three shapes were found on fastify at 39e87e8. The first two were
+    // reported and were wrong, which is what this test exists to keep fixed.
+    r.write("test/b.test.mjs", [
+      'import { test } from "node:test";',
+      'test("planned, with a comma in the title", async t => {',
+      "  t.plan(2)",
+      "  const app = build({ trustProxy: true })",
+      "  app.get('/x', (req, reply) => reply.code(200).send({ ip: req.ip }))",
+      "  await app.listen({ port: 0 })",
+      "});",
+      'test("helper holds the assertion", async t => {',
+      "  const app = build({ trustProxy: true })",
+      "  checkRequestValues(t, app, { ip: '1.1.1.1', port: 1234 })",
+      "  await app.listen({ port: 0 })",
+      "});",
+      'test("really hollow", async t => {',
+      "  const app = build({ trustProxy: true })",
+      "  console.log(t)",
+      "  await app.listen({ port: 0 })",
+      "});",
+    ].join("\n"));
+    r.commit();
+
+    const found = noAssertion(r.dir);
+    assert.equal(found.length, 1, `only the hollow test is a finding, got ${found.map((f) => f.summary).join(" | ")}`);
+    assert.match(found[0].summary, /"really hollow"/);
+    assert.match(found[0].summary, /nothing but a thrown error/);
+  } finally {
+    r.cleanup();
+  }
+});
+
 test("mutation refuses to draw conclusions from a red baseline", () => {
   const r = repo();
   try {

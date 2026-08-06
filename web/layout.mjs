@@ -23,6 +23,7 @@ export const SITE = {
 
 /** The nav, in one place, so a new page is one entry rather than six edits. */
 const NAV = [
+  { href: "/proof", label: "Proof" },
   { href: "/docs", label: "Docs" },
   { href: "/pricing", label: "Pricing" },
   { href: "/changelog", label: "Changelog" },
@@ -137,6 +138,7 @@ ${page.body}
     </div>
     <nav aria-label="Product">
       <p class="foothead">Product</p>
+      <a href="/proof">Proof</a>
       <a href="/docs">Documentation</a>
       <a href="/pricing">Pricing</a>
       <a href="/changelog">Changelog</a>

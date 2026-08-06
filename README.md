@@ -49,7 +49,8 @@ something that was never pushed.
 **`no-assertion`, high.** Tests that assert nothing. The body runs the code,
 throws nothing, then reports green whatever the code returns. Assertions reached
 through a local helper count, so a test whose whole body is
-`expectTreeError(...)` is not reported.
+`expectTreeError(...)` is not reported. So does a declared count like
+`t.plan(11)`, plus any helper handed the test context.
 
 **`mutation`, high, opt-in.** The strongest evidence this tool has. It inverts a
 line, runs the suite, then reports the suite that stayed green anyway. There is no
@@ -84,7 +85,7 @@ src/checks/mutation.mjs        return true -> false   suite still passed
 ```
 
 The last one is the mutation checker. Our own tool inverted a line inside our own
-mutation checker and 41 tests reported success. We publish the number rather than
+mutation checker and 43 tests reported success. We publish the number rather than
 the cap that flatters it.
 
 The paid gate is on the CLI flag rather than on the code, so a clone reproduces
@@ -97,23 +98,36 @@ console.log(mutationProof(process.cwd(), { max: 12 }).map(f => f.summary));'
 
 ## Precision, measured
 
-A scanner that cries wolf is hollow itself, so false positives were treated as
-defects. The first run across five real repositories produced 132 findings on one
-of them, nearly all noise. Four fixes:
+Run on 2026-08-06 against a shallow clone of each, at the commit named. Nothing
+was tuned for these and nothing was left out because the number was inconvenient.
 
-- A `package.json` declaring its own build output in `main` or `exports` is not
-  reading it. Only source code counts as a reader.
-- Matching on a bare basename reported every `dist/index.js` in a monorepo.
-  Matching now needs a path suffix carrying at least one parent directory, which
-  is how the real defect was found in the first place: `dist/abis/IPool.mjs`.
-- Dependency trees an install step fetches, `forge install` into
-  `contracts/lib`, are ignored on purpose and recreated on demand. Detected by a
-  manifest of their own inside an untracked ancestor.
-- A sibling script calling a gate as `pnpm check:web` counts as running it.
+| Repository | Commit | Findings |
+| --- | --- | --- |
+| chalk/chalk | `661317e` | 0 |
+| sindresorhus/execa | `8017b27` | 0 |
+| sindresorhus/got | `e3924aa` | 1 unrun gate |
+| expressjs/express | `a371447` | 3 unrun gates |
+| fastify/fastify | `39e87e8` | 6 tests with no assertion, 4 unrun gates |
 
-Result on the same five repositories: 132 to 0, 51 to 2, 20 to 2, 6 to 2, 12 to
-0. The remaining findings are true: an unrun `lint:fix`, plus biome inheriting its
-exclusions from `.gitignore`.
+```bash
+git clone --depth 1 https://github.com/fastify/fastify.git /tmp/fastify
+npx margyn-scan /tmp/fastify
+```
+
+`ignored-source` found nothing on any of the five and it could not have: it
+reports a file that is on disk and not in the commit, which cannot exist in a
+fresh clone. It fires on a working tree, which is where the defect below lived.
+
+**That run reported 17 on fastify before it reported 10.** Seven findings in
+`test/trust-proxy.test.js` were wrong: the tests declare `t.plan(11)` then assert
+through a helper. A scanner that cries wolf is hollow itself, so both rules went
+into the check and both directions are tested. The full before and after is at
+[margyn.xyz/proof](https://margyn.xyz/proof).
+
+An earlier run took five other repositories from 132, 51, 20, 6 and 12 findings to
+0, 2, 2, 2 and 0 after four matching fixes. That is a true story about how the
+rules were built. It is also the weakest number here, because those repositories
+were never written down.
 
 ## Proof it catches a real failure
 
@@ -216,7 +230,7 @@ both valid. A licence therefore works the same whichever host issued it.
 npm test
 ```
 
-Forty-one tests, no dependencies. The check tests each build a real git repository
+Forty-three tests, no dependencies. The check tests each build a real git repository
 in a temp directory, plant exactly one defect, assert the check finds it, then
 plant the fixed shape and assert the check stays silent. The licence tests carry
 real signatures from the production key and prove that a flipped signature byte, a

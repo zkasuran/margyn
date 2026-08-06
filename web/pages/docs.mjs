@@ -119,6 +119,13 @@ margyn [path] [options]              # once it is on your path
 <ul>
   <li>The assertion is reached through a helper. Any identifier containing expect or assert counts,
     so a test whose whole body is <code>expectTreeError(...)</code> is left alone.</li>
+  <li>A helper is handed the test context, for example
+    <code>checkRequestValues(t, req, { ip })</code>. The assertion lives in the helper and the helper
+    needs the context to make it, so this is the same rule as above without depending on the
+    helper's name.</li>
+  <li>The body declares an assertion count. <code>t.plan(11)</code> fails the test when the count
+    comes up short, in node:test, tap, tape and ava alike, so a body carrying one cannot be
+    hollow.</li>
   <li>The file is a type level test. <code>@ts-expect-error</code>,
     <code>expectTypeOf</code>, <code>assertType</code> or <code>satisfies</code> anywhere in the file
     means the checking happens at compile time.</li>
@@ -127,6 +134,9 @@ margyn [path] [options]              # once it is on your path
 <p>The whole balanced parenthesis span of the call is searched rather than a guess at where the
   callback body starts, because <code>it("x", { timeout: 1 }, fn)</code> puts an options object
   exactly where a naive parser looks for the body and would report every timed test.</p>
+<p>The middle two rules came from running this check over fastify, where seven tests in one file were
+  reported and every one of them was wrong. <a href="/proof#public">That run is on the proof
+  page</a>, before and after.</p>
 
 <h3 id="unrun-check">unrun-check <span class="sev med">medium</span></h3>
 <p><strong>Fires when</strong> a script whose name starts with test, lint, typecheck, check, verify,
