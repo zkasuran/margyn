@@ -61,7 +61,7 @@ function checkoutUnavailable(why) {
   who.textContent = why;
   const note = el("buynote");
   if (note) note.textContent = "Checkout cannot load right now. The free scan needs no account. The price is unchanged at $8.99 a month.";
-  for (const id of ["buylogin", "buy"]) el(id)?.setAttribute("disabled", "");
+  for (const button of document.querySelectorAll("[data-buy], [data-signin]")) button.setAttribute("disabled", "");
 }
 
 const cfg = await (await fetch("/api/config")).json().catch(() => ({}));
@@ -95,7 +95,23 @@ try {
   throw new Error("tiun sdk did not load");
 }
 
-const watch = (cfg.products ?? []).find((p) => p.key === "watch");
+const byKey = new Map((cfg.products ?? []).map((p) => [p.key, p]));
+
+/**
+ * Every buy control carries the product it buys, so the pricing page can offer
+ * three of them without this file knowing the page's layout. A control whose
+ * product is not configured on the server is disabled with the reason, rather
+ * than left to open an empty checkout.
+ */
+for (const button of document.querySelectorAll("[data-buy]")) {
+  const product = byKey.get(button.dataset.buy);
+  if (!product) {
+    button.disabled = true;
+    button.title = "This plan is not configured on the server yet";
+    continue;
+  }
+  button.addEventListener("click", () => tiun.checkout({ productId: product.id }));
+}
 
 /** One place decides what the bar looks like, so the state cannot drift. */
 async function paint() {
@@ -109,24 +125,24 @@ async function paint() {
   // The licence is only worth offering to someone who bought something, since
   // minting one for a free account can only ever be refused.
   el("licence").hidden = !access;
-  // Two buttons, one visible at a time: signed out gets sign in, signed in and
-  // unpaid gets checkout, paid gets neither because the licence button appears.
-  const buy = el("buy");
-  const buylogin = el("buylogin");
-  if (buy) buy.hidden = !signedIn || access || !watch;
-  if (buylogin) buylogin.hidden = signedIn;
+  // Signed out, every buy control becomes a sign-in prompt instead, because
+  // checkout needs an account and a dead button is worse than a redirect.
+  for (const button of document.querySelectorAll("[data-buy]")) button.hidden = !signedIn;
+  for (const button of document.querySelectorAll("[data-signin]")) button.hidden = signedIn;
   const note = el("buynote");
   if (note) {
     note.textContent = access
-      ? "You have Watch. Get your licence from the top bar."
-      : "3 days free, then $8.99 a month. Checkout runs on Tiun.";
+      ? "You already have a plan. Get your licence from the top bar."
+      : "3 days free on Watch and Team, then the price above. Checkout runs on Tiun.";
   }
 }
 
 el("login").onclick = () => tiun.login();
 el("logout").onclick = async () => { await tiun.logout(); paint(); };
-el("buy")?.addEventListener("click", () => tiun.checkout({ productId: watch.id }));
 el("buylogin")?.addEventListener("click", () => tiun.login());
+for (const button of document.querySelectorAll("[data-signin]")) {
+  button.addEventListener("click", () => tiun.login());
+}
 
 /**
  * Hands over the CLI licence. Shown rather than downloaded: what the user needs

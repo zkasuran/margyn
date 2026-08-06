@@ -194,6 +194,9 @@ button.ghost:hover, .btn.ghost:hover { background: var(--rais); color: var(--ink
 /* ---- pricing ---- */
 .tiers { display: grid; gap: 16px; margin: 0; grid-template-columns: minmax(0, 1fr) }
 @media (min-width: 760px) { .tiers { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) } }
+/* Three across only when there is room for three readable columns. Below that the
+   third wraps under the pair rather than squeezing all three. */
+@media (min-width: 1000px) { .tiers.three { grid-template-columns: repeat(3, minmax(0, 1fr)) } }
 /* min-width: 0 on the card and on the copy row, because the install command is
    nowrap: its min-content size made the card 395px wide inside a 320px column. */
 .tier { background: var(--card); border: 1px solid var(--line); border-radius: var(--r);

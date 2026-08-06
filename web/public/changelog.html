@@ -226,6 +226,9 @@ button.ghost:hover, .btn.ghost:hover { background: var(--rais); color: var(--ink
 /* ---- pricing ---- */
 .tiers { display: grid; gap: 16px; margin: 0; grid-template-columns: minmax(0, 1fr) }
 @media (min-width: 760px) { .tiers { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) } }
+/* Three across only when there is room for three readable columns. Below that the
+   third wraps under the pair rather than squeezing all three. */
+@media (min-width: 1000px) { .tiers.three { grid-template-columns: repeat(3, minmax(0, 1fr)) } }
 /* min-width: 0 on the card and on the copy row, because the install command is
    nowrap: its min-content size made the card 395px wide inside a 320px column. */
 .tier { background: var(--card); border: 1px solid var(--line); border-radius: var(--r);
@@ -358,6 +361,27 @@ footer nav a:hover { color: var(--accent) }
 </div></section>
 
 <section><div class="wrap">
+  <div class="rel">
+    <p class="when">2026-08-06<br>later</p>
+    <div>
+      <h3>Two more ways to buy, one of which is a person rather than a binary</h3>
+      <p><b>Team, 29 USD a month</b>, is Watch for every repository an organisation owns, with issues
+        triaged first and invoices instead of a card on request. It expands into the same capability
+        Watch grants, because a customer on the larger plan finding the paid check locked would be
+        the worst bug to ship in a billing path. That expansion now lives in one module both hosts
+        import, with a test naming each rule, rather than as a copy in each of them.</p>
+      <p><b>Fix flow, 79 USD a month</b>, is up to three findings a month fixed for you, each
+        returned as a patch carrying a test that fails before it and passes after. It works from the
+        finding rather than from your repository, so it needs no token, no clone and no repository
+        access, which keeps the promise on the security page intact. Three is the ceiling because
+        three is what one person can do properly in a month, so that is the number on the page
+        instead of the word unlimited.</p>
+      <p>The pricing page carries all three, checkout is wired per product rather than to one hard
+        coded id, then the terms say exactly what the service delivers plus what happens when it is
+        late.</p>
+    </div>
+  </div>
+
   <div class="rel">
     <p class="when">0.1.2<br>2026-08-06</p>
     <div>

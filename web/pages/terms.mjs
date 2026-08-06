@@ -33,17 +33,35 @@ export default {
   handling run on <a href="https://tiun.business">Tiun</a>. We never see or store a card number.</p>
 
 <h2 id="what">What you are buying</h2>
-<p>Two separate things. It is worth keeping them apart.</p>
+<p>Three separate things. It is worth keeping them apart.</p>
 <p>The command line tool is MIT licensed and free. You can read it, fork it, run it on anything you
   have the right to read. Nothing about that depends on paying us. The four static checks are
   part of that free tool and they stay free.</p>
-<p>A Watch subscription buys one thing: the right to hold a licence that unlocks the mutation proof
-  in that tool. It is a subscription to a capability, not access to a service, which is why a scan
-  keeps working when our site does not.</p>
+<p><b>Watch</b> and <b>Team</b> buy one thing: the right to hold a licence that unlocks the mutation
+  proof in that tool. Watch covers one repository owner, Team covers an organisation and every
+  repository it owns. Both are subscriptions to a capability rather than access to a service, which
+  is why a scan keeps working when our site does not.</p>
+<p><b>Fix flow</b> is not software, it is work. For 79 USD a month we fix up to three findings you
+  send us, each returned as a patch carrying a test that fails before the fix and passes after.
+  Three is the ceiling and it is on the page rather than the word unlimited, because three is what
+  one person can do properly in a month. Terms of that work:</p>
+<ul>
+  <li>It runs from the finding, not from your repository. You send the finding output plus the file
+    it names if the patch needs it. We ask for no token, no repository access and no clone.</li>
+  <li>Back within five working days of receiving what a patch needs. If it is later than that, that
+    month is refunded without you having to ask twice.</li>
+  <li>If a fix genuinely cannot be written from what you sent, we say so and it does not count
+    against your three.</li>
+  <li>A patch that does not apply is our defect, as is a test that does not fail before the fix. We
+    redo it and it does not count against your three either.</li>
+  <li>Unused findings do not roll over. It is a month of attention rather than a bucket of
+    credits.</li>
+</ul>
 
 <h2 id="price">Price and billing</h2>
-<p>8.99 USD per month. The first three days are free. After the trial the subscription renews every
-  month until you cancel it. Prices shown on the <a href="/pricing">pricing page</a> are the prices
+<p>Watch is 8.99 USD a month for one repository owner. Team is 29 USD a month for an organisation.
+  Fix flow is 79 USD a month. Watch and Team carry three free days first. Every one of them renews
+  monthly until you cancel it. Prices shown on the <a href="/pricing">pricing page</a> are the prices
   charged. A change to them applies from your next renewal rather than retroactively.</p>
 
 <h2 id="cancel">Cancelling</h2>

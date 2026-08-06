@@ -226,6 +226,9 @@ button.ghost:hover, .btn.ghost:hover { background: var(--rais); color: var(--ink
 /* ---- pricing ---- */
 .tiers { display: grid; gap: 16px; margin: 0; grid-template-columns: minmax(0, 1fr) }
 @media (min-width: 760px) { .tiers { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) } }
+/* Three across only when there is room for three readable columns. Below that the
+   third wraps under the pair rather than squeezing all three. */
+@media (min-width: 1000px) { .tiers.three { grid-template-columns: repeat(3, minmax(0, 1fr)) } }
 /* min-width: 0 on the card and on the copy row, because the install command is
    nowrap: its min-content size made the card 395px wide inside a 320px column. */
 .tier { background: var(--card); border: 1px solid var(--line); border-radius: var(--r);
@@ -357,13 +360,13 @@ footer nav a:hover { color: var(--accent) }
 
 <section class="phead"><div class="wrap">
   <h1 class="prose">Four checks are free. The fifth runs your suite, so it costs money.</h1>
-  <p class="lede prose">Watch is $8.99 a month. It adds the mutation proof, which is the check that
-    edits your tree and runs your whole suite once per mutation. The four static checks stay free
-    with no account, no licence and no network.</p>
+  <p class="lede prose">Watch is $8.99 a month for one owner's repositories. Team is $29 a month for
+    an organisation. Fix flow is $79 a month if you would rather the findings arrived already
+    fixed. The four static checks stay free with no account, no licence and no network.</p>
 </div></section>
 
 <section><div class="wrap">
-  <div class="tiers">
+  <div class="tiers three">
     <div class="tier">
       <p class="tag">Free scan</p>
       <p class="amt">$0<span class="per"> forever</span></p>
@@ -371,7 +374,7 @@ footer nav a:hover { color: var(--accent) }
         <li>Four static checks: ignored-source, no-assertion, unrun-check, lint-blindspot</li>
         <li>No account, no licence, no network call at any point</li>
         <li>Every finding carries a command that reproduces it</li>
-        <li>Exit code 1 on findings, so it works as a CI gate today</li>
+        <li>Exit code 1 on findings, so it gates CI today</li>
       </ul>
       <div class="fill"></div>
       <div class="run">
@@ -381,22 +384,75 @@ footer nav a:hover { color: var(--accent) }
     </div>
 
     <div class="tier pick">
-      <p class="tag">Watch</p>
+      <p class="tag">Watch <span class="paid">most start here</span></p>
       <p class="amt">$8.99<span class="per"> a month, 3 days free</span></p>
       <ul>
         <li>Everything in the free scan</li>
         <li>The mutation proof: it inverts a line, runs your suite, then reports the suite that
           stayed green anyway</li>
         <li>A licence your CI verifies offline, so a paid check runs on a runner with no network</li>
-        <li>Cancel whenever you like. The four free checks keep working either way</li>
+        <li>One repository owner. Cancel whenever you like</li>
       </ul>
       <div class="fill"></div>
       <p class="cta">
-        <button id="buylogin">Sign in to start the trial</button>
-        <button id="buy" hidden>Start the 3 day trial</button>
+        <button id="buylogin" data-signin>Sign in to start the trial</button>
+        <button data-buy="watch" hidden>Start the 3 day trial</button>
       </p>
       <p class="sm" id="buynote">3 days free, then $8.99 a month. Checkout runs on Tiun.</p>
       <p class="sm note" id="sandboxnote" hidden></p>
+    </div>
+
+    <div class="tier">
+      <p class="tag">Team</p>
+      <p class="amt">$29<span class="per"> a month, 3 days free</span></p>
+      <ul>
+        <li>Everything in Watch, for every repository the organisation owns</li>
+        <li>One licence covers every CI runner, with no seat count and no phone home</li>
+        <li>Your issues are triaged first</li>
+        <li>Invoices on request rather than a card</li>
+      </ul>
+      <div class="fill"></div>
+      <p class="cta">
+        <button class="ghost" data-signin>Sign in to start</button>
+        <button data-buy="team" hidden>Start the 3 day trial</button>
+      </p>
+      <p class="sm">Still no per seat billing. A CI gate has no seats.</p>
+    </div>
+  </div>
+</div></section>
+
+<section id="fixflow"><div class="wrap">
+  <p class="eyebrow">The service line</p>
+  <h2>Or have the findings arrive already fixed</h2>
+  <div class="tiers">
+    <div class="tier pick">
+      <p class="tag">Fix flow</p>
+      <p class="amt">$79<span class="per"> a month</span></p>
+      <ul>
+        <li>Up to three findings a month fixed for you</li>
+        <li>Each one arrives as a patch carrying a test that fails before it and passes after</li>
+        <li>Back within five working days. Otherwise that month is refunded</li>
+        <li>Cancel whenever you like</li>
+      </ul>
+      <div class="fill"></div>
+      <p class="cta">
+        <button class="ghost" data-signin>Sign in to start</button>
+        <button data-buy="fixflow" hidden>Start Fix flow</button>
+      </p>
+      <p class="sm">No trial on this one, because a trial on a service is unpaid work.</p>
+    </div>
+    <div>
+      <h3>It works from the finding, not from your repository</h3>
+      <p class="prose">You send the finding, which already carries the file, the line, the rule that
+        caused it and the reproduction. We send back a patch. Nobody needs a token that can read
+        your source, so the promise on the <a href="/security">security page</a> holds exactly as
+        it does for the free scan: your code stays where it is.</p>
+      <p class="prose">If a fix genuinely cannot be written from the finding alone, we say so and it
+        does not count against your three. A patch that does not apply is our defect rather than
+        your problem.</p>
+      <p class="sm prose">This is the honest shape of it: the scan is a tool, the fix is a person
+        writing a patch. Three a month is what one person can do properly, so that is the number on
+        the page rather than the word unlimited.</p>
     </div>
   </div>
 </div></section>
@@ -442,11 +498,12 @@ Everything below is the free scan, which ran in full.
 <section><div class="wrap">
   <h2>Billing, stated plainly</h2>
   <table class="st">
-    <tr><th>Price</th><td>8.99 USD per month, per repository owner. No per seat and no per
-      committer billing: a CI gate has no seats, so charging for engineers who never open the tool
-      would be charging for nothing.</td></tr>
-    <tr><th>Trial</th><td>Three days at no charge. Checkout tells you what it needs before you
-      confirm anything.</td></tr>
+    <tr><th>Price</th><td>Watch 8.99 USD a month for one repository owner. Team 29 USD a month for
+      an organisation. Fix flow 79 USD a month for up to three fixed findings. No per seat and no
+      per committer billing anywhere: a CI gate has no seats, so charging for engineers who never
+      open the tool would be charging for nothing.</td></tr>
+    <tr><th>Trial</th><td>Three days at no charge on Watch and Team. Fix flow has none, because a
+      trial on a service is unpaid work.</td></tr>
     <tr><th>Renewal</th><td>Monthly, until you cancel.</td></tr>
     <tr><th>Cancelling</th><td>Any time. The licence on your disk keeps working until it expires
       and the four free checks are unaffected.</td></tr>

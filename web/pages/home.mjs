@@ -205,8 +205,10 @@ export default {
     </div>
   </div>
   <p class="sm prose" style="margin-top:20px">Per repository owner, never per seat. A CI gate has no
-    seats, so charging for engineers who never open the tool would be charging for nothing. More than
-    one repository? An invoice rather than a card? <a href="/pricing#teams">Ask</a>.</p>
+    seats, so charging for engineers who never open the tool would be charging for nothing.
+    <b>Team is $29 a month</b> for every repository an organisation owns, and
+    <b><a href="/pricing#fixflow">Fix flow</a> is $79 a month</b> if you would rather the findings
+    arrived already fixed, as a patch carrying a test that fails before it and passes after.</p>
 </div></section>
 
 <section><div class="wrap">

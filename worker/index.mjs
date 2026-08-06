@@ -23,6 +23,7 @@
  * WebCrypto signs here, `node:crypto` signs locally, and both produce the same
  * bytes because the format lives in one module. Proven by test/worker.test.mjs.
  */
+import { granted } from "../src/entitlements.mjs";
 import { bodyOf, bytesToSign, decode, tokenOf } from "../src/licence-format.mjs";
 import { STATIC } from "./static.generated.mjs";
 
@@ -69,10 +70,16 @@ function config(env) {
         id: sandbox ? env.TIUN_SANDBOX_PRODUCT_WATCH : env.TIUN_PRODUCT_WATCH,
       },
       {
-        key: "fixpack",
-        name: "Fix pack",
-        blurb: "Everything in Watch, plus the generated patch for every finding, each carrying a test that fails before the fix and passes after.",
-        id: sandbox ? env.TIUN_SANDBOX_PRODUCT_FIXPACK : env.TIUN_PRODUCT_FIXPACK,
+        key: "team",
+        name: "Team",
+        blurb: "Watch for every repository the organisation owns, priority on issues, invoices on request.",
+        id: sandbox ? env.TIUN_SANDBOX_PRODUCT_TEAM : env.TIUN_PRODUCT_TEAM,
+      },
+      {
+        key: "fixflow",
+        name: "Fix flow",
+        blurb: "Up to three findings a month fixed for you, each as a patch carrying a test that fails before and passes after.",
+        id: sandbox ? env.TIUN_SANDBOX_PRODUCT_FIXFLOW : env.TIUN_PRODUCT_FIXFLOW,
       },
     ].filter((p) => Boolean(p.id)),
   };
@@ -110,8 +117,10 @@ async function licenceFor(user, cfg) {
   const owned = Object.keys(user?.productAccess ?? {});
   if (owned.length === 0) return { ok: false, status: 402, error: "this account has not bought anything yet" };
   // Map Tiun ids back to our own names, so a token never carries an id that
-  // changes when the live products are created.
-  const products = cfg.products.filter((p) => owned.includes(p.id)).map((p) => p.key);
+  // changes when the live products are created, then expand each one into what it
+  // grants. A licence lists capabilities, not purchases.
+  const bought = cfg.products.filter((p) => owned.includes(p.id)).map((p) => p.key);
+  const products = granted(bought);
   if (products.length === 0) {
     return { ok: false, status: 402, error: "the products on this account are not ones this build knows about" };
   }

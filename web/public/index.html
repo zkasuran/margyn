@@ -238,6 +238,9 @@ button.ghost:hover, .btn.ghost:hover { background: var(--rais); color: var(--ink
 /* ---- pricing ---- */
 .tiers { display: grid; gap: 16px; margin: 0; grid-template-columns: minmax(0, 1fr) }
 @media (min-width: 760px) { .tiers { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) } }
+/* Three across only when there is room for three readable columns. Below that the
+   third wraps under the pair rather than squeezing all three. */
+@media (min-width: 1000px) { .tiers.three { grid-template-columns: repeat(3, minmax(0, 1fr)) } }
 /* min-width: 0 on the card and on the copy row, because the install command is
    nowrap: its min-content size made the card 395px wide inside a 320px column. */
 .tier { background: var(--card); border: 1px solid var(--line); border-radius: var(--r);
@@ -556,8 +559,10 @@ footer nav a:hover { color: var(--accent) }
     </div>
   </div>
   <p class="sm prose" style="margin-top:20px">Per repository owner, never per seat. A CI gate has no
-    seats, so charging for engineers who never open the tool would be charging for nothing. More than
-    one repository? An invoice rather than a card? <a href="/pricing#teams">Ask</a>.</p>
+    seats, so charging for engineers who never open the tool would be charging for nothing.
+    <b>Team is $29 a month</b> for every repository an organisation owns, and
+    <b><a href="/pricing#fixflow">Fix flow</a> is $79 a month</b> if you would rather the findings
+    arrived already fixed, as a patch carrying a test that fails before it and passes after.</p>
 </div></section>
 
 <section><div class="wrap">

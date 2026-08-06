@@ -19,6 +19,7 @@ import { readFileSync, existsSync } from "node:fs";
 import { createServer } from "node:http";
 import { dirname, extname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
+import { granted } from "../src/entitlements.mjs";
 import { mintLicence } from "../src/licence.mjs";
 import { scan } from "../src/scan.mjs";
 
@@ -48,16 +49,22 @@ const SNIPPET_ID = SANDBOX ? process.env.TIUN_SANDBOX_SNIPPET_ID : process.env.T
  */
 const PRODUCTS = [
   {
-    key: "fixpack",
-    name: "Fix pack",
-    blurb: "Everything in Watch, plus the generated patch for every finding, each carrying a test that fails before the fix and passes after.",
-    id: SANDBOX ? process.env.TIUN_SANDBOX_PRODUCT_FIXPACK : process.env.TIUN_PRODUCT_FIXPACK,
-  },
-  {
     key: "watch",
     name: "Watch",
     blurb: "Continuous auditing plus a CI gate that fails the build when a check goes hollow. Unlocks the mutation proof in the CLI.",
     id: SANDBOX ? process.env.TIUN_SANDBOX_PRODUCT_WATCH : process.env.TIUN_PRODUCT_WATCH,
+  },
+  {
+    key: "team",
+    name: "Team",
+    blurb: "Watch for every repository the organisation owns, priority on issues, invoices on request.",
+    id: SANDBOX ? process.env.TIUN_SANDBOX_PRODUCT_TEAM : process.env.TIUN_PRODUCT_TEAM,
+  },
+  {
+    key: "fixflow",
+    name: "Fix flow",
+    blurb: "Up to three findings a month fixed for you, each as a patch carrying a test that fails before and passes after.",
+    id: SANDBOX ? process.env.TIUN_SANDBOX_PRODUCT_FIXFLOW : process.env.TIUN_PRODUCT_FIXFLOW,
   },
 ].filter((p) => Boolean(p.id));
 const API_BASE = SANDBOX ? "https://api-sandbox.tiun.live" : "https://api.tiun.live";
@@ -117,8 +124,10 @@ function licenceFor(user) {
   const owned = Object.keys(user?.productAccess ?? {});
   if (owned.length === 0) return { ok: false, error: "this account has not bought anything yet" };
   // Map Tiun product ids back to our own names, so the token never carries an id
-  // that changes when the live products are created.
-  const products = PRODUCTS.filter((p) => owned.includes(p.id)).map((p) => p.key);
+  // that changes when the live products are created, then expand each purchase
+  // into what it grants. A licence lists capabilities rather than purchases.
+  const bought = PRODUCTS.filter((p) => owned.includes(p.id)).map((p) => p.key);
+  const products = granted(bought);
   if (products.length === 0) return { ok: false, error: "the products on this account are not ones this build knows about" };
   if (!SIGNING_KEY) return { ok: false, error: "MARGYN_LICENCE_KEY is not set on the server, so no licence can be signed" };
   const expires = Date.now() + LICENCE_DAYS * 86_400_000;

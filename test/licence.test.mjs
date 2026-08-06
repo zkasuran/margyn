@@ -12,6 +12,7 @@ import { mkdtempSync, mkdirSync, writeFileSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { test } from "node:test";
+import { granted } from "../src/entitlements.mjs";
 import { entitled, verifyLicence } from "../src/licence.mjs";
 
 const LICENCES = {
@@ -75,8 +76,21 @@ test("entitled reads MARGYN_LICENCE and gates on the product name", () => {
   assert.match(wrong.reason, /covers fixture-only, not watch/);
 });
 
-test("a licence can cover several products at once", () => {
-  const env = { MARGYN_LICENCE: LICENCES.twoProducts };
+test("Team grants the paid check, a service grants nothing in the binary", () => {
+  // The CLI asks one question: does this licence cover "watch". So a Team
+  // purchase has to expand into that or somebody who bought the larger plan
+  // finds the paid check locked, which is the worst possible bug to ship in a
+  // billing path.
+  assert.deepEqual(granted(["watch"]), ["watch"]);
+  assert.deepEqual(granted(["team"]).sort(), ["team", "watch"]);
+  assert.ok(!granted(["fixflow"]).includes("watch"), "a service must not unlock the binary");
+  assert.deepEqual(granted(["team", "watch"]).sort(), ["team", "watch"], "no duplicates");
+  // An id created after this build shipped still names what was bought.
+  assert.deepEqual(granted(["enterprise"]), ["enterprise"]);
+  assert.deepEqual(granted([]), []);
+});
+
+test("a licence can cover several products at once", () => {  const env = { MARGYN_LICENCE: LICENCES.twoProducts };
   assert.equal(entitled("fixture-only", env).ok, true);
   assert.equal(entitled("fixture-extra", env).ok, true);
   assert.equal(entitled("watch", env).ok, false);

@@ -18,6 +18,27 @@ export default {
 
 <section><div class="wrap">
   <div class="rel">
+    <p class="when">2026-08-06<br>later</p>
+    <div>
+      <h3>Two more ways to buy, one of which is a person rather than a binary</h3>
+      <p><b>Team, 29 USD a month</b>, is Watch for every repository an organisation owns, with issues
+        triaged first and invoices instead of a card on request. It expands into the same capability
+        Watch grants, because a customer on the larger plan finding the paid check locked would be
+        the worst bug to ship in a billing path. That expansion now lives in one module both hosts
+        import, with a test naming each rule, rather than as a copy in each of them.</p>
+      <p><b>Fix flow, 79 USD a month</b>, is up to three findings a month fixed for you, each
+        returned as a patch carrying a test that fails before it and passes after. It works from the
+        finding rather than from your repository, so it needs no token, no clone and no repository
+        access, which keeps the promise on the security page intact. Three is the ceiling because
+        three is what one person can do properly in a month, so that is the number on the page
+        instead of the word unlimited.</p>
+      <p>The pricing page carries all three, checkout is wired per product rather than to one hard
+        coded id, then the terms say exactly what the service delivers plus what happens when it is
+        late.</p>
+    </div>
+  </div>
+
+  <div class="rel">
     <p class="when">0.1.2<br>2026-08-06</p>
     <div>
       <h3>Seven false positives found on a real repository, then fixed</h3>
