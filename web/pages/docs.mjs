@@ -201,6 +201,10 @@ npx margyn-scan . --mutate --max=12   # more mutations, more full test runs</pre
 <p>It is verified offline against a public key compiled into the CLI, so a paid check runs on a runner
   with no network access. Licences last 31 days. Take a new one whenever you like while the
   subscription is active, which is also how a lapsed subscription stops working on its own.</p>
+<p>A <b>Team</b> subscription mints a licence that carries the same capability as Watch, so the
+  mutation proof unlocks either way. A <b>Fix flow</b> subscription unlocks nothing in the binary,
+  which the licence says rather than implies: it is work delivered by a person, not a feature
+  flag.</p>
 <p>Every refusal names itself rather than collapsing into a single unhelpful no:</p>
 <pre tabindex="0" role="group" aria-label="Licence refusal messages">no licence found
 licence expired on 2026-09-06
