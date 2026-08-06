@@ -133,6 +133,10 @@ button:disabled { opacity: .4; cursor: not-allowed }
 button.ghost, .btn.ghost { background: transparent; color: var(--ink); border-color: var(--strong) }
 button.ghost:hover, .btn.ghost:hover { background: var(--rais); color: var(--ink); opacity: 1 }
 .btn.sm { min-height: 38px; padding: 0 13px; font-size: 13px }
+/* The bar CTA is the one control that can be dropped on a phone: the hero carries
+   the same action 200 pixels below it, and the bar has to hold the theme control. */
+.bar .btn.sm { display: none }
+@media (min-width: 560px) { .bar .btn.sm { display: inline-flex } }
 /* The copied confirmation is a state change the user asked for, so it gets
    --t-state rather than the faster hover duration. */
 .run button { transition: background var(--t-state) var(--ease), color var(--t-hover) var(--ease) }
@@ -235,6 +239,16 @@ button.ghost:hover, .btn.ghost:hover { background: var(--rais); color: var(--ink
 .tier li { padding: 4px 0 4px 21px; position: relative }
 .tier li::before { content: "+"; position: absolute; left: 0; color: var(--ok); font-weight: 700 }
 .tier .fill { flex: 1 }
+
+/* ---- numbered steps ---- */
+.steps { counter-reset: s; list-style: none; padding: 0; margin: 0 }
+.steps li { counter-increment: s; position: relative; padding: 0 0 16px 38px; color: var(--mut) }
+.steps li::before { content: counter(s); position: absolute; left: 0; top: 1px;
+                    width: 25px; height: 25px; display: grid; place-items: center;
+                    border: 1px solid var(--line2); border-radius: 999px;
+                    font: 700 12px/1 var(--sans); color: var(--ink) }
+.steps li b { color: var(--ink) }
+.steps + pre { margin-top: 8px }
 
 /* ---- panels, tables, definition rows ---- */
 .out:empty { display: none }
@@ -453,13 +467,15 @@ footer nav a:hover { color: var(--accent) }
     <nav aria-label="Elsewhere">
       <p class="foothead">Elsewhere</p>
       <a href="https://github.com/zkasuran/margyn">Source on GitHub</a>
+      <a href="https://github.com/zkasuran/margyn/issues">Support</a>
       <a href="https://tiun.business">Auth and payments by Tiun</a>
       <a href="/terms">Terms</a>
       <a href="/privacy">Privacy</a>
     </nav>
   </div>
-  <p class="sm footnote">Margyn. MIT licensed. Every number on this site was measured on the
-    shipped product, not estimated.</p>
+  <p class="sm footnote">Margyn is built and sold by <b>Asura Coding Works</b>. MIT licensed.
+    Support runs through <a href="https://github.com/zkasuran/margyn/issues">the repository issues</a>. Every number on
+    this site was measured on the shipped product rather than estimated.</p>
 </div></footer>
 <script type="module" src="/theme.mjs"></script>
 </body>

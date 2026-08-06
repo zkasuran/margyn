@@ -1,0 +1,79 @@
+name: Margyn
+description: >-
+  Audit the verification layer of a repository. Finds tests that assert nothing,
+  files git never committed and gates nothing invokes, then fails the job with a
+  reproduction for each finding.
+author: Asura Coding Works
+branding:
+  icon: alert-circle
+  color: green
+
+inputs:
+  path:
+    description: Repository path to scan. Defaults to the checkout root.
+    required: false
+    default: "."
+  version:
+    description: Which margyn-scan release to run. Pin it so a job cannot change under you.
+    required: false
+    default: "0.1.2"
+  mutate:
+    description: >-
+      Run the mutation proof too. Part of Watch, so it needs a licence in the
+      MARGYN_LICENCE environment variable. A missing licence prints the reason and
+      never fails the job.
+    required: false
+    default: "false"
+  max:
+    description: How many mutations to try when mutate is true.
+    required: false
+    default: "4"
+  json:
+    description: Also write the findings to margyn.json in the workspace.
+    required: false
+    default: "false"
+
+runs:
+  using: composite
+  steps:
+    - name: Audit the verification layer
+      shell: bash
+      # Inputs are passed through the environment rather than interpolated into
+      # the script, so a value containing shell syntax cannot become shell.
+      env:
+        MARGYN_PATH: ${{ inputs.path }}
+        MARGYN_VERSION: ${{ inputs.version }}
+        MARGYN_MUTATE: ${{ inputs.mutate }}
+        MARGYN_MAX: ${{ inputs.max }}
+        MARGYN_JSON: ${{ inputs.json }}
+      run: |
+        set -uo pipefail
+        # Installed into a directory of its own rather than run through npx.
+        # `npx margyn-scan` resolves a local package of the same name first, which
+        # breaks the moment the repository being scanned is this one. A gate that
+        # fails on its own repository is not a gate.
+        dir="${RUNNER_TEMP:-/tmp}/margyn-$MARGYN_VERSION"
+        mkdir -p "$dir"
+        npm install --no-save --no-audit --no-fund --prefix "$dir" "margyn-scan@$MARGYN_VERSION" > /dev/null
+        bin="$dir/node_modules/.bin/margyn-scan"
+        if [ ! -x "$bin" ]; then
+          echo "margyn-scan@$MARGYN_VERSION did not install, so nothing was audited" >&2
+          exit 90
+        fi
+
+        args=("$MARGYN_PATH")
+        if [ "$MARGYN_MUTATE" = "true" ]; then
+          args+=(--mutate "--max=$MARGYN_MAX")
+        fi
+
+        status=0
+        if [ "$MARGYN_JSON" = "true" ]; then
+          "$bin" "${args[@]}" --json > margyn.json || status=$?
+          cat margyn.json
+        else
+          "$bin" "${args[@]}" || status=$?
+        fi
+        # Exit code 1 means findings, which should fail the job. Anything else is
+        # the tool itself going wrong, which should fail louder rather than
+        # quieter, so the code is passed straight through.
+        exit "$status"

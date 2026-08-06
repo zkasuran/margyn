@@ -1,0 +1,36 @@
+name: ci
+
+# The gates that decide whether this ships, run on every push. The last step runs
+# our own action over our own repository, so the thing we sell is exercised by the
+# pipeline that publishes it rather than only in a demo.
+on:
+  push:
+    branches: [master]
+  pull_request:
+
+jobs:
+  gates:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      # No install step: the scanner has no runtime dependencies and the suite
+      # runs on node:test, so there is nothing to fetch before testing.
+      - name: Tests
+        run: npm test
+
+      - name: Palette contrast gate
+        run: node bin/contrast.mjs
+
+      - name: The built pages match their modules
+        run: |
+          npm run build
+          git diff --exit-code -- web/public worker/static.generated.mjs
+
+      - name: Audit our own verification layer
+        uses: ./
+        with:
+          path: .

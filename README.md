@@ -1,5 +1,8 @@
 # Margyn
 
+[![ci](https://github.com/zkasuran/margyn/actions/workflows/ci.yml/badge.svg)](https://github.com/zkasuran/margyn/actions/workflows/ci.yml)
+[![npm](https://img.shields.io/npm/v/margyn-scan)](https://www.npmjs.com/package/margyn-scan)
+
 Audits your test suite instead of your code.
 
 Margyn does not review your logic. It audits the machinery that is supposed to
@@ -34,6 +37,19 @@ existing package called morgan. The command it installs is `margyn`.
 Site: [margyn.xyz](https://margyn.xyz). Documentation:
 [margyn.xyz/docs](https://margyn.xyz/docs). Pricing:
 [margyn.xyz/pricing](https://margyn.xyz/pricing).
+
+## In GitHub Actions
+
+```yaml
+- uses: zkasuran/margyn@v0
+  with:
+    path: .
+```
+
+One line, pinned to a release, exit code 1 when anything was found. Inputs:
+`path`, `version`, `mutate`, `max` and `json`. With `mutate: "true"` put your
+licence in `MARGYN_LICENCE` as a repository secret. This repository's own pipeline
+runs that action over itself on every push.
 
 ## What it checks today
 

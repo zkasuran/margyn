@@ -120,8 +120,8 @@ ${page.session ? `
   <p class="who" id="who" role="status" aria-live="polite"></p>
   <button id="login" class="ghost" hidden>Sign in</button>
   <button id="licence" hidden>Get my licence</button>
-  <button id="logout" class="ghost" hidden>Sign out</button>` : `
-  <a class="btn sm" href="/pricing">Get Watch</a>`}
+  <button id="logout" class="ghost" hidden>Sign out</button>` : ""}
+${page.path === "/pricing" ? "" : '  <a class="btn sm" href="/pricing">Get Watch</a>'}
 </div></header>
 
 <main id="main">${page.session ? `
@@ -147,13 +147,15 @@ ${page.body}
     <nav aria-label="Elsewhere">
       <p class="foothead">Elsewhere</p>
       <a href="${SITE.repo}">Source on GitHub</a>
+      <a href="${SITE.repo}/issues">Support</a>
       <a href="https://tiun.business">Auth and payments by Tiun</a>
       <a href="/terms">Terms</a>
       <a href="/privacy">Privacy</a>
     </nav>
   </div>
-  <p class="sm footnote">Margyn. MIT licensed. Every number on this site was measured on the
-    shipped product, not estimated.</p>
+  <p class="sm footnote">Margyn is built and sold by <b>Asura Coding Works</b>. MIT licensed.
+    Support runs through <a href="${SITE.repo}/issues">the repository issues</a>. Every number on
+    this site was measured on the shipped product rather than estimated.</p>
 </div></footer>
 ${page.session ? '<script type="module" src="/app.mjs"></script>' : '<script type="module" src="/theme.mjs"></script>'}
 </body>

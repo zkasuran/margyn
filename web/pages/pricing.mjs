@@ -112,6 +112,31 @@ Everything below is the free scan, which ran in full.
   </table>
 </div></section>
 
+<section id="teams"><div class="wrap">
+  <h2>For a team, plus whoever signs off on it</h2>
+  <p class="prose">The price is per repository owner rather than per seat, so adding engineers who
+    never open the tool costs nothing. One licence covers your CI runners: it is verified offline
+    against a key compiled into the binary, so it works on every runner at once without a seat count
+    or a phone home.</p>
+  <table class="st">
+    <tr><th>More than one repository</th><td>One subscription covers the repositories you own. If you
+      need separate billing per team or a single invoice across several,
+      <a href="https://github.com/zkasuran/margyn/issues">ask</a> and it is set up by hand today
+      rather than by a form.</td></tr>
+    <tr><th>Invoices, annual terms, purchase orders</th><td>Card checkout is what is automated. An
+      annual arrangement or an invoice is a conversation, so ask before you subscribe rather than
+      after.</td></tr>
+    <tr><th>Procurement review</th><td>Everything a reviewer normally asks for is already written
+      down: <a href="/security">every process the scanner starts</a>, the absence of a hosted scan
+      endpoint, what the licence carries, plus <a href="https://github.com/zkasuran/margyn">the
+      source</a> under MIT so it can be read before it runs.</td></tr>
+    <tr><th>Support</th><td><a href="https://github.com/zkasuran/margyn/issues">Repository
+      issues</a>, in public, which is a channel you can check is answered before you pay. A finding
+      you cannot reproduce is treated as a defect in the tool rather than a question about your
+      repository.</td></tr>
+  </table>
+</div></section>
+
 <section><div class="wrap">
   <h2>Questions people actually ask</h2>
   <div class="faq prose">

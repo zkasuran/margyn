@@ -133,6 +133,10 @@ button:disabled { opacity: .4; cursor: not-allowed }
 button.ghost, .btn.ghost { background: transparent; color: var(--ink); border-color: var(--strong) }
 button.ghost:hover, .btn.ghost:hover { background: var(--rais); color: var(--ink); opacity: 1 }
 .btn.sm { min-height: 38px; padding: 0 13px; font-size: 13px }
+/* The bar CTA is the one control that can be dropped on a phone: the hero carries
+   the same action 200 pixels below it, and the bar has to hold the theme control. */
+.bar .btn.sm { display: none }
+@media (min-width: 560px) { .bar .btn.sm { display: inline-flex } }
 /* The copied confirmation is a state change the user asked for, so it gets
    --t-state rather than the faster hover duration. */
 .run button { transition: background var(--t-state) var(--ease), color var(--t-hover) var(--ease) }
@@ -236,6 +240,16 @@ button.ghost:hover, .btn.ghost:hover { background: var(--rais); color: var(--ink
 .tier li::before { content: "+"; position: absolute; left: 0; color: var(--ok); font-weight: 700 }
 .tier .fill { flex: 1 }
 
+/* ---- numbered steps ---- */
+.steps { counter-reset: s; list-style: none; padding: 0; margin: 0 }
+.steps li { counter-increment: s; position: relative; padding: 0 0 16px 38px; color: var(--mut) }
+.steps li::before { content: counter(s); position: absolute; left: 0; top: 1px;
+                    width: 25px; height: 25px; display: grid; place-items: center;
+                    border: 1px solid var(--line2); border-radius: 999px;
+                    font: 700 12px/1 var(--sans); color: var(--ink) }
+.steps li b { color: var(--ink) }
+.steps + pre { margin-top: 8px }
+
 /* ---- panels, tables, definition rows ---- */
 .out:empty { display: none }
 .out { margin-top: 20px }
@@ -335,6 +349,7 @@ footer nav a:hover { color: var(--accent) }
   <button id="login" class="ghost" hidden>Sign in</button>
   <button id="licence" hidden>Get my licence</button>
   <button id="logout" class="ghost" hidden>Sign out</button>
+
 </div></header>
 
 <main id="main">
@@ -445,6 +460,31 @@ Everything below is the free scan, which ran in full.
   </table>
 </div></section>
 
+<section id="teams"><div class="wrap">
+  <h2>For a team, plus whoever signs off on it</h2>
+  <p class="prose">The price is per repository owner rather than per seat, so adding engineers who
+    never open the tool costs nothing. One licence covers your CI runners: it is verified offline
+    against a key compiled into the binary, so it works on every runner at once without a seat count
+    or a phone home.</p>
+  <table class="st">
+    <tr><th>More than one repository</th><td>One subscription covers the repositories you own. If you
+      need separate billing per team or a single invoice across several,
+      <a href="https://github.com/zkasuran/margyn/issues">ask</a> and it is set up by hand today
+      rather than by a form.</td></tr>
+    <tr><th>Invoices, annual terms, purchase orders</th><td>Card checkout is what is automated. An
+      annual arrangement or an invoice is a conversation, so ask before you subscribe rather than
+      after.</td></tr>
+    <tr><th>Procurement review</th><td>Everything a reviewer normally asks for is already written
+      down: <a href="/security">every process the scanner starts</a>, the absence of a hosted scan
+      endpoint, what the licence carries, plus <a href="https://github.com/zkasuran/margyn">the
+      source</a> under MIT so it can be read before it runs.</td></tr>
+    <tr><th>Support</th><td><a href="https://github.com/zkasuran/margyn/issues">Repository
+      issues</a>, in public, which is a channel you can check is answered before you pay. A finding
+      you cannot reproduce is treated as a defect in the tool rather than a question about your
+      repository.</td></tr>
+  </table>
+</div></section>
+
 <section><div class="wrap">
   <h2>Questions people actually ask</h2>
   <div class="faq prose">
@@ -503,13 +543,15 @@ Everything below is the free scan, which ran in full.
     <nav aria-label="Elsewhere">
       <p class="foothead">Elsewhere</p>
       <a href="https://github.com/zkasuran/margyn">Source on GitHub</a>
+      <a href="https://github.com/zkasuran/margyn/issues">Support</a>
       <a href="https://tiun.business">Auth and payments by Tiun</a>
       <a href="/terms">Terms</a>
       <a href="/privacy">Privacy</a>
     </nav>
   </div>
-  <p class="sm footnote">Margyn. MIT licensed. Every number on this site was measured on the
-    shipped product, not estimated.</p>
+  <p class="sm footnote">Margyn is built and sold by <b>Asura Coding Works</b>. MIT licensed.
+    Support runs through <a href="https://github.com/zkasuran/margyn/issues">the repository issues</a>. Every number on
+    this site was measured on the shipped product rather than estimated.</p>
 </div></footer>
 <script type="module" src="/app.mjs"></script>
 </body>
