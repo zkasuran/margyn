@@ -8,6 +8,7 @@
  */
 import { existsSync, readFileSync, readdirSync } from "node:fs";
 import { join } from "node:path";
+import { shq } from "../shell.mjs";
 
 /** npm runs these itself, so absence from CI proves nothing. */
 const LIFECYCLE = new Set([
@@ -79,6 +80,16 @@ export function unrunChecks(root) {
           `grep -R '${name}' .github/workflows/ || echo 'NOT referenced by any workflow'`,
           `npm run ${name} --prefix $(dirname ${path.replace(root + "/", "")})`,
         ],
+        // Proof mode re-greps the workflows for the script name. It does not run
+        // the script (that would execute arbitrary declared commands); it
+        // confirms the claim that no workflow names it.
+        proof: {
+          verifiable: true,
+          commands: [
+            `grep -rF ${shq(name)} .github/workflows/ >/dev/null 2>&1 && echo MARGYN_REFERENCED || echo MARGYN_NOT_REFERENCED`,
+          ],
+          expect: ["MARGYN_NOT_REFERENCED"],
+        },
         why: "A gate nobody invokes cannot fail. It reads as coverage in the repository and contributes none.",
       });
     }

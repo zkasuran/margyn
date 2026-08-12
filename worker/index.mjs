@@ -24,6 +24,7 @@
  * bytes because the format lives in one module. Proven by test/worker.test.mjs.
  */
 import { granted } from "../src/entitlements.mjs";
+import { intake } from "../src/fix-intake.mjs";
 import { bodyOf, bytesToSign, decode, tokenOf } from "../src/licence-format.mjs";
 import { STATIC } from "./static.generated.mjs";
 
@@ -80,6 +81,12 @@ function config(env) {
         name: "Fix flow",
         blurb: "Up to three findings a month fixed for you, each as a patch carrying a test that fails before and passes after.",
         id: sandbox ? env.TIUN_SANDBOX_PRODUCT_FIXFLOW : env.TIUN_PRODUCT_FIXFLOW,
+      },
+      {
+        key: "solofix",
+        name: "Solo Fix",
+        blurb: "One finding a month fixed for you, as a patch carrying a test that fails before and passes after. The cheap way in.",
+        id: sandbox ? env.TIUN_SANDBOX_PRODUCT_SOLOFIX : env.TIUN_PRODUCT_SOLOFIX,
       },
     ].filter((p) => Boolean(p.id)),
   };
@@ -141,6 +148,21 @@ export default {
       // The snippet id is a public client value. The API key is not, and is absent here.
       // `scan: false` tells the page there is no scan route on this host.
       return json({ snippetId: cfg.snippetId ?? null, sandbox: cfg.sandbox, products: cfg.products, scan: false });
+    }
+
+    if (url.pathname === "/api/fix-intake") {
+      if (request.method !== "POST") return json({ error: "use POST" }, 405);
+      let body;
+      try {
+        body = await readBody(request);
+      } catch (e) {
+        return json({ error: String(e.message ?? e) }, 400);
+      }
+      // Prepares a fix request from the finding alone. It stores nothing and
+      // reads no repository, so there is no source to leak and no data to guard.
+      const result = intake(body);
+      const { status, ...rest } = result;
+      return json(rest, status);
     }
 
     if (url.pathname === "/api/verify" || url.pathname === "/api/licence") {

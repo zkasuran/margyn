@@ -141,6 +141,7 @@ ${page.body}
       <a href="/proof">Proof</a>
       <a href="/docs">Documentation</a>
       <a href="/pricing">Pricing</a>
+      <a href="/fix">Fix flow</a>
       <a href="/changelog">Changelog</a>
       <a href="/security">Security</a>
     </nav>

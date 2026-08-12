@@ -1,12 +1,16 @@
 #!/usr/bin/env node
-import { readFileSync } from "node:fs";
+import { readFileSync, writeFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { entitled } from "./licence.mjs";
+import { prove } from "./prove.mjs";
+import { toMarkdown } from "./report/github.mjs";
+import { toSarif } from "./report/sarif.mjs";
 import { scan } from "./scan.mjs";
 
 const args = process.argv.slice(2);
 const asJson = args.includes("--json");
 const wantsMutation = args.includes("--mutate");
+const wantsProve = args.includes("--prove");
 const root = resolve(args.find((a) => !a.startsWith("--")) ?? ".");
 
 /** Read rather than hardcoded, so a release cannot ship the wrong number. */
@@ -27,8 +31,12 @@ usage: margyn [path] [options]
 
   path         repository to scan. Defaults to the current directory
   --mutate     run the mutation proof too. Part of Watch, so it needs a licence
+  --prove      run each finding's own proof, certify what reproduces and retract
+               what does not, so a gate never fails on a claim it cannot show
   --max=<n>    how many mutations to try. Defaults to 4
   --json       print the findings as JSON instead of text
+  --sarif-out=<file>    also write SARIF 2.1.0, for GitHub's Security tab
+  --comment-out=<file>  also write a Markdown report, for a PR comment or summary
   --version    print the version
   --help       print this
 
@@ -74,7 +82,24 @@ const licence = wantsMutation ? entitled("watch") : null;
 const mutate = wantsMutation && licence.ok;
 
 const findings = scan(root, { mutate, max });
-const C = { r: "\x1b[31m", y: "\x1b[33m", d: "\x1b[2m", b: "\x1b[1m", x: "\x1b[0m" };
+const proven = wantsProve ? prove(root, findings) : null;
+const shown = proven ? proven.kept : findings;
+
+/**
+ * Extra report files, written alongside the normal output rather than instead of
+ * it, so one scan can feed a PR comment, the Security tab and a human at once.
+ * A single run keeps the mutation proof from executing more than once.
+ */
+const sarifOut = (args.find((a) => a.startsWith("--sarif-out=")) ?? "").slice("--sarif-out=".length);
+const commentOut = (args.find((a) => a.startsWith("--comment-out=")) ?? "").slice("--comment-out=".length);
+if (sarifOut) {
+  writeFileSync(sarifOut, `${JSON.stringify(toSarif(shown, { version: version() }), null, 2)}\n`);
+}
+if (commentOut) {
+  writeFileSync(commentOut, `${toMarkdown(shown, { retracted: proven?.retracted, version: version() })}\n`);
+}
+
+const C = { r: "\x1b[31m", y: "\x1b[33m", g: "\x1b[32m", d: "\x1b[2m", b: "\x1b[1m", x: "\x1b[0m" };
 const tint = { high: C.r, medium: C.y, low: C.d };
 
 /**
@@ -85,7 +110,10 @@ const tint = { high: C.r, medium: C.y, low: C.d };
 function report() {
   if (asJson) {
     const gate = wantsMutation ? { mutation: mutate ? "unlocked" : "locked", reason: licence.ok ? undefined : licence.reason } : undefined;
-    process.stdout.write(`${JSON.stringify({ root, findings, gate }, null, 2)}\n`);
+    const body = proven
+      ? { root, findings: proven.kept, retracted: proven.retracted, proof: proven.tally, gate }
+      : { root, findings, gate };
+    process.stdout.write(`${JSON.stringify(body, null, 2)}\n`);
     return;
   }
 
@@ -96,6 +124,8 @@ function report() {
     console.log(`${C.d}Unlock it at https://margyn.xyz/pricing, then put the licence in ~/.margyn/licence or MARGYN_LICENCE.${C.x}`);
     console.log(`${C.d}Everything below is the free scan, which ran in full.${C.x}\n`);
   }
+
+  if (proven) return reportProven();
 
   if (findings.length === 0) {
     console.log("Nothing hollow found. Every check this tool knows how to test held up.");
@@ -114,5 +144,44 @@ function report() {
   }
 }
 
+/**
+ * Proof mode output. Each kept finding carries what proving it produced:
+ * REPRODUCED with the markers its proof printed, OBSERVED for the mutation proof
+ * that was established by running the suite, SHOWN for the few whose evidence a
+ * person reads. Retracted findings are listed apart, because withdrawing a
+ * finding you cannot reproduce is the whole point of the mode.
+ */
+function reportProven() {
+  const { kept, retracted, tally } = proven;
+  if (kept.length === 0 && retracted.length === 0) {
+    console.log("Nothing hollow found. Every check this tool knows how to test held up.");
+    return;
+  }
+  const badge = { reproduced: `${C.g}REPRODUCED${C.x}`, observed: `${C.g}OBSERVED${C.x}`, shown: `${C.d}SHOWN${C.x}` };
+  for (const [i, f] of kept.entries()) {
+    const status = f.proven.status;
+    console.log(`${C.b}${i + 1}. ${f.summary}${C.x}`);
+    console.log(`   ${tint[f.severity] ?? ""}${f.severity.toUpperCase()}${C.x}  ${C.d}${f.check}${C.x}  ${f.file}  ${badge[status] ?? status}`);
+    if (status === "reproduced") {
+      for (const line of f.proven.output.split("\n").slice(0, 6)) console.log(`   ${C.d}${line}${C.x}`);
+    } else if (status === "observed") {
+      console.log(`   ${C.d}${f.proven.note ?? "established by running your suite while scanning"}${C.x}`);
+    } else {
+      for (const line of f.reproduction) console.log(`     ${line}`);
+    }
+    console.log();
+  }
+  if (retracted.length) {
+    console.log(`${C.d}Retracted, because the proof did not reproduce on this tree:${C.x}`);
+    for (const f of retracted) console.log(`   ${C.d}- ${f.summary} (no ${f.proven.missing.join(", ")})${C.x}`);
+    console.log();
+  }
+  const parts = [`${tally.reproduced} reproduced`];
+  if (tally.observed) parts.push(`${tally.observed} observed`);
+  if (tally.shown) parts.push(`${tally.shown} shown`);
+  if (tally.retracted) parts.push(`${tally.retracted} retracted`);
+  console.log(`${tally.total} finding${tally.total === 1 ? "" : "s"}: ${parts.join(", ")}.`);
+}
+
 report();
-process.exitCode = findings.length > 0 ? 1 : 0;
+process.exitCode = shown.length > 0 ? 1 : 0;

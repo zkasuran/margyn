@@ -56,14 +56,33 @@ margyn [path] [options]              # once it is on your path
 
   path         repository to scan. Defaults to the current directory
   --mutate     run the mutation proof too. Part of Watch, so it needs a licence
+  --prove      run each finding's own proof, certify what reproduces, retract the rest
   --max=&lt;n&gt;    how many mutations to try. Defaults to 4
   --json       print the findings as JSON instead of text
+  --sarif-out=&lt;file&gt;    also write SARIF 2.1.0 for GitHub's Security tab
+  --comment-out=&lt;file&gt;  also write a Markdown report for a PR comment or summary
   --version    print the version
   --help       print the usage above</pre>
 <p><strong>Exit code is 1 when anything was found</strong> and 0 when nothing was. That is the whole
   CI contract, so no wrapper script is needed. An invalid <code>--max</code> exits 2 rather than
   quietly falling back to the default, because a typo that scans four files while you believe it
   scanned forty is the same class of defect this tool reports.</p>
+
+<h2 id="prove">Proof mode</h2>
+<p>Every finding already ships a reproduction. <code>--prove</code> runs it for you. For each
+  finding Margyn executes the read-only proof its check emitted, checks the output carries the
+  markers the finding predicted, and labels it <b>reproduced</b>. A finding it cannot reproduce is
+  <b>retracted</b> and dropped, so a gate never fails your build on a claim the tool could not show
+  on your own tree. The mutation proof is reported as <b>observed</b>, because it was already
+  established by running your suite. It is free: it makes a finding undeniable, which is the whole
+  product.</p>
+<pre tabindex="0" role="group" aria-label="Proof mode">npx margyn-scan . --prove
+
+1. vendor/dist/IPool.mjs is read but git ignores it   <span class="r">HIGH</span>  ignored-source  <b>REPRODUCED</b>
+   MARGYN_ABSENT_FROM_HEAD
+   MARGYN_PRESENT_ON_DISK
+
+2 findings: 2 reproduced.</pre>
 
 <h2 id="output">Reading the output</h2>
 <pre tabindex="0" role="group" aria-label="Anatomy of a finding"><b>margyn /tmp/moss</b>
@@ -230,6 +249,24 @@ this licence covers watch, not fixpack</pre>
   <code>ignored-source</code> exists to find. And the licence secret belongs in the repository or
   organisation secrets, not in the workflow file, for the reason on the
   <a href="/security">security page</a>.</p>
+
+<h2 id="pr">Findings on the pull request</h2>
+<p>The <a href="https://github.com/zkasuran/margyn">Margyn action</a> can post the findings where developers look. It
+  writes a job summary every run, and on a pull request it will keep one comment updated in place and
+  upload SARIF to the Security tab. It uses the job's own <code>GITHUB_TOKEN</code>, so nothing is
+  hosted and no secret leaves your repository.</p>
+<pre tabindex="0" role="group" aria-label="GitHub Actions, findings on the PR">permissions:
+  contents: read
+  pull-requests: write     # for the comment
+  security-events: write   # for the Security tab
+steps:
+  - uses: actions/checkout@v4
+  - uses: zkasuran/margyn@v0
+    with:
+      comment: true
+      sarif: true</pre>
+<p>Both are off by default and both are best-effort: if a comment or an upload fails, the step warns
+  and still fails the job on findings, because the audit result is the exit code, not the comment.</p>
 
 <h2 id="json">JSON output</h2>
 <pre tabindex="0" role="group" aria-label="The JSON shape">{

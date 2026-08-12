@@ -18,6 +18,30 @@ export default {
 
 <section><div class="wrap">
   <div class="rel">
+    <p class="when">0.2.0<br>2026-08-12</p>
+    <div>
+      <h3>Margyn runs its own reproductions, posts them on your PR, and gains a cheaper way in</h3>
+      <p><b>Proof mode, <code>--prove</code>.</b> Every finding already ships a reproduction. Now
+        Margyn runs it. For each finding it executes the read-only proof its check emitted, checks the
+        output carries the markers it predicted, and marks it reproduced. A finding it cannot
+        reproduce is retracted and dropped, so a gate never fails a build on a claim the tool could
+        not show on your tree. The mutation proof reports as observed, because running your suite is
+        how it was established. It is free, because a finding you can watch reproduce is the whole
+        product.</p>
+      <p><b>Findings on the pull request.</b> The action can now write a job summary every run, keep
+        one pull-request comment updated in place, and upload SARIF to the Security tab. It uses the
+        job's own token, so nothing is hosted and no secret leaves the repository. New CLI outputs
+        <code>--sarif-out</code> and <code>--comment-out</code> back it, and both are one scan, so the
+        mutation proof never runs twice.</p>
+      <p><b>Fix flow has an intake, and a cheaper tier.</b> <a href="/fix">A page</a> takes a finding,
+        works from it rather than your repository, and prepares a tracked request without ever
+        carrying the code snippet a finding sometimes holds. <b>Solo Fix, 19 USD a month</b>, is one
+        fixed finding a month, the cheap way in below Fix flow's three. A real fix is a person writing
+        a patch, so one a month is the honest floor rather than a number chosen to look small.</p>
+    </div>
+  </div>
+
+  <div class="rel">
     <p class="when">2026-08-06<br>later</p>
     <div>
       <h3>Two more ways to buy, one of which is a person rather than a binary</h3>

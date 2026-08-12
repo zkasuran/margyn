@@ -20,6 +20,7 @@ import { createServer } from "node:http";
 import { dirname, extname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { granted } from "../src/entitlements.mjs";
+import { intake } from "../src/fix-intake.mjs";
 import { mintLicence } from "../src/licence.mjs";
 import { scan } from "../src/scan.mjs";
 
@@ -65,6 +66,12 @@ const PRODUCTS = [
     name: "Fix flow",
     blurb: "Up to three findings a month fixed for you, each as a patch carrying a test that fails before and passes after.",
     id: SANDBOX ? process.env.TIUN_SANDBOX_PRODUCT_FIXFLOW : process.env.TIUN_PRODUCT_FIXFLOW,
+  },
+  {
+    key: "solofix",
+    name: "Solo Fix",
+    blurb: "One finding a month fixed for you, as a patch carrying a test that fails before and passes after. The cheap way in.",
+    id: SANDBOX ? process.env.TIUN_SANDBOX_PRODUCT_SOLOFIX : process.env.TIUN_PRODUCT_SOLOFIX,
   },
 ].filter((p) => Boolean(p.id));
 const API_BASE = SANDBOX ? "https://api-sandbox.tiun.live" : "https://api.tiun.live";
@@ -165,6 +172,15 @@ const server = createServer(async (req, res) => {
       if (!seen.ok) return json(res, 401, { error: seen.error ?? "not authenticated with tiun" });
       const minted = licenceFor(seen.user);
       return json(res, minted.ok ? 200 : 402, minted.ok ? minted : { error: minted.error });
+    } catch (e) {
+      return json(res, 400, { error: String(e.message ?? e) });
+    }
+  }
+
+  if (url.pathname === "/api/fix-intake" && req.method === "POST") {
+    try {
+      const { status, ...rest } = intake(await readBody(req));
+      return json(res, status, rest);
     } catch (e) {
       return json(res, 400, { error: String(e.message ?? e) });
     }

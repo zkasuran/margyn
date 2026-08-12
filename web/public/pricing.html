@@ -361,8 +361,9 @@ footer nav a:hover { color: var(--accent) }
 <section class="phead"><div class="wrap">
   <h1 class="prose">Four checks are free. The fifth runs your suite, so it costs money.</h1>
   <p class="lede prose">Watch is $8.99 a month for one owner's repositories. Team is $29 a month for
-    an organisation. Fix flow is $79 a month if you would rather the findings arrived already
-    fixed. The four static checks stay free with no account, no licence and no network.</p>
+    an organisation. Solo Fix is $19 a month for one finding fixed, Fix flow is $79 a month for
+    three, if you would rather the findings arrived already fixed. The four static checks stay free
+    with no account, no licence and no network.</p>
 </div></section>
 
 <section><div class="wrap">
@@ -374,6 +375,8 @@ footer nav a:hover { color: var(--accent) }
         <li>Four static checks: ignored-source, no-assertion, unrun-check, lint-blindspot</li>
         <li>No account, no licence, no network call at any point</li>
         <li>Every finding carries a command that reproduces it</li>
+        <li><code>--prove</code> runs each finding's own proof, then retracts anything it cannot reproduce</li>
+        <li>On a pull request: a comment, a job summary and SARIF in the Security tab, all free</li>
         <li>Exit code 1 on findings, so it gates CI today</li>
       </ul>
       <div class="fill"></div>
@@ -421,10 +424,26 @@ footer nav a:hover { color: var(--accent) }
   </div>
 </div></section>
 
-<section id="fixflow"><div class="wrap">
+<section id="fix"><div class="wrap">
   <p class="eyebrow">The service line</p>
   <h2>Or have the findings arrive already fixed</h2>
   <div class="tiers">
+    <div class="tier">
+      <p class="tag">Solo Fix <span class="paid">the cheap way in</span></p>
+      <p class="amt">$19<span class="per"> a month</span></p>
+      <ul>
+        <li>One finding a month fixed for you</li>
+        <li>It arrives as a patch carrying a test that fails before it and passes after</li>
+        <li>Back within five working days. Otherwise that month is refunded</li>
+        <li>Cancel whenever you like</li>
+      </ul>
+      <div class="fill"></div>
+      <p class="cta">
+        <button class="ghost" data-signin>Sign in to start</button>
+        <button data-buy="solofix" hidden>Start Solo Fix</button>
+      </p>
+      <p class="sm">One a month is the honest floor: a real fix is a person writing a patch.</p>
+    </div>
     <div class="tier pick">
       <p class="tag">Fix flow</p>
       <p class="amt">$79<span class="per"> a month</span></p>
@@ -439,21 +458,22 @@ footer nav a:hover { color: var(--accent) }
         <button class="ghost" data-signin>Sign in to start</button>
         <button data-buy="fixflow" hidden>Start Fix flow</button>
       </p>
-      <p class="sm">No trial on this one, because a trial on a service is unpaid work.</p>
+      <p class="sm">No trial on either, because a trial on a service is unpaid work.</p>
     </div>
-    <div>
-      <h3>It works from the finding, not from your repository</h3>
-      <p class="prose">You send the finding, which already carries the file, the line, the rule that
-        caused it and the reproduction. We send back a patch. Nobody needs a token that can read
-        your source, so the promise on the <a href="/security">security page</a> holds exactly as
-        it does for the free scan: your code stays where it is.</p>
-      <p class="prose">If a fix genuinely cannot be written from the finding alone, we say so and it
-        does not count against your three. A patch that does not apply is our defect rather than
-        your problem.</p>
-      <p class="sm prose">This is the honest shape of it: the scan is a tool, the fix is a person
-        writing a patch. Three a month is what one person can do properly, so that is the number on
-        the page rather than the word unlimited.</p>
-    </div>
+  </div>
+  <div style="margin-top:18px">
+    <h3>It works from the finding, not from your repository</h3>
+    <p class="prose">You send the finding, which already carries the file, the line, the rule that
+      caused it and the reproduction. We send back a patch. Nobody needs a token that can read
+      your source, so the promise on the <a href="/security">security page</a> holds exactly as
+      it does for the free scan: your code stays where it is. <b><a href="/fix">Send a finding
+      now</a></b>, it takes a paste.</p>
+    <p class="prose">If a fix genuinely cannot be written from the finding alone, we say so and it
+      does not count against your month. A patch that does not apply is our defect rather than
+      your problem.</p>
+    <p class="sm prose">This is the honest shape of it: the scan is a tool, the fix is a person
+      writing a patch. One or three a month is what a person can do properly, so that is the
+      number on the page rather than the word unlimited.</p>
   </div>
 </div></section>
 
@@ -499,11 +519,11 @@ Everything below is the free scan, which ran in full.
   <h2>Billing, stated plainly</h2>
   <table class="st">
     <tr><th>Price</th><td>Watch 8.99 USD a month for one repository owner. Team 29 USD a month for
-      an organisation. Fix flow 79 USD a month for up to three fixed findings. No per seat and no
-      per committer billing anywhere: a CI gate has no seats, so charging for engineers who never
-      open the tool would be charging for nothing.</td></tr>
-    <tr><th>Trial</th><td>Three days at no charge on Watch and Team. Fix flow has none, because a
-      trial on a service is unpaid work.</td></tr>
+      an organisation. Solo Fix 19 USD a month for one fixed finding, Fix flow 79 USD a month for up
+      to three. No per seat and no per committer billing anywhere: a CI gate has no seats, so
+      charging for engineers who never open the tool would be charging for nothing.</td></tr>
+    <tr><th>Trial</th><td>Three days at no charge on Watch and Team. Solo Fix and Fix flow have
+      none, because a trial on a service is unpaid work.</td></tr>
     <tr><th>Renewal</th><td>Monthly, until you cancel.</td></tr>
     <tr><th>Cancelling</th><td>Any time. The licence on your disk keeps working until it expires
       and the four free checks are unaffected.</td></tr>
@@ -595,6 +615,7 @@ Everything below is the free scan, which ran in full.
       <a href="/proof">Proof</a>
       <a href="/docs">Documentation</a>
       <a href="/pricing">Pricing</a>
+      <a href="/fix">Fix flow</a>
       <a href="/changelog">Changelog</a>
       <a href="/security">Security</a>
     </nav>

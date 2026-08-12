@@ -72,6 +72,7 @@ export function mutationProof(root, opts = {}) {
         summary: "mutation testing skipped because the suite does not pass unmutated",
         evidence: `baseline \`${command}\` ${baseline.timedOut ? "timed out" : "failed"}`,
         reproduction: [command],
+        proof: { verifiable: false, note: `baseline \`${command}\` did not pass, so nothing was mutated` },
         why: "A mutation only proves something when the suite is green before the mutation. Fix the baseline, then re-run with --mutate.",
       },
     ];
@@ -121,6 +122,10 @@ export function mutationProof(root, opts = {}) {
             command,
             `git checkout -- ${file}`,
           ],
+          // Already established: this finding exists only because the suite was
+          // run with the line inverted and passed. Proof mode reports it as
+          // observed rather than re-running, which would mutate the tree again.
+          proof: { verifiable: false, observed: true, note: `${mutation.label} in ${file}, suite passed under \`${command}\`` },
           why: "No test observes this behaviour. The line can be inverted in production and every gate you own reports success.",
         });
       }

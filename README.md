@@ -25,8 +25,11 @@ margyn [path] [options]              # once it is on your path
 
   path         repository to scan. Defaults to the current directory
   --mutate     run the mutation proof too. Part of Watch, so it needs a licence
+  --prove      run each finding's own proof, certify what reproduces, retract the rest
   --max=<n>    how many mutations to try. Defaults to 4
   --json       print the findings as JSON instead of text
+  --sarif-out=<file>    also write SARIF 2.1.0 for GitHub's Security tab
+  --comment-out=<file>  also write a Markdown report for a PR comment or summary
   --version    print the version
   --help       print the usage above
 ```
@@ -47,9 +50,35 @@ Site: [margyn.xyz](https://margyn.xyz). Documentation:
 ```
 
 One line, pinned to a release, exit code 1 when anything was found. Inputs:
-`path`, `version`, `mutate`, `max` and `json`. With `mutate: "true"` put your
-licence in `MARGYN_LICENCE` as a repository secret. This repository's own pipeline
-runs that action over itself on every push.
+`path`, `version`, `mutate`, `max`, `json`, `comment` and `sarif`. With
+`mutate: "true"` put your licence in `MARGYN_LICENCE` as a repository secret.
+With `comment: "true"` the action keeps one pull-request comment updated in place
+(needs `pull-requests: write`), and with `sarif: "true"` it uploads findings to the
+Security tab (needs `security-events: write`). It writes a job summary every run.
+It uses the job's own `GITHUB_TOKEN`, so nothing is hosted and no secret leaves
+your repository. This repository's own pipeline runs that action over itself on
+every push.
+
+## Proof mode
+
+Every finding ships a reproduction. `--prove` runs it. For each finding Margyn
+executes the read-only proof its check emitted, checks the output carries the
+markers the finding predicted, and marks it **reproduced**. A finding it cannot
+reproduce is **retracted** and dropped, so a gate never fails your build on a
+claim the tool could not show on your own tree. The mutation proof reports as
+**observed**, because running your suite is how it was established.
+
+```
+npx margyn-scan . --prove
+
+1. vendor/dist/IPool.mjs is read but git ignores it   HIGH  ignored-source  REPRODUCED
+   MARGYN_ABSENT_FROM_HEAD
+   MARGYN_PRESENT_ON_DISK
+
+2 findings: 2 reproduced.
+```
+
+It is free, because a finding you can watch reproduce is the whole product.
 
 ## What it checks today
 
@@ -91,18 +120,21 @@ on purpose: one pass costs one full test run per mutation. Raise the cap with
 ## We run it on ourselves
 
 Pointed at this repository at the default cap of four, all four mutations
-survived. Raise the cap to twelve and six do.
+survived. Raise the cap to twelve and seven do.
 
 ```
-bin/build-pages.mjs            === -> !==             suite still passed
-bin/contrast.mjs               === -> !==             suite still passed
-src/checks/ignored-source.mjs  return true -> false   suite still passed
-src/checks/mutation.mjs        return true -> false   suite still passed
+bin/build-pages.mjs             === -> !==             suite still passed
+bin/contrast.mjs                === -> !==             suite still passed
+src/checks/ignored-source.mjs   return true -> false   suite still passed
+src/checks/lint-blindspots.mjs  && -> ||               suite still passed
+src/checks/mutation.mjs         return true -> false   suite still passed
+src/checks/unrun-checks.mjs     !== -> ===             suite still passed
+src/cli.mjs                     === -> !==             suite still passed
 ```
 
-The last one is the mutation checker. Our own tool inverted a line inside our own
-mutation checker and 43 tests reported success. We publish the number rather than
-the cap that flatters it.
+One of them is the mutation checker itself. Our own tool inverted a line inside
+our own mutation checker and 63 tests reported success. We publish the number
+rather than the cap that flatters it.
 
 The paid gate is on the CLI flag rather than on the code, so a clone reproduces
 this without a licence:
@@ -186,6 +218,13 @@ The static checks are free and always will be. The mutation proof is part of
 **Watch**, $8.99 a month with three days free, because it is the check that costs
 real machine time: it edits your tree and runs your suite once per mutation.
 
+Or have the findings arrive already fixed. **Solo Fix** is $19 a month for one
+finding fixed, **Fix flow** is $79 a month for three, each returned as a patch
+carrying a test that fails before it and passes after. It works from the finding,
+not your repository, so it needs no token that can read your source. Send one at
+[margyn.xyz/fix](https://margyn.xyz/fix); it takes a paste, and the code snippet a
+finding sometimes carries never travels.
+
 The scanner runs on your machine, so your machine decides whether that check is
 unlocked. It never calls home. A licence check that needs the network is a new way
 for a build to go red for reasons that have nothing to do with the code. A CI
@@ -246,10 +285,11 @@ both valid. A licence therefore works the same whichever host issued it.
 npm test
 ```
 
-Forty-three tests, no dependencies. The check tests each build a real git repository
+Sixty-three tests, no dependencies. The check tests each build a real git repository
 in a temp directory, plant exactly one defect, assert the check finds it, then
-plant the fixed shape and assert the check stays silent. The licence tests carry
-real signatures from the production key and prove that a flipped signature byte, a
+plant the fixed shape and assert the check stays silent. Proof mode is tested the
+same way, including that it retracts a finding it cannot reproduce. The licence tests
+carry real signatures from the production key and prove that a flipped signature byte, a
 payload swapped under a real signature, an expired licence and a licence for the
 wrong product are all refused with the reason named.
 
@@ -259,7 +299,8 @@ wrong product are all refused with the reason named.
   a fixture hash written by hand instead of generated. We hit exactly this on
   2026-08-01 and it is not automated yet.
 - Local versus CI environment divergence.
-- Generating the patch, not just naming the defect.
+- Generating the patch automatically. Fix flow does it as a service today, by a
+  person working from the finding; the CLI still only names the defect.
 
 MIT licensed. Every number in this file was measured on the shipped product rather
 than estimated.

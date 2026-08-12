@@ -8,6 +8,7 @@
 import { readFileSync } from "node:fs";
 import { execFileSync } from "node:child_process";
 import { join } from "node:path";
+import { shq } from "../shell.mjs";
 
 const TEST_FILE = /\.(test|spec)\.[mc]?[jt]sx?$/;
 // Helpers are the common case: a test whose whole body is `expectTreeError(...)`
@@ -95,6 +96,7 @@ function testCalls(source) {
       name: m[2],
       span: source.slice(open, end + 1),
       line: source.slice(0, m.index).split("\n").length,
+      endLine: source.slice(0, end + 1).split("\n").length,
     });
     opener.lastIndex = end;
   }
@@ -111,7 +113,7 @@ export function noAssertion(root) {
       continue;
     }
     if (TYPE_ONLY.test(source)) continue;
-    for (const { name, span, line } of testCalls(source)) {
+    for (const { name, span, line, endLine } of testCalls(source)) {
       if (ASSERT.test(span) || PLAN.test(span)) continue;
       if (helperAsserts(span, contextName(span))) continue;
       // A body that is only a call with no assertion still might throw on
@@ -127,6 +129,16 @@ export function noAssertion(root) {
           `# the test passes with its subject broken, because nothing is checked:`,
           `sed -n '${line},$p' ${file} | head -20`,
         ],
+        // Proof mode re-reads the flagged test body and greps it for any
+        // assertion token, independently of the parser that flagged it. If the
+        // body actually asserts, the marker is absent and the finding retracts.
+        proof: {
+          verifiable: true,
+          commands: [
+            `sed -n '${line},${endLine}p' ${shq(file)} | grep -Eq '(expect|assert|\\.to\\.|\\.toBe|\\.toEqual|\\.toThrow|\\.rejects|\\.resolves|should|chai|plan[[:space:]]*\\()' && echo MARGYN_HAS_ASSERT || echo MARGYN_NO_ASSERT_IN_BODY`,
+          ],
+          expect: ["MARGYN_NO_ASSERT_IN_BODY"],
+        },
         why: "The test runs the code and reports green whatever the code returns, so it passes unless something throws. It counts toward coverage and guards no behaviour.",
       });
     }

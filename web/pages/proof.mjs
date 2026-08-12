@@ -104,13 +104,16 @@ test/schema-special-usage.test.js:423   side effect on schema let the server cra
   <h2>What it says about itself</h2>
   <p class="prose">The mutation proof inverts one line, runs the suite, then reports the suite that
     stayed green anyway. Pointed at our own repository at the default cap of four, all four
-    survived. Raise the cap to twelve and six do.</p>
-<pre tabindex="0" role="group" aria-label="Four surviving mutations in Margyn's own suite">bin/build-pages.mjs            === -&gt; !==             <span class="r">suite still passed</span>
-bin/contrast.mjs               === -&gt; !==             <span class="r">suite still passed</span>
-src/checks/ignored-source.mjs  return true -&gt; false   <span class="r">suite still passed</span>
-src/checks/mutation.mjs        return true -&gt; false   <span class="r">suite still passed</span></pre>
-  <p class="prose" style="margin-top:16px">The last one is the mutation checker. Our own tool
-    inverted a line inside our own mutation checker and 43 tests reported success. We publish the
+    survived. Raise the cap to twelve and seven do.</p>
+<pre tabindex="0" role="group" aria-label="Seven surviving mutations in Margyn's own suite">bin/build-pages.mjs             === -&gt; !==             <span class="r">suite still passed</span>
+bin/contrast.mjs                === -&gt; !==             <span class="r">suite still passed</span>
+src/checks/ignored-source.mjs   return true -&gt; false   <span class="r">suite still passed</span>
+src/checks/lint-blindspots.mjs  &amp;&amp; -&gt; ||               <span class="r">suite still passed</span>
+src/checks/mutation.mjs         return true -&gt; false   <span class="r">suite still passed</span>
+src/checks/unrun-checks.mjs     !== -&gt; ===             <span class="r">suite still passed</span>
+src/cli.mjs                     === -&gt; !==             <span class="r">suite still passed</span></pre>
+  <p class="prose" style="margin-top:16px">One of them is the mutation checker itself. Our own tool
+    inverted a line inside our own mutation checker and 63 tests reported success. We publish the
     number rather than the cap that flatters it.</p>
   <p class="sm prose">The paid gate is on the CLI flag rather than on the code, so a clone
     reproduces this without a licence:</p>

@@ -8,6 +8,7 @@
 import { execFileSync } from "node:child_process";
 import { existsSync, readFileSync, readdirSync, statSync } from "node:fs";
 import { join, relative, sep } from "node:path";
+import { shq } from "../shell.mjs";
 
 const SKIP_DIRS = new Set([".git", "node_modules", ".next", "target", "venv", ".venv", "__pycache__"]);
 const TEXT_EXT = /\.(m?[jt]sx?|json|jsonc|ya?ml|toml|md|sol|py|rs|go|rb|sh|cfg|ini|txt)$/i;
@@ -125,6 +126,17 @@ export function ignoredSource(root) {
           `git -C . archive HEAD | tar -t | grep -qx '${file}' || echo 'ABSENT from HEAD: ${file}'`,
           `test -f '${file}' && echo 'PRESENT on disk: ${file}'`,
         ],
+        // Proof mode runs these read-only commands and checks both markers show.
+        // A file that is genuinely in the commit prints neither, so the finding
+        // retracts itself rather than failing a build on a stale claim.
+        proof: {
+          verifiable: true,
+          commands: [
+            `git -C . archive HEAD 2>/dev/null | tar -t 2>/dev/null | grep -qx ${shq(file)} && echo MARGYN_IN_HEAD || echo MARGYN_ABSENT_FROM_HEAD`,
+            `test -f ${shq(file)} && echo MARGYN_PRESENT_ON_DISK || echo MARGYN_MISSING_ON_DISK`,
+          ],
+          expect: ["MARGYN_ABSENT_FROM_HEAD", "MARGYN_PRESENT_ON_DISK"],
+        },
         why: "A clean clone or a CI runner cannot read this file. Local runs pass because the file is on your disk and untracked.",
         referencedBy: candidate,
       });

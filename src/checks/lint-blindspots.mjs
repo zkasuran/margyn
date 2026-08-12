@@ -12,6 +12,7 @@
  */
 import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
+import { shq } from "../shell.mjs";
 
 const CONFIGS = [
   { file: "biome.json", tool: "biome" },
@@ -43,6 +44,16 @@ export function lintBlindspots(root) {
         `${tool} check . 2>&1 | head -20`,
         `# any file that newly appears was excluded by .gitignore, not by ${file}`,
       ],
+      // Proof mode re-reads the config and confirms it inherits the ignore file,
+      // independently of the check that flagged it. It does not run the linter,
+      // which would need the tool installed.
+      proof: {
+        verifiable: true,
+        commands: [
+          `grep -Eq '"useIgnoreFile"[[:space:]]*:[[:space:]]*true|ignorePath' ${shq(file)} && echo MARGYN_INHERITS_GITIGNORE || echo MARGYN_OWN_IGNORE`,
+        ],
+        expect: ["MARGYN_INHERITS_GITIGNORE"],
+      },
       why: "Exclusions that live in .gitignore are a side effect. A path that becomes tracked silently enters the tool's scope, which can rewrite vendored bytes or start failing a gate nobody changed.",
     });
   }

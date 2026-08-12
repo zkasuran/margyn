@@ -16,6 +16,7 @@ export const GRANTS = {
   watch: ["watch"],
   team: ["team", "watch"],
   fixflow: ["fixflow"],
+  solofix: ["solofix"],
 };
 
 /**
