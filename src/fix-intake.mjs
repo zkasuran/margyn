@@ -11,24 +11,40 @@
  * issue. The security promise on the site holds for the paid service exactly as
  * it does for the free scan.
  */
-import { reference } from "./reference.mjs";
+import { clip, fitUrl, oneLine, reference, repoPath } from "./prepare.mjs";
 
 const CONTACT_MIN = 3;
 const CONTACT_MAX = 200;
 const MAX_FINDINGS = 20;
 const ISSUE_BODY_CAP = 6000;
 
-/** A finding, reduced to the fields that describe a defect rather than the source. */
+/**
+ * A finding, reduced to the fields that describe a defect rather than the source.
+ *
+ * Every field is coerced and clipped rather than copied. A finding arrives as JSON
+ * from a stranger, so `{"summary": 1}` used to reach `.slice` and throw a
+ * TypeError out of the worker. A backtick in `check` or `file` escaped the inline
+ * code span it is wrapped in.
+ */
+const plain = (value, max) => (value == null ? undefined : clip(oneLine(value).replace(/`/g, "'"), max));
 function safeFields(f) {
-  if (typeof f === "string") return { summary: f.slice(0, 400) };
+  if (typeof f !== "object" || f === null) return { summary: clip(oneLine(f ?? ""), 400) };
   return {
-    check: f.check,
-    severity: f.severity,
-    file: f.file,
-    summary: f.summary,
-    why: f.why,
-    reproduction: Array.isArray(f.reproduction) ? f.reproduction : undefined,
+    check: plain(f.check, 60),
+    severity: plain(f.severity, 20),
+    file: plain(f.file, 200),
+    summary: plain(f.summary, 400),
+    why: plain(f.why, 600),
+    reproduction: Array.isArray(f.reproduction)
+      ? f.reproduction.slice(0, 12).map((line) => clip(String(line), 300))
+      : undefined,
   };
+}
+
+/** A fence longer than the longest backtick run inside it, so nothing closes early. */
+function fence(lines) {
+  const longest = Math.max(0, ...lines.map((l) => Math.max(0, ...[...String(l).matchAll(/`+/g)].map((m) => m[0].length))));
+  return "`".repeat(Math.max(3, longest + 1));
 }
 
 function issueBody(findings, contact, note, ref) {
@@ -46,9 +62,12 @@ function issueBody(findings, contact, note, ref) {
     if (f.check) lines.push(`- rule: \`${f.check}\`${f.severity ? ` (${f.severity})` : ""}`);
     if (f.file) lines.push(`- where: \`${f.file}\``);
     if (f.why) lines.push(`- why: ${f.why}`);
-    if (f.reproduction?.length) lines.push("- reproduce:", "```", ...f.reproduction, "```");
+    if (f.reproduction?.length) {
+      const bars = fence(f.reproduction);
+      lines.push("- reproduce:", bars, ...f.reproduction, bars);
+    }
   });
-  return lines.join("\n").slice(0, ISSUE_BODY_CAP);
+  return lines.join("\n");
 }
 
 /**
@@ -61,9 +80,9 @@ function issueBody(findings, contact, note, ref) {
  * @param opts.repo the repo the prefilled issue targets
  */
 export function intake(body = {}, opts = {}) {
-  const repo = opts.repo ?? "zkasuran/margyn";
-  const contact = typeof body.contact === "string" ? body.contact.trim() : "";
-  if (contact.length < CONTACT_MIN || contact.length > CONTACT_MAX) {
+  const repo = repoPath(opts.repo ?? "zkasuran/margyn");
+  const contact = typeof body.contact === "string" ? clip(oneLine(body.contact), CONTACT_MAX) : "";
+  if (contact.length < CONTACT_MIN) {
     return { ok: false, status: 400, error: "a contact (email or handle) is required so a fix can reach you" };
   }
 
@@ -77,13 +96,17 @@ export function intake(body = {}, opts = {}) {
   }
 
   const findings = list.map(safeFields);
-  const note = typeof body.note === "string" ? body.note.trim().slice(0, 500) : "";
+  const note = typeof body.note === "string" ? clip(oneLine(body.note), 500) : "";
   const ref = reference("FX", JSON.stringify({ contact, findings }));
-  const title = `Fix request ${ref}: ${(findings[0].summary ?? findings[0].check ?? "finding").slice(0, 80)}`;
-  const url =
-    `https://github.com/${repo}/issues/new?labels=fix-request` +
-    `&title=${encodeURIComponent(title)}` +
-    `&body=${encodeURIComponent(issueBody(findings, contact, note, ref))}`;
+  const title = `Fix request ${ref}: ${clip(findings[0].summary ?? findings[0].check ?? "finding", 80)}`;
+  // No `labels=`: GitHub needs permission to honour it and treats a label the
+  // repository does not have as an invalid URL, either of which hands the sender a
+  // 404 instead of the form. The kind is in the title and the label is applied at
+  // triage.
+  const link = (body) =>
+    `https://github.com/${repo}/issues/new?title=${encodeURIComponent(title)}` +
+    `&body=${encodeURIComponent(body)}`;
+  const { url, trimmed } = fitUrl(issueBody(findings, contact, note, ref), link, ISSUE_BODY_CAP);
 
-  return { ok: true, status: 200, reference: ref, count: findings.length, issue: { url, title } };
+  return { ok: true, status: 200, reference: ref, count: findings.length, trimmed, issue: { url, title } };
 }

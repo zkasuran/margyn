@@ -15,7 +15,7 @@
  * carried in the URL through `encodeURIComponent`, which is what keeps it inside
  * the `body` parameter instead of leaking into `labels` or `assignees`.
  */
-import { reference } from "./reference.mjs";
+import { clip, fitUrl, oneLine, reference, repoPath } from "./prepare.mjs";
 
 /** What a suggestion can be, with the label triage sorts it by. */
 const KINDS = {
@@ -34,8 +34,6 @@ const CONTACT_MAX = 200;
  */
 const URL_CAP = 6000;
 
-const oneLine = (text) => text.replace(/\s+/g, " ").trim();
-
 function issueBody(kind, text, contact, ref) {
   const lines = [
     `${KINDS[kind].noun} ${ref}`,
@@ -49,9 +47,18 @@ function issueBody(kind, text, contact, ref) {
   return lines.join("\n");
 }
 
-const linkFor = (repo, label, title, body) =>
-  `https://github.com/${repo}/issues/new?labels=${encodeURIComponent(label)}` +
-  `&title=${encodeURIComponent(title)}` +
+/**
+ * The prepared link carries a title and a body and nothing else.
+ *
+ * It used to carry `labels=` too, which is a documented way to hand a stranger a
+ * 404: GitHub requires permission to label an issue before it will honour that
+ * parameter, then treats a label the repository does not have as an invalid URL.
+ * Neither condition is visible from our side, so the whole feature would have been
+ * a dead end for exactly the people it is for. The kind is in the title instead,
+ * and the label is applied when the issue is triaged.
+ */
+const linkFor = (repo, title, body) =>
+  `https://github.com/${repo}/issues/new?title=${encodeURIComponent(title)}` +
   `&body=${encodeURIComponent(body)}`;
 
 /**
@@ -63,7 +70,7 @@ const linkFor = (repo, label, title, body) =>
  * @param opts.repo the repository the prefilled issue targets
  */
 export function suggest(body = {}, opts = {}) {
-  const repo = opts.repo ?? "zkasuran/margyn";
+  const repo = repoPath(opts.repo ?? "zkasuran/margyn");
   const kind = typeof body.kind === "string" && body.kind.trim() ? body.kind.trim().toLowerCase() : "feedback";
   if (!Object.hasOwn(KINDS, kind)) {
     return { ok: false, status: 400, error: `kind has to be ${Object.keys(KINDS).join(" or ")}` };
@@ -77,20 +84,13 @@ export function suggest(body = {}, opts = {}) {
     return { ok: false, status: 400, error: `that is over ${TEXT_MAX} characters, so trim it or open the issue yourself` };
   }
 
-  const contact = typeof body.contact === "string" ? oneLine(body.contact).slice(0, CONTACT_MAX) : "";
+  const contact = typeof body.contact === "string" ? clip(oneLine(body.contact), CONTACT_MAX) : "";
   const ref = reference("SG", JSON.stringify({ kind, text, contact }));
-  const title = `${KINDS[kind].noun} ${ref}: ${oneLine(text).slice(0, 80)}`;
+  const title = `${KINDS[kind].noun} ${ref}: ${clip(oneLine(text), 80)}`;
 
   // Build it, then check it fits. A link too long to open is worse than a trimmed
   // one. The person still has their own text in the box either way.
-  let prepared = issueBody(kind, text, contact, ref);
-  let url = linkFor(repo, KINDS[kind].label, title, prepared);
-  let trimmed = false;
-  while (url.length > URL_CAP && prepared.length > 200) {
-    prepared = `${prepared.slice(0, Math.floor(prepared.length * 0.8))}\n\n(trimmed to fit the link, paste the rest)`;
-    url = linkFor(repo, KINDS[kind].label, title, prepared);
-    trimmed = true;
-  }
+  const { url, trimmed } = fitUrl(issueBody(kind, text, contact, ref), (b) => linkFor(repo, title, b), URL_CAP);
 
   return {
     ok: true,

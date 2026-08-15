@@ -94,14 +94,45 @@ const json = (res, code, body) => {
   res.end(payload);
 };
 
+const BODY_CAP = 64_000;
+
+/**
+ * Reads a JSON body, in bytes rather than in string concatenation.
+ *
+ * `raw += chunk` decodes each chunk on its own, so a multi-byte character split
+ * across two TCP packets arrives as U+FFFD. For a free-text feedback box that is
+ * the common case rather than the edge one. Over the cap the socket is destroyed
+ * instead of being left to keep arriving after the answer has been sent.
+ */
 const readBody = (req) =>
   new Promise((ok, fail) => {
-    let raw = "";
+    const type = req.headers["content-type"] ?? "";
+    if (!type.includes("application/json")) {
+      fail(Object.assign(new Error("send content-type: application/json"), { status: 415 }));
+      return;
+    }
+    const chunks = [];
+    let size = 0;
+    let done = false;
+    // Pause rather than destroy: the caller still has to be able to read the answer,
+    // and the route destroys the socket once it has sent it.
+    const stop = (error) => {
+      if (done) return;
+      done = true;
+      req.pause();
+      fail(error);
+    };
     req.on("data", (c) => {
-      raw += c;
-      if (raw.length > 64_000) fail(new Error("body too large"));
+      if (done) return;
+      size += c.length;
+      if (size > BODY_CAP) return stop(Object.assign(new Error("body too large"), { status: 413 }));
+      chunks.push(c);
     });
+    req.on("error", stop);
     req.on("end", () => {
+      if (done) return;
+      done = true;
+      const raw = Buffer.concat(chunks).toString("utf8");
       try { ok(raw ? JSON.parse(raw) : {}); } catch (e) { fail(e); }
     });
   });
@@ -178,21 +209,22 @@ const server = createServer(async (req, res) => {
     }
   }
 
-  if (url.pathname === "/api/fix-intake" && req.method === "POST") {
+  // Both prepare-a-link routes answer the way the Worker answers, including 405 on
+  // the wrong method. They used to fall through to the static handler, so a client
+  // debugging against the dev server got a 404 HTML page where production sends
+  // JSON.
+  for (const [path, prepare] of [["/api/fix-intake", intake], ["/api/suggest", suggest]]) {
+    if (url.pathname !== path) continue;
+    if (req.method !== "POST") return json(res, 405, { error: "use POST" });
     try {
-      const { status, ...rest } = intake(await readBody(req));
+      const { status, ...rest } = prepare(await readBody(req));
       return json(res, status, rest);
     } catch (e) {
-      return json(res, 400, { error: String(e.message ?? e) });
-    }
-  }
-
-  if (url.pathname === "/api/suggest" && req.method === "POST") {
-    try {
-      const { status, ...rest } = suggest(await readBody(req));
-      return json(res, status, rest);
-    } catch (e) {
-      return json(res, 400, { error: String(e.message ?? e) });
+      const answered = json(res, e.status ?? 400, { error: String(e.message ?? e) });
+      // The upload is still arriving on an oversized body, so hang up now that the
+      // reason has been sent.
+      if (e.status === 413) req.destroy();
+      return answered;
     }
   }
 
@@ -229,7 +261,13 @@ const server = createServer(async (req, res) => {
   res.end(readFileSync(abs));
 });
 
-server.listen(PORT, () => {
+/**
+ * Loopback only, deliberately. This server has a scan route, which takes a
+ * filesystem path and runs git against it. The whole reason that route is allowed
+ * to exist here is that the caller and the repository are the same machine.
+ * Binding every interface quietly made that untrue on any shared network.
+ */
+server.listen(PORT, "127.0.0.1", () => {
   console.log(`margyn web  http://localhost:${PORT}`);
   console.log(`  tiun env   ${SANDBOX ? "sandbox" : "LIVE"}  (${API_BASE})`);
   console.log(`  snippet    ${SNIPPET_ID ? `${SNIPPET_ID.slice(0, 8)}...` : "MISSING, set TIUN_SANDBOX_SNIPPET_ID"}`);

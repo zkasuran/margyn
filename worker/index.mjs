@@ -36,19 +36,78 @@ import { STATIC } from "./static.generated.mjs";
 /** A licence lasts 31 days, so a lapsed subscription stops working on its own. */
 const LICENCE_DAYS = 31;
 
+/**
+ * Sent on every response. Nothing here fixes a hole that exists: no
+ * user-controlled value reaches HTML on this site, and that was checked sink by
+ * sink rather than assumed. They are here so that the day one does, it is already
+ * covered. The policy is tight because the whole frontend is first party: two
+ * inline modules, inline CSS, the Tiun SDK on two pages, and no other origin.
+ */
+const SECURITY_HEADERS = {
+  "content-security-policy":
+    "default-src 'self'; script-src 'self' 'unsafe-inline' https://esm.sh; " +
+    "style-src 'self' 'unsafe-inline'; img-src 'self' data:; " +
+    "connect-src 'self' https://esm.sh https://api.tiun.live https://api-sandbox.tiun.live; " +
+    "frame-ancestors 'none'; base-uri 'none'; form-action 'none'; object-src 'none'",
+  "referrer-policy": "strict-origin-when-cross-origin",
+  "x-content-type-options": "nosniff",
+  "x-frame-options": "DENY",
+};
+
 const json = (body, status = 200) =>
   new Response(JSON.stringify(body), {
     status,
-    headers: { "content-type": "application/json", "cache-control": "no-store" },
+    headers: { "content-type": "application/json", "cache-control": "no-store", ...SECURITY_HEADERS },
   });
 
+const BODY_CAP = 64_000;
+
 /**
- * Reads a JSON body without trusting its size. A Worker is billed on CPU, so an
- * unbounded parse is somebody else's denial of service on our account.
+ * Reads a JSON body without trusting its size or its type.
+ *
+ * The first version read the whole body and checked the length afterwards, which
+ * is not a cap on anything: the free plan accepts a 100 MB request and the isolate
+ * has 128 MB shared across everything it is serving. So the declared length is
+ * refused first, then the stream is read with a running count in case nothing was
+ * declared. A wrong content type is refused too, because a `text/plain` POST needs
+ * no CORS preflight and any page anywhere could spend our request quota with it.
  */
 async function readBody(request) {
-  const raw = await request.text();
-  if (raw.length > 64_000) throw new Error("body too large");
+  const type = request.headers.get("content-type") ?? "";
+  if (!type.includes("application/json")) {
+    const error = new Error("send content-type: application/json");
+    error.status = 415;
+    throw error;
+  }
+  const declared = Number(request.headers.get("content-length") ?? 0);
+  if (declared > BODY_CAP) {
+    const error = new Error("body too large");
+    error.status = 413;
+    throw error;
+  }
+  const reader = request.body?.getReader();
+  if (!reader) return {};
+  const chunks = [];
+  let size = 0;
+  for (;;) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    size += value.byteLength;
+    if (size > BODY_CAP) {
+      await reader.cancel();
+      const error = new Error("body too large");
+      error.status = 413;
+      throw error;
+    }
+    chunks.push(value);
+  }
+  const bytes = new Uint8Array(size);
+  let at = 0;
+  for (const c of chunks) {
+    bytes.set(c, at);
+    at += c.byteLength;
+  }
+  const raw = new TextDecoder().decode(bytes);
   return raw ? JSON.parse(raw) : {};
 }
 
@@ -157,32 +216,29 @@ export default {
 
     if (url.pathname === "/api/fix-intake") {
       if (request.method !== "POST") return json({ error: "use POST" }, 405);
-      let body;
       try {
-        body = await readBody(request);
+        // Prepares a fix request from the finding alone. It stores nothing and
+        // reads no repository, so there is no source to leak and no data to guard.
+        // Inside the try on purpose: a throw from here used to leave the isolate
+        // and become a Cloudflare error page rather than our own message.
+        const { status, ...rest } = intake(await readBody(request));
+        return json(rest, status);
       } catch (e) {
-        return json({ error: String(e.message ?? e) }, 400);
+        return json({ error: String(e.message ?? e) }, e.status ?? 400);
       }
-      // Prepares a fix request from the finding alone. It stores nothing and
-      // reads no repository, so there is no source to leak and no data to guard.
-      const result = intake(body);
-      const { status, ...rest } = result;
-      return json(rest, status);
     }
 
     if (url.pathname === "/api/suggest") {
       if (request.method !== "POST") return json({ error: "use POST" }, 405);
-      let body;
       try {
-        body = await readBody(request);
+        // Prepares a prefilled issue and returns it. It stores nothing, sends
+        // nothing and reads nothing, so a suggestion cannot become a database we
+        // are then holding on someone else's behalf.
+        const { status, ...rest } = suggest(await readBody(request));
+        return json(rest, status);
       } catch (e) {
-        return json({ error: String(e.message ?? e) }, 400);
+        return json({ error: String(e.message ?? e) }, e.status ?? 400);
       }
-      // Prepares a prefilled issue and returns it. It stores nothing, sends
-      // nothing and reads nothing, so a suggestion cannot become a database we
-      // are then holding on someone else's behalf.
-      const { status, ...rest } = suggest(body);
-      return json(rest, status);
     }
 
     if (url.pathname === "/api/verify" || url.pathname === "/api/licence") {
@@ -214,7 +270,7 @@ export default {
       return missing
         ? new Response(missing.body, {
             status: 404,
-            headers: { "content-type": missing.type, "cache-control": "no-store" },
+            headers: { "content-type": missing.type, "cache-control": "no-store", ...SECURITY_HEADERS },
           })
         : new Response("not found", { status: 404 });
     }
@@ -228,6 +284,7 @@ export default {
         // stale page against a new API is the one failure this design rules out.
         // Long on the images, which are content-addressed by their own bytes.
         "cache-control": asset.binary ? "public, max-age=604800" : "public, max-age=60",
+        ...SECURITY_HEADERS,
       },
     });
   },

@@ -47,8 +47,9 @@ export default {
     what makes it yours to watch and ours to answer in public. There is no inbox on this side to
     fill up and no database of other people's ideas to guard.</p>
   <p class="prose">If you would rather not use a GitHub account, open the prepared link, copy the
-    text out of it and send it wherever you like. The reference is deterministic, so quoting it back
-    at us finds the same request.</p>
+    text out of it and send it wherever you like. The reference is deterministic rather than unique:
+    the same text always produces the same one, which is what makes a duplicate obvious. It is a 32
+    bit hash, so it is a label rather than an identifier to look anything up by.</p>
   <p class="sm prose">A finding you think is wrong is the highest value message on this page.
     <a href="/proof#public">Twenty two false positives</a> were found and fixed exactly this way,
     by pointing the tool at repositories that were not ours and reading every finding by hand.</p>

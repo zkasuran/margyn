@@ -18,7 +18,11 @@ test("a suggestion prepares a labelled, tracked issue", () => {
   assert.equal(r.label, "feedback");
   assert.equal(r.trimmed, false);
   assert.match(r.issue.url, /github\.com\/zkasuran\/margyn\/issues\/new/);
-  assert.match(r.issue.url, /labels=feedback/);
+  // No `labels=` in the link: GitHub needs permission to honour that parameter and
+  // treats a label the repository does not have as an invalid URL, so carrying one
+  // hands a stranger a 404 instead of the form. The kind is in the title.
+  assert.ok(!r.issue.url.includes("labels="), "the label is applied at triage, not in the link");
+  assert.match(r.issue.title, /^Feedback SG-/);
   const decoded = decodeURIComponent(r.issue.url);
   assert.ok(decoded.includes(text), "the suggestion has to reach the issue");
   assert.ok(decoded.includes("dev@example.com"), "the contact travels when it is given");
@@ -66,7 +70,7 @@ test("nothing a visitor types can escape the body parameter", () => {
   const r = suggest({ suggestion: `${text} &labels=bug&assignees=someone#fragment` });
   const [, query] = r.issue.url.split("?");
   const params = new URLSearchParams(query);
-  assert.equal(params.get("labels"), "feedback", "labels stays ours");
+  assert.deepEqual([...params.keys()], ["title", "body"], "only the two we send");
   assert.equal(params.get("assignees"), null, "no assignee can be smuggled in");
   assert.ok(params.get("body").includes("&labels=bug"), "the text is preserved, as text");
 });
