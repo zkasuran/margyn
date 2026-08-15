@@ -139,3 +139,21 @@ test("the styles are one file, so two pages cannot drift apart", () => {
     assert.equal(styleOf(html.get(page.path)), first, `${page.path} carries different CSS from the home page`);
   }
 });
+
+/**
+ * The build's own path mapping, checked against an independent one.
+ *
+ * The rest of this file deliberately reimplements the mapping rather than
+ * importing it, so a mutation in `fileFor` cannot hide behind the test that uses
+ * it. That left nothing watching `fileFor` itself, which our mutation proof
+ * reported: the suite passed with its `path === "/"` inverted, and that inversion
+ * writes index.html for every page except the index. So compare the two
+ * statements instead of picking one.
+ */
+test("the builder's own filename mapping agrees with an independent one", async () => {
+  const { fileFor } = await import("../bin/build-pages.mjs");
+  for (const page of pages) {
+    assert.equal(fileFor(page.path), fileOf(page.path), `${page.path} maps to two different files`);
+  }
+  assert.equal(fileFor("/"), "index.html", "the root has to be index.html or the site has no home page");
+});

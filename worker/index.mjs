@@ -120,7 +120,7 @@ async function signLicence(payload, privateKeyDerBase64) {
  * `productAccess` is Tiun's own record of what was bought, so the entitlement
  * decision stays theirs and this only writes it down in a portable form.
  */
-async function licenceFor(user, cfg) {
+export async function licenceFor(user, cfg) {
   const owned = Object.keys(user?.productAccess ?? {});
   if (owned.length === 0) return { ok: false, status: 402, error: "this account has not bought anything yet" };
   // Map Tiun ids back to our own names, so a token never carries an id that

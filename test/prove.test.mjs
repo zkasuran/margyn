@@ -150,3 +150,49 @@ test("proof mode over a clean repository reports nothing", () => {
     r.cleanup();
   }
 });
+
+/**
+ * The three tests below exist because our own mutation proof reported these lines
+ * as unobserved: the suite passed with each of them inverted. A tool that reports
+ * that about other people's repositories and leaves it standing in its own is the
+ * hollow thing it hunts.
+ */
+test("proof mode certifies a lint-blindspot by re-reading the config itself", () => {
+  const r = repo();
+  try {
+    // The proof for this check is one shell command whose `&&` decides whether the
+    // marker prints at all. Inverted, the finding retracts on a config that really
+    // does inherit .gitignore, so the check goes quiet on a true positive.
+    r.write("biome.json", JSON.stringify({ vcs: { enabled: true, useIgnoreFile: true } }, null, 2));
+    r.write("src/a.mjs", "export const a = 1;\n");
+    r.commit();
+
+    const { kept, retracted } = prove(r.dir, scan(r.dir));
+    const f = kept.find((x) => x.check === "lint-blindspot");
+    assert.ok(f, "the lint-blindspot finding must survive proof");
+    assert.equal(f.proven.status, "reproduced");
+    assert.match(f.proven.output, /MARGYN_INHERITS_GITIGNORE/);
+    assert.equal(retracted.length, 0);
+  } finally {
+    r.cleanup();
+  }
+});
+
+test("a proof command that exits non-zero is not reported as a timeout", () => {
+  const r = repo();
+  try {
+    r.write("a.txt", "x\n");
+    r.commit();
+
+    // `test -f missing && echo` exits non-zero on purpose, which is the answer
+    // rather than a failure. Only a killed process is a timeout.
+    const f = proveFinding(r.dir, {
+      check: "synthetic",
+      proof: { verifiable: true, commands: ["echo MARGYN_ANSWERED; exit 3"], expect: ["MARGYN_ANSWERED"] },
+    });
+    assert.equal(f.proven.status, "reproduced");
+    assert.doesNotMatch(f.proven.output, /timed out/, "a non-zero exit is not a timeout");
+  } finally {
+    r.cleanup();
+  }
+});

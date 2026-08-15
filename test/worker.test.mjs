@@ -81,3 +81,33 @@ test("the whole chain holds: mint with WebCrypto, verify with the CLI's own veri
   assert.equal(seen.ok, false, "a licence signed by any other key must be refused");
   assert.match(seen.reason, /was not issued by us/);
 });
+
+/**
+ * The entitlement branch, which decides whether a paying customer gets a licence
+ * at all.
+ *
+ * Our own mutation proof reported `owned.length === 0` as unobserved: the suite
+ * passed with it inverted, and inverted it refuses every customer who has bought
+ * something while letting an empty account through to a different refusal. That is
+ * the worst failure this repository can ship, since it is the whole billing path,
+ * and nothing was watching it.
+ */
+test("a paid account gets a licence carrying what the purchase grants", async () => {
+  const { licenceFor } = await import("../worker/index.mjs");
+  const { pkcs8 } = await keypair();
+  const cfg = { signingKey: pkcs8, products: [{ key: "watch", id: "p-live-watch" }] };
+
+  const paid = await licenceFor({ productAccess: { "p-live-watch": {} }, email: "buyer@example.com" }, cfg);
+  assert.equal(paid.ok, true, "a customer Tiun says has paid must get a licence");
+  assert.ok(paid.products.includes("watch"));
+  assert.ok(paid.licence.includes("."), "the licence has to be a signed token");
+  assert.equal(payloadOf(splitToken(paid.licence).body).payload.email, "buyer@example.com");
+
+  const unpaid = await licenceFor({ productAccess: {}, email: "browser@example.com" }, cfg);
+  assert.equal(unpaid.ok, false, "an account that bought nothing gets no licence");
+  assert.equal(unpaid.status, 402);
+
+  const stranger = await licenceFor({ productAccess: { "p-live-unknown": {} }, email: "x@example.com" }, cfg);
+  assert.equal(stranger.ok, false, "a product this build does not know about grants nothing");
+  assert.equal(stranger.status, 402);
+});

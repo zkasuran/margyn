@@ -39,8 +39,9 @@ export default {
    <span class="r">HIGH</span>  <span class="d">ignored-source     ignore rule: .gitignore:2:dist/</span></pre>
   <p class="prose" style="margin-top:16px">Both reproductions answer, which is what turns a finding
     into a fact. Two statements about one path that disagree:</p>
-<pre tabindex="0" role="group" aria-label="The reproduction for a dropped file"><b>$ git archive HEAD | tar -t | grep -qx '&lt;path&gt;' || echo 'ABSENT from HEAD'</b>
-ABSENT from HEAD
+<pre tabindex="0" role="group" aria-label="The reproduction for a dropped file"><b>$ git archive HEAD | tar -t | grep -qE '(^|/)&lt;the path the reader asks for&gt;$' \
+    || echo 'NOTHING in HEAD answers &lt;path&gt;'</b>
+NOTHING in HEAD answers dist/abis/IPool.mjs
 <b>$ test -f '&lt;path&gt;' &amp;&amp; echo 'PRESENT on disk'</b>
 PRESENT on disk</pre>
   <p class="prose" style="margin-top:16px">Against the fixed tree at <code>0c743c2</code> both high
@@ -52,7 +53,9 @@ PRESENT on disk</pre>
   <p class="eyebrow">Claim two</p>
   <h2>What it says about five public repositories</h2>
   <p class="prose">Run on 2026-08-06 against a shallow clone of each, at the commit named. Nothing
-    was tuned for these repositories and nothing was left out because the number was inconvenient.</p>
+    was tuned for these repositories and nothing was left out because the number was inconvenient.
+    Re-derived on 2026-08-15 with 0.2.1, at the same five commits: every number below still holds,
+    down to the file and line of each named finding.</p>
   <table class="st">
     <tr><th>Repository</th><th>Commit</th><th>Findings</th></tr>
     <tr><td>chalk/chalk</td><td><code>661317e</code></td><td>0</td></tr>
@@ -72,16 +75,18 @@ npx margyn-scan /tmp/fastify</pre>
     exist in a fresh clone. That check fires on a working tree, which is where the moss defect
     lived. Saying so is the difference between a table and a claim.</p>
 
-  <h3 style="margin-top:30px">The four highest findings, named</h3>
+  <h3 style="margin-top:30px">All six no-assertion findings, named</h3>
   <p class="prose">Each one is a file and a line anyone can open. These are tests whose only failure
     mode is an exception: they run the code, assert nothing, then report green whatever came
-    back.</p>
-<pre tabindex="0" role="group" aria-label="Four named findings in fastify">fastify/fastify at 39e87e8
+    back. The table above says six, so all six are here rather than a selection.</p>
+<pre tabindex="0" role="group" aria-label="Six named findings in fastify">fastify/fastify at 39e87e8
 
-test/decorator.test.js:869          plugin required decorators
-test/http2/closing.test.js:118      http/2 closes successfully with async await
-test/http2/closing.test.js:133      https/2 closes successfully with async await
-test/schema-special-usage.test.js:423   side effect on schema let the server crash</pre>
+test/decorator.test.js:869               plugin required decorators
+test/http2/closing.test.js:118           http/2 closes successfully with async await
+test/http2/closing.test.js:133           https/2 closes successfully with async await
+test/schema-special-usage.test.js:423    side effect on schema let the server crash
+test/schema-special-usage.test.js:469    only response schema trigger AJV pollution
+test/schema-special-usage.test.js:493    only response schema trigger AJV pollution #2</pre>
   <p class="sm prose" style="margin-top:14px">Two of those are worth reading before you judge the
     check: an <code>await close()</code> with no assertion is a deliberate smoke test in a lot of
     suites. That is why the finding says what it says rather than "cannot fail". It is reported
@@ -101,25 +106,43 @@ test/schema-special-usage.test.js:423   side effect on schema let the server cra
 
 <section id="itself"><div class="wrap">
   <p class="eyebrow">Claim three</p>
-  <h2>What it says about itself</h2>
+  <h2>What it said about itself, and what we did about it</h2>
   <p class="prose">The mutation proof inverts one line, runs the suite, then reports the suite that
-    stayed green anyway. Pointed at our own repository at the default cap of four, all four
-    survived. Raise the cap to twelve and seven do.</p>
-<pre tabindex="0" role="group" aria-label="Seven surviving mutations in Margyn's own suite">bin/build-pages.mjs             === -&gt; !==             <span class="r">suite still passed</span>
+    stayed green anyway. Pointed at this repository on 2026-08-12 it reported four survivors of four
+    tried at the default cap and seven at a cap of twelve. One of them was inside the mutation
+    checker itself. That list is below, unedited.</p>
+<pre tabindex="0" role="group" aria-label="The seven surviving mutations reported on 2026-08-12">bin/build-pages.mjs             === -&gt; !==             <span class="r">suite still passed</span>
 bin/contrast.mjs                === -&gt; !==             <span class="r">suite still passed</span>
 src/checks/ignored-source.mjs   return true -&gt; false   <span class="r">suite still passed</span>
 src/checks/lint-blindspots.mjs  &amp;&amp; -&gt; ||               <span class="r">suite still passed</span>
 src/checks/mutation.mjs         return true -&gt; false   <span class="r">suite still passed</span>
 src/checks/unrun-checks.mjs     !== -&gt; ===             <span class="r">suite still passed</span>
 src/cli.mjs                     === -&gt; !==             <span class="r">suite still passed</span></pre>
-  <p class="prose" style="margin-top:16px">One of them is the mutation checker itself. Our own tool
-    inverted a line inside our own mutation checker and 63 tests reported success. We publish the
-    number rather than the cap that flatters it.</p>
+  <p class="prose" style="margin-top:16px">Publishing that list was the easy half. On 2026-08-15 a
+    test was written for every line on it, plus <code>src/prove.mjs</code>, which had joined the
+    list. The suite went from 63 tests to 81. The run now reports this:</p>
+<pre tabindex="0" role="group" aria-label="The same proof today, over every file in the repository">$ <b>every candidate file, cap 60</b>
+35 files tracked as source, 22 carry a mutation this tool knows how to make
+22 mutated, 22 caught by the suite, <span class="g">0 survivors</span>, 12 seconds
+81 tests, 0 failing</pre>
+  <p class="prose" style="margin-top:16px">Each of those tests pins the behaviour the mutation
+    changed, not the mutation. <code>src/cli.mjs</code> had no test at all, so its exit code, its
+    JSON and its locked-licence message are now checked by running the real binary.
+    <code>worker/index.mjs</code> got the one that mattered most: inverted, the entitlement branch
+    refuses a licence to every customer who has paid. Nothing was watching it.</p>
+  <p class="prose">The proof also found a defect that was not a missing test.
+    <code>bin/build-pages.mjs</code> ran its build as a side effect of being imported, so a test that
+    imported it rebuilt the whole site, and under a mutated mapping it wrote
+    <code>web/public/.html</code> and sent every page to the wrong file. The build is behind a
+    run-as-a-command guard now.</p>
   <p class="sm prose">The paid gate is on the CLI flag rather than on the code, so a clone
     reproduces this without a licence:</p>
 <pre tabindex="0" role="group" aria-label="Reproducing the self audit">git clone https://github.com/zkasuran/margyn &amp;&amp; cd margyn &amp;&amp; npm test
 node --input-type=module -e 'import { mutationProof } from "./src/checks/mutation.mjs";
-console.log(mutationProof(process.cwd(), { max: 12 }).map(f =&gt; f.summary));'</pre>
+console.log(mutationProof(process.cwd(), { max: 60 }).map(f =&gt; f.summary));'</pre>
+  <p class="sm prose">Zero survivors is a claim about this suite against these seven mutation
+    operators, not a claim that the code is correct. A stronger operator set would find more, which
+    is the honest reading of any mutation score.</p>
 </div></section>
 
 <section><div class="wrap">

@@ -117,10 +117,10 @@ The mutation proof is **capped at four mutations by default**, so it under-repor
 on purpose: one pass costs one full test run per mutation. Raise the cap with
 `--max` to find more.
 
-## We run it on ourselves
+## We run it on ourselves, then we fix what it says
 
-Pointed at this repository at the default cap of four, all four mutations
-survived. Raise the cap to twelve and seven do.
+On 2026-08-12 this repository reported four survivors of four tried at the default
+cap and seven at a cap of twelve, one of them inside the mutation checker itself.
 
 ```
 bin/build-pages.mjs             === -> !==             suite still passed
@@ -132,16 +132,35 @@ src/checks/unrun-checks.mjs     !== -> ===             suite still passed
 src/cli.mjs                     === -> !==             suite still passed
 ```
 
-One of them is the mutation checker itself. Our own tool inverted a line inside
-our own mutation checker and 63 tests reported success. We publish the number
-rather than the cap that flatters it.
+On 2026-08-15 every line on that list got a test, plus `src/prove.mjs`, which had
+joined it. 63 tests became 81, and the run over every file reports this:
+
+```
+35 files tracked as source, 22 carry a mutation this tool knows how to make
+22 mutated, 22 caught by the suite, 0 survivors, 12 seconds
+```
+
+Each test pins the behaviour the mutation changed rather than the mutation.
+`src/cli.mjs` had no test at all, so the real binary is now run for its exit code,
+its JSON and its locked-licence message. Inverted, `worker/index.mjs` refused a
+licence to every customer who had paid, and nothing was watching that line.
+
+The proof also found something no test could have covered:
+`bin/build-pages.mjs` ran its build as a side effect of being imported, so a test
+that imported it rebuilt the site, and under a mutated mapping it wrote
+`web/public/.html` and sent every page to the wrong file. It is behind a
+run-as-a-command guard now.
+
+Zero survivors is a claim about this suite against these seven operators, not a
+claim that the code is correct. A stronger operator set would find more, which is
+the honest reading of any mutation score.
 
 The paid gate is on the CLI flag rather than on the code, so a clone reproduces
 this without a licence:
 
 ```bash
 node --input-type=module -e 'import { mutationProof } from "./src/checks/mutation.mjs";
-console.log(mutationProof(process.cwd(), { max: 12 }).map(f => f.summary));'
+console.log(mutationProof(process.cwd(), { max: 60 }).map(f => f.summary));'
 ```
 
 ## Precision, measured
@@ -202,8 +221,9 @@ Reconstructed against that exact commit, Margyn returns:
 Both reproductions run and confirm it:
 
 ```
-$ git archive HEAD | tar -t | grep -qx '<path>' || echo 'ABSENT from HEAD'
-ABSENT from HEAD
+$ git archive HEAD | tar -t | grep -qE '(^|/)<the path the reader asks for>$' \
+    || echo 'NOTHING in HEAD answers <path>'
+NOTHING in HEAD answers dist/abis/IPool.mjs
 $ test -f '<path>' && echo 'PRESENT on disk'
 PRESENT on disk
 ```

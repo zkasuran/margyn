@@ -66,3 +66,19 @@ test("the page's own custom properties match the audited palette", () => {
     }
   }
 });
+
+/**
+ * The gate prints its table only when it is run as a command. Importing it must
+ * stay silent: every other module here is imported by a tool whose stdout is
+ * JSON, and a stray table in that stream is a broken pipeline rather than a
+ * cosmetic problem. Our mutation proof reported the guard as unobserved.
+ */
+test("importing the contrast gate prints nothing and fails nothing", async () => {
+  const { execFileSync } = await import("node:child_process");
+  const module = join(here, "..", "bin", "contrast.mjs");
+  const out = execFileSync(process.execPath, ["--input-type=module", "-e", `await import(${JSON.stringify(module)})`], {
+    encoding: "utf8",
+    env: { ...process.env, NO_COLOR: "1" },
+  });
+  assert.equal(out.trim(), "", "contrast.mjs printed on import, so it ran its own gate as a side effect");
+});

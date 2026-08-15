@@ -171,6 +171,46 @@ test("ignored-source still reports vendored source under a path that only looks 
   }
 });
 
+test("ignored-source leaves a dependency tree an install step fetches", () => {
+  const r = repo();
+  try {
+    // forge install writes into contracts/lib and the whole directory is ignored.
+    // The signal is a manifest of its own inside an untracked ancestor, so a clean
+    // clone plus `forge install` has the file and reporting it is noise. Our own
+    // mutation proof named this suppression as unobserved, which is how a rule
+    // this check depends on can be inverted with every gate still green.
+    r.write(".gitignore", "node_modules/\ncontracts/lib/\n");
+    r.write("contracts/src/Pool.sol", 'import "lib/forge-std/src/Test.sol";\n');
+    r.commit();
+    r.write("contracts/lib/forge-std/package.json", '{"name":"forge-std"}\n');
+    r.write("contracts/lib/forge-std/src/Test.sol", "contract Test {}\n");
+
+    assert.deepEqual(ignoredSource(r.dir), [], "a fetched dependency is not missing source");
+  } finally {
+    r.cleanup();
+  }
+});
+
+test("unrun-check stays quiet when a sibling script is the thing that runs it", () => {
+  const r = repo();
+  try {
+    // `verify` is never named in a workflow. It is not unrun: `test` calls it, and
+    // CI calls `test`. Our own mutation proof reported the line that excludes the
+    // script from its own peer list as unobserved, and with that line inverted this
+    // repository reports a gate that a sibling plainly runs.
+    r.write("package.json", JSON.stringify({
+      name: "x",
+      scripts: { test: "npm run verify && node --test", verify: "node scripts/gate.mjs" },
+    }, null, 2));
+    r.write(".github/workflows/ci.yml", "jobs:\n  v:\n    steps:\n      - run: npm test\n");
+    r.commit();
+
+    assert.deepEqual(unrunChecks(r.dir), [], "a gate a sibling script runs is not unrun");
+  } finally {
+    r.cleanup();
+  }
+});
+
 test("unrun-check catches a gate no workflow invokes", () => {
   const r = repo();
   try {
@@ -313,6 +353,12 @@ test("mutation reports a line no test observes, and restores the file", () => {
     const found = mutationProof(r.dir, { command: "node run-tests.mjs", max: 1, timeoutMs: 20_000 });
     assert.equal(found.length, 1, "the unobserved mutation must be reported");
     assert.match(found[0].summary, /still passed/);
+    // The label is the whole sentence a reader gets: "was mutated (X -> Y)". It
+    // has to name the change that was actually applied, and the only thing
+    // watching it is this line. Our own mutation proof made the point by editing
+    // that label to read "return false -> false" with the suite still green.
+    assert.match(found[0].summary, /\(return true -> false\)/, "the label must describe the real change");
+    assert.match(found[0].reproduction.join("\n"), /return\\s\+\)true/, "the reproduction applies the same mutation");
     assert.equal(readFileSync(join(r.dir, "src/a.mjs"), "utf8"), before, "the file must be restored");
   } finally {
     r.cleanup();
