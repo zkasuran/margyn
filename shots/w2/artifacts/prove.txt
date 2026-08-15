@@ -1,0 +1,16 @@
+margyn /your/repo
+
+1. vendor/dist/IPool.mjs is read by scripts/abis.mjs but git ignores it, so it is not in the commit
+   HIGH  ignored-source  vendor/dist/IPool.mjs  REPRODUCED
+   MARGYN_ABSENT_FROM_HEAD
+   MARGYN_PRESENT_ON_DISK
+
+2. test "hollow" asserts nothing, so nothing but a thrown error can fail it
+   HIGH  no-assertion  app.test.mjs:2  REPRODUCED
+   MARGYN_NO_ASSERT_IN_BODY
+
+3. script "test:online" is declared but no workflow or sibling script runs it
+   MEDIUM  unrun-check  package.json  REPRODUCED
+   MARGYN_NOT_REFERENCED
+
+3 findings: 3 reproduced.

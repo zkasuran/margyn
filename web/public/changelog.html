@@ -362,6 +362,37 @@ footer nav a:hover { color: var(--accent) }
 
 <section><div class="wrap">
   <div class="rel">
+    <p class="when">0.2.1<br>2026-08-15</p>
+    <div>
+      <h3>Twenty two false positives, found by pointing Margyn at other people's repositories</h3>
+      <p><b>Build output is no longer reported as missing source.</b> Scanned five real projects and
+        every <code>ignored-source</code> finding on four of them was wrong. A Vite app's committed
+        assets were matched against the copies the build left in <code>dist</code>. A Foundry project's
+        artefacts under <code>contracts/out</code> were reported although its own
+        <code>foundry.toml</code> declares that directory. A bundler's output was reported because the
+        build script that writes it also names it. All 22 passed proof mode too, which is the part
+        worth saying out loud: the proof asked whether that path was committed, when the question is
+        whether anything in the commit answers the path the reader asks for.</p>
+      <p>So a reference is now resolved against everything git has. A finding is only reported for a
+        path that no committed file answers. The proof asks that question, so a finding that slips
+        through
+        retracts itself rather than failing a build on a copy of a committed file. On top of that,
+        output a tool in the repository declares it writes is skipped: <code>out</code> from
+        <code>foundry.toml</code>, a <code>vite</code>, <code>next</code> or <code>cargo</code> build
+        from the script that runs it, an <code>outdir</code> in a build script, an
+        <code>outDir</code> in a <code>tsconfig</code>. Read from declarations and resolved to real
+        paths, never from a directory being called <code>dist</code>, because the defect this check
+        was written from was vendored source in <code>vendor/dist</code> and that one still fires.</p>
+      <p><b>A help link that pointed at nothing.</b> Every SARIF rule carries a
+        <code>helpUri</code> into these docs, and the mutation rule's has always missed: it links
+        <code>/docs#mutation</code> while the heading carried <code>id="mutation-check"</code>, so a
+        reader in the Security tab landed at the top of a long page. Fixed, with a test that resolves
+        the help link of every check the scanner can emit. The existing links test could not catch it,
+        because the site never links that fragment itself.</p>
+    </div>
+  </div>
+
+  <div class="rel">
     <p class="when">0.2.0<br>2026-08-12</p>
     <div>
       <h3>Margyn runs its own reproductions, posts them on your PR, and gains a cheaper way in</h3>

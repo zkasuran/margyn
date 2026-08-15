@@ -465,6 +465,17 @@ margyn [path] [options]              # once it is on your path
   <li>The mention comes from a <code>package.json</code> naming its own build output in
     <code>main</code>, <code>exports</code> or <code>bin</code>. Declaring your output is not reading
     it, so only real source counts as a reader.</li>
+  <li>Something in the commit answers the path the reader asks for. An asset committed at
+    <code>web/public/tour/clip.webm</code> satisfies <code>src="/tour/clip.webm"</code>, so the copy
+    your build left in <code>web/dist</code> is not missing source. Every path a reader names is
+    collected and only one that nothing commits is reported.</li>
+  <li>The file sits under output a tool in this repository declares it writes: <code>out</code> in
+    <code>foundry.toml</code>, a <code>vite build</code> or <code>next build</code> or
+    <code>cargo build</code> in the script that runs it, an <code>outdir</code> in a build script, an
+    <code>outDir</code> in a <code>tsconfig</code>. A clean clone plus that build has the file. The
+    rule reads declarations and resolves them to real paths, never the directory being called
+    <code>dist</code>: the defect this check was written from was vendored source in
+    <code>vendor/dist</code>, which no tool declares, and that one still fires.</li>
   <li>The match is only a bare filename. A path suffix carrying at least one parent directory is
     required, otherwise every <code>dist/index.js</code> in a monorepo gets reported. The real defect
     this check was written from still matches, because it was found by three segments:
