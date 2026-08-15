@@ -89,6 +89,88 @@ test("ignored-source ignores an ignored file nothing references", () => {
   }
 });
 
+test("ignored-source stays quiet when the commit answers the path the reader asks for", () => {
+  const r = repo();
+  try {
+    // The mpamm.wtf shape, which this check got wrong: a Vite app referencing an
+    // asset by its served URL, with the committed copy under public/ and a build
+    // lying around in dist/. The reference resolves in a clean clone, so there is
+    // no finding, whatever the build left on this disk.
+    r.write(".gitignore", "node_modules/\ndist/\n");
+    r.write("web/src/Tour.tsx", "const clips = [{ src: '/tour/clip.webm' }];\nexport default clips;\n");
+    r.write("web/public/tour/clip.webm", "committed asset\n");
+    r.commit();
+    r.write("web/dist/tour/clip.webm", "the build's copy of it\n");
+
+    assert.deepEqual(ignoredSource(r.dir), [], "a built copy of a committed asset is not missing source");
+  } finally {
+    r.cleanup();
+  }
+});
+
+test("ignored-source still reports the path a reader names that nothing commits", () => {
+  const r = repo();
+  try {
+    // Same repository, except the reader names the build directory itself. That
+    // path is in no commit, so a clean clone cannot read it and the finding
+    // stands. The reference it reports is the path that is actually broken.
+    r.write(".gitignore", "node_modules/\ndist/\n");
+    r.write("web/src/Tour.tsx", "const clip = 'web/dist/tour/clip.webm';\nexport default clip;\n");
+    r.write("web/public/tour/clip.webm", "committed asset\n");
+    r.commit();
+    r.write("web/dist/tour/clip.webm", "the build's copy of it\n");
+
+    const found = ignoredSource(r.dir);
+    assert.equal(found.length, 1, "expected exactly one finding");
+    assert.equal(found[0].file, "web/dist/tour/clip.webm");
+    assert.equal(found[0].reference, "dist/tour/clip.webm");
+    assert.ok(found[0].proof.commands[0].includes("dist/tour/clip\\.webm"), "the proof asks about the reference");
+  } finally {
+    r.cleanup();
+  }
+});
+
+test("ignored-source leaves build output a tool in the repo declares it writes", () => {
+  const r = repo();
+  try {
+    // puddleswap's shape: forge declares `out` in its own toml, a script reads
+    // the artefacts it produces, and the whole directory is ignored on purpose.
+    // A clean clone plus `forge build` has these files, so they are not missing
+    // source and reporting them is the noise this check exists to remove.
+    r.write(".gitignore", "node_modules/\ncontracts/out/\n");
+    r.write("contracts/foundry.toml", '[profile.default]\nsrc = "src"\nout = "out"\n');
+    r.write("scripts/sync.mjs", 'const abi = "contracts/out/Pool.sol/Pool.json";\nexport default abi;\n');
+    r.commit();
+    r.write("contracts/out/Pool.sol/Pool.json", '{"abi":[]}\n');
+
+    assert.deepEqual(ignoredSource(r.dir), [], "declared build output is not a finding");
+  } finally {
+    r.cleanup();
+  }
+});
+
+test("ignored-source still reports vendored source under a path that only looks built", () => {
+  const r = repo();
+  try {
+    // The moss defect, in a repository that also has a real build writing to
+    // dist. The declared output is `dist` at the root. `vendor/dist` is a
+    // different path that no tool declares, so the vendored module stays a
+    // finding. A rule keyed on the directory being called dist would lose this.
+    r.write(".gitignore", "node_modules/\ndist/\n");
+    r.write("package.json", JSON.stringify({ name: "x", scripts: { build: "vite build" } }, null, 2));
+    r.write("scripts/abis.mjs", 'import "../vendor/dist/IPool.mjs";\n');
+    r.write("vendor/dist/IPool.mjs", "export const IPool_ABI = [];\n");
+    r.write("dist/app.js", "the build's own output, ignored and rebuilt\n");
+    r.commit();
+
+    const found = ignoredSource(r.dir);
+    assert.equal(found.length, 1, "expected exactly the vendored file");
+    assert.equal(found[0].file, "vendor/dist/IPool.mjs");
+  } finally {
+    r.cleanup();
+  }
+});
+
 test("unrun-check catches a gate no workflow invokes", () => {
   const r = repo();
   try {

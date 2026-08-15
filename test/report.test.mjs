@@ -79,3 +79,30 @@ test("toMarkdown lists what proof mode withdrew and badges what it kept", () => 
   assert.match(md, /withdrew 1 finding/);
   assert.match(md, /lint-blindspot/);
 });
+
+/**
+ * A rule's helpUri is a promise to a reader who is looking at a finding in
+ * GitHub's Security tab and wants to know what it means. `#mutation` pointed at
+ * nothing for as long as SARIF has shipped, because the docs heading carried
+ * `id="mutation-check"`, and a fragment that misses lands the reader at the top
+ * of a long page with no idea which section was meant. The links test only
+ * resolves fragments the site links to itself, so nothing was watching this one.
+ */
+test("every check the scanner can emit has a docs section its helpUri resolves to", async () => {
+  const { CHECKS } = await import("../src/scan.mjs");
+  const { readFileSync } = await import("node:fs");
+  const { dirname, join } = await import("node:path");
+  const { fileURLToPath } = await import("node:url");
+  const docs = readFileSync(
+    join(dirname(fileURLToPath(import.meta.url)), "..", "web", "public", "docs.html"),
+    "utf8",
+  );
+  const ids = [...CHECKS.map((c) => c.name), "mutation"];
+  assert.ok(ids.length >= 5, `only ${ids.length} checks found, so this test is checking nothing`);
+  for (const id of ids) {
+    const { helpUri } = toSarif([{ check: id, severity: "high", file: "x", summary: "s", reproduction: ["x"] }])
+      .runs[0].tool.driver.rules[0];
+    assert.equal(helpUri, `https://margyn.xyz/docs#${id}`);
+    assert.ok(docs.includes(`id="${id}"`), `${helpUri} resolves to nothing: docs.html has no id="${id}"`);
+  }
+});

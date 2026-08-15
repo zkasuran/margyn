@@ -182,7 +182,7 @@ margyn [path] [options]              # once it is on your path
   which can rewrite vendored bytes whose hash was the thing proving they came from upstream. That is
   not hypothetical: it is the second half of the failure this product was written from.</p>
 
-<h3 id="mutation-check">mutation <span class="sev high">high</span> <span class="paid">part of Watch</span></h3>
+<h3 id="mutation">mutation <span class="sev high">high</span> <span class="paid">part of Watch</span></h3>
 <p><strong>Fires when</strong> a line is inverted, your whole suite runs, then it passes anyway. There
   is no arguing with a test that passed while the thing it guards was inverted. Details in the next
   section.</p>

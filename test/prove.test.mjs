@@ -49,7 +49,7 @@ test("proof mode certifies a real ignored-source finding by running its proof", 
     const f = kept.find((x) => x.check === "ignored-source");
     assert.ok(f, "the ignored-source finding must survive proof");
     assert.equal(f.proven.status, "reproduced");
-    assert.match(f.proven.output, /MARGYN_ABSENT_FROM_HEAD/);
+    assert.match(f.proven.output, /MARGYN_REFERENCE_ABSENT_FROM_HEAD/);
     assert.match(f.proven.output, /MARGYN_PRESENT_ON_DISK/);
     assert.equal(retracted.length, 0);
     assert.equal(tally.reproduced, 1);
