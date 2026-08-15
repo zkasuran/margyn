@@ -142,6 +142,7 @@ ${page.body}
       <a href="/docs">Documentation</a>
       <a href="/pricing">Pricing</a>
       <a href="/fix">Fix flow</a>
+      <a href="/suggest">Suggestion box</a>
       <a href="/changelog">Changelog</a>
       <a href="/security">Security</a>
     </nav>
@@ -155,7 +156,8 @@ ${page.body}
     </nav>
   </div>
   <p class="sm footnote">Margyn is built and sold by <b>Asura Coding Works</b>. MIT licensed.
-    Support runs through <a href="${SITE.repo}/issues">the repository issues</a>. Every number on
+    Support runs through <a href="${SITE.repo}/issues">the repository issues</a>, and
+    <a href="/suggest">the suggestion box</a> prepares one for you. Every number on
     this site was measured on the shipped product rather than estimated.</p>
 </div></footer>
 ${page.session ? '<script type="module" src="/app.mjs"></script>' : '<script type="module" src="/theme.mjs"></script>'}

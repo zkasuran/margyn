@@ -16,6 +16,7 @@ export default {
     <p>Contents</p>
     <a href="#cli">The command line tool</a>
     <a href="#site">The site</a>
+    <a href="#forms">The two forms</a>
     <a href="#licence">What is inside a licence</a>
     <a href="#browser">Cookies and storage</a>
     <a href="#third">Who else is involved</a>
@@ -41,6 +42,17 @@ export default {
   and has this account bought anything. That answer is what a licence is minted from.</p>
 <p>Cloudflare sees the request itself, the way any host does: an IP address, a path, a user agent, a
   timestamp. We do not build a profile from it and we run no reporting on it.</p>
+
+<h2 id="forms">The two forms</h2>
+<p><a href="/fix">The fix intake</a> and <a href="/suggest">the suggestion box</a> work the same way.
+  What you type is validated, turned into a prefilled link and handed straight back to your browser.
+  Nothing is written down on this side: no database, no queue, no inbox. The request only exists once
+  you click through and submit it to the public repository under your own account, which is also what
+  makes it yours to watch.</p>
+<p>So a contact address you type is only visible to us if you submit the issue carrying it. Cloudflare
+  sees that request the way it sees any request. The fix intake goes one step further and drops the
+  code snippet a finding can carry before the link is built, so your source cannot travel that way
+  even by accident.</p>
 
 <h2 id="licence">What is inside a licence</h2>
 <p>A licence is a signed payload. It carries the product names it unlocks, the account email, the

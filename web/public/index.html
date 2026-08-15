@@ -325,6 +325,40 @@ footer nav a { color: var(--mut); text-decoration: none }
 footer nav a:hover { color: var(--accent) }
 .footnote { margin: 34px 0 0; padding-top: 18px; border-top: 1px solid var(--line) }
 
+/* ---- the two forms: the fix intake and the suggestion box ----
+   Both pages shipped on browser defaults, which on a dark theme means a white
+   box with a black caret in the middle of a dark page. One block, both pages, so
+   a third form cannot look like a fourth site. */
+.fixform { display: grid; gap: 6px; max-width: var(--prose) }
+.fixform label { font: 640 13.5px/1.4 var(--sans); color: var(--ink); margin-top: 14px }
+.fixform label:first-child { margin-top: 0 }
+.fixform .hint { margin: 0 0 4px; font-size: 13.5px; color: var(--mut) }
+.fixform input, .fixform select, .fixform textarea {
+  font: 400 14px/1.55 var(--sans); color: var(--ink); background: var(--card);
+  border: 1px solid var(--strong); border-radius: var(--r-in); padding: 10px 12px;
+  width: 100%; min-width: 0; appearance: none;
+}
+.fixform textarea { font-family: var(--mono); font-size: 13px; resize: vertical; min-height: 120px }
+.fixform input:focus-visible, .fixform select:focus-visible, .fixform textarea:focus-visible {
+  outline: 2px solid var(--ink); outline-offset: 1px; border-color: var(--ink);
+}
+.fixform input::placeholder, .fixform textarea::placeholder { color: var(--faint) }
+/* The chevron is drawn rather than an image, so the select matches the ink in
+   both themes and there is no asset to ship. */
+.fixform select {
+  padding-right: 34px;
+  background-image: linear-gradient(45deg, transparent 50%, var(--mut) 50%),
+                    linear-gradient(135deg, var(--mut) 50%, transparent 50%);
+  background-position: calc(100% - 18px) center, calc(100% - 13px) center;
+  background-size: 5px 5px, 5px 5px;
+  background-repeat: no-repeat;
+}
+.fixform .row { margin-top: 18px }
+.fixout { margin-top: 20px; max-width: var(--prose) }
+.fixout:empty { display: none }
+.fixout p { margin: 0 0 12px }
+.fixout .btn { margin-bottom: 10px }
+
 @media (prefers-reduced-motion: reduce) {
   /* Shortened, not removed. A state change with no transition at all reads as a
      glitch rather than as calm. */
@@ -466,7 +500,7 @@ footer nav a:hover { color: var(--accent) }
     </li>
   </ul>
   <p class="sm" style="margin-top:22px"><a href="/docs#checks">What fires each check, what
-    deliberately does not</a></p>
+    deliberately does not</a> &middot; <a href="/suggest">Ask for a check that does not exist</a></p>
 </div></section>
 
 <section><div class="wrap">
@@ -629,6 +663,7 @@ footer nav a:hover { color: var(--accent) }
       <a href="/docs">Documentation</a>
       <a href="/pricing">Pricing</a>
       <a href="/fix">Fix flow</a>
+      <a href="/suggest">Suggestion box</a>
       <a href="/changelog">Changelog</a>
       <a href="/security">Security</a>
     </nav>
@@ -642,7 +677,8 @@ footer nav a:hover { color: var(--accent) }
     </nav>
   </div>
   <p class="sm footnote">Margyn is built and sold by <b>Asura Coding Works</b>. MIT licensed.
-    Support runs through <a href="https://github.com/zkasuran/margyn/issues">the repository issues</a>. Every number on
+    Support runs through <a href="https://github.com/zkasuran/margyn/issues">the repository issues</a>, and
+    <a href="/suggest">the suggestion box</a> prepares one for you. Every number on
     this site was measured on the shipped product rather than estimated.</p>
 </div></footer>
 <script type="module" src="/app.mjs"></script>

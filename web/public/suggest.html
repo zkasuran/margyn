@@ -3,14 +3,14 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Margyn Fix flow: send a finding, get back a patch with a test</title>
-<meta name="description" content="Paste a Margyn finding and prepare a fix request. It works from the finding, not your repository, so no token that can read your source is ever needed. Fulfilment is included with Solo Fix and Fix flow.">
-<link rel="canonical" href="https://margyn.xyz/fix">
+<title>Margyn suggestion box: feedback and feature requests</title>
+<meta name="description" content="Send feedback or ask for a feature. Nothing is stored: the box prepares a prefilled issue on the public repository, you submit it under your own account, and you can watch the answer.">
+<link rel="canonical" href="https://margyn.xyz/suggest">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Margyn">
-<meta property="og:url" content="https://margyn.xyz/fix">
-<meta property="og:title" content="Send the finding. Get back a patch that carries its own test.">
-<meta property="og:description" content="Paste a Margyn finding and prepare a fix request. It works from the finding, not your repository, so no token that can read your source is ever needed. Fulfilment is included with Solo Fix and Fix flow.">
+<meta property="og:url" content="https://margyn.xyz/suggest">
+<meta property="og:title" content="Tell it what it is missing.">
+<meta property="og:description" content="Send feedback or ask for a feature. Nothing is stored: the box prepares a prefilled issue on the public repository, you submit it under your own account, and you can watch the answer.">
 <meta property="og:image" content="https://margyn.xyz/og.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
@@ -389,69 +389,67 @@ footer nav a:hover { color: var(--accent) }
 <main id="main">
 
 <section class="phead"><div class="wrap">
-  <h1 class="prose">Send the finding. Get back a patch that carries its own test.</h1>
-  <p class="lede prose">Fix flow works from the finding, never from your repository. The finding
-    already carries the file, the line, the rule and the reproduction, so nobody needs a token that
-    can read your source. Paste one below and Margyn prepares a tracked request. Fulfilment is
-    included with <a href="/pricing#fix">Solo Fix</a> ($19 a month, one fix) and
-    <a href="/pricing#fix">Fix flow</a> ($79 a month, three).</p>
+  <h1 class="prose">Tell it what it is missing.</h1>
+  <p class="lede prose">Six checks is a deliberate number rather than a finished one. If Margyn
+    reported something wrong, missed something it should have caught, or needs a check that does not
+    exist yet, this is the box for it. A false positive is treated as a defect here, so those are
+    the most useful messages we get.</p>
 </div></section>
 
 <section><div class="wrap">
-  <form id="fixform" class="fixform">
-    <label for="finding">The finding</label>
-    <p class="hint prose">Paste the output of <code>margyn --json</code>, or a single finding, or
-      just describe it in a sentence. Your code is not needed and is not sent: only the location and
-      the rule travel.</p>
-    <textarea id="finding" name="finding" rows="10" required
-      placeholder='{ "findings": [ { "check": "no-assertion", "file": "test/a.test.mjs:12", "summary": "test \"x\" asserts nothing" } ] }'></textarea>
+  <form id="sgform" class="fixform">
+    <label for="kind">What is this</label>
+    <select id="kind" name="kind">
+      <option value="feedback">Feedback, including a wrong or noisy finding</option>
+      <option value="feature">A feature or a check that should exist</option>
+    </select>
 
-    <label for="contact">Where a fix should reach you</label>
-    <input id="contact" name="contact" type="text" required placeholder="you@example.com or @handle">
+    <label for="suggestion">Say it here</label>
+    <p class="hint prose">Concrete beats polite. A repository and a command we can run, or the
+      finding you disagree with, turns this into something we can act on the same day. Do not paste
+      code you would not put in a public issue: this prepares one.</p>
+    <textarea id="suggestion" name="suggestion" rows="9" required minlength="12" maxlength="2000"
+      placeholder="npx margyn-scan on our monorepo reports every package's dist/ as missing source. Repo is public at github.com/..., the command is ..."></textarea>
 
-    <label for="note">Anything else (optional)</label>
-    <textarea id="note" name="note" rows="3" placeholder="Context, a deadline, the branch it lives on."></textarea>
+    <label for="contact">Where a reply should reach you (optional)</label>
+    <input id="contact" name="contact" type="text" maxlength="200" placeholder="you@example.com or @handle">
 
     <div class="row">
-      <button type="submit">Prepare the fix request</button>
+      <button type="submit">Prepare the request</button>
     </div>
   </form>
-  <div id="fixout" class="fixout" role="status" aria-live="polite"></div>
+  <div id="sgout" class="fixout" role="status" aria-live="polite"></div>
 </div></section>
 
 <section><div class="wrap">
-  <h2>What happens next</h2>
-  <p class="prose">Preparing a request opens a tracked issue you can watch. Only the finding's
-    location, rule and reproduction are included, never the code snippet a finding sometimes
-    carries, so preparing a request cannot put your source anywhere public. Edit anything before you
-    submit. A fix comes back as a patch carrying a test that fails before it and passes after, within
-    five working days, or that month is refunded. If a fix genuinely cannot be written from the
-    finding alone, we say so and it does not count.</p>
-  <p class="sm prose">Preparing is open to anyone. Fulfilment is what the <a href="/pricing#fix">Solo
-    Fix and Fix flow plans</a> buy.</p>
+  <h2>What happens to it</h2>
+  <p class="prose">Nothing is stored here. The box validates what you wrote, gives it a reference and
+    prepares an issue on <a href="https://github.com/zkasuran/margyn/issues">the public
+    repository</a> with the text already filled in. You submit it under your own account, which is
+    what makes it yours to watch and ours to answer in public. There is no inbox on this side to
+    fill up and no database of other people's ideas to guard.</p>
+  <p class="prose">If you would rather not use a GitHub account, open the prepared link, copy the
+    text out of it and send it wherever you like. The reference is deterministic, so quoting it back
+    at us finds the same request.</p>
+  <p class="sm prose">A finding you think is wrong is the highest value message on this page.
+    <a href="/proof#public">Twenty two false positives</a> were found and fixed exactly this way,
+    by pointing the tool at repositories that were not ours and reading every finding by hand.</p>
 </div></section>
 
 <script type="module">
 const byId = (id) => document.getElementById(id);
-const form = byId("fixform");
-const out = byId("fixout");
+const form = byId("sgform");
+const out = byId("sgout");
 form.addEventListener("submit", async (event) => {
   event.preventDefault();
-  const contact = byId("contact").value.trim();
-  const note = byId("note").value.trim();
-  const raw = byId("finding").value.trim();
-  const body = { contact, note };
+  const body = {
+    kind: byId("kind").value,
+    suggestion: byId("suggestion").value.trim(),
+    contact: byId("contact").value.trim(),
+  };
+  out.textContent = "Preparing...";
   try {
-    const parsed = JSON.parse(raw);
-    if (parsed && Array.isArray(parsed.findings)) body.findings = parsed.findings;
-    else if (Array.isArray(parsed)) body.findings = parsed;
-    else body.finding = parsed;
-  } catch (e) {
-    body.finding = raw;
-  }
-  out.textContent = "Preparing the request...";
-  try {
-    const res = await fetch("/api/fix-intake", {
+    const res = await fetch("/api/suggest", {
       method: "POST",
       headers: { "content-type": "application/json" },
       body: JSON.stringify(body),
@@ -460,19 +458,25 @@ form.addEventListener("submit", async (event) => {
     if (!res.ok) { out.textContent = data.error || ("the server returned " + res.status); return; }
     out.innerHTML = "";
     const head = document.createElement("p");
-    head.innerHTML = "Prepared. Reference <b></b> for <b></b> finding(s).";
-    head.querySelectorAll("b")[0].textContent = data.reference;
-    head.querySelectorAll("b")[1].textContent = String(data.count);
+    const ref = document.createElement("b");
+    ref.textContent = data.reference;
+    head.append("Prepared as ", ref, ", labelled ");
+    const label = document.createElement("code");
+    label.textContent = data.label;
+    // No period after the code span: its right padding leaves a visible gap.
+    head.append(label);
     const link = document.createElement("a");
     link.href = data.issue.url;
     link.target = "_blank";
     link.rel = "noopener";
     link.className = "btn";
-    link.textContent = "Open the fix request";
-    const note2 = document.createElement("p");
-    note2.className = "sm";
-    note2.textContent = "Only the location and rule are included, never your source. Edit anything before you submit. Fulfilment is included with Solo Fix and Fix flow.";
-    out.append(head, link, note2);
+    link.textContent = "Open the prepared issue";
+    const note = document.createElement("p");
+    note.className = "sm";
+    note.textContent = data.trimmed
+      ? "The text was trimmed to fit the link, so paste the rest into the issue before you submit."
+      : "Edit anything before you submit. Nothing was stored on this side.";
+    out.append(head, link, note);
   } catch (err) {
     out.textContent = String((err && err.message) || err);
   }

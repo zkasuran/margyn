@@ -6,6 +6,10 @@
  *   POST /api/verify   exchanges the SDK's userVerificationToken for a user,
  *                      using the secret API key. Server-side only.
  *   POST /api/licence  mints a signed licence for a user Tiun says has paid.
+ *   POST /api/fix-intake  turns a finding into a prefilled fix request.
+ *   POST /api/suggest     turns feedback or a feature request into a prefilled
+ *                         issue. Both of those store nothing: they answer with a
+ *                         link the visitor submits under their own account.
  *
  * `/api/scan` is deliberately absent. The local server has it, because there the
  * caller and the repository are the same machine. Here a scan route would take a
@@ -25,6 +29,7 @@
  */
 import { granted } from "../src/entitlements.mjs";
 import { intake } from "../src/fix-intake.mjs";
+import { suggest } from "../src/suggest.mjs";
 import { bodyOf, bytesToSign, decode, tokenOf } from "../src/licence-format.mjs";
 import { STATIC } from "./static.generated.mjs";
 
@@ -162,6 +167,21 @@ export default {
       // reads no repository, so there is no source to leak and no data to guard.
       const result = intake(body);
       const { status, ...rest } = result;
+      return json(rest, status);
+    }
+
+    if (url.pathname === "/api/suggest") {
+      if (request.method !== "POST") return json({ error: "use POST" }, 405);
+      let body;
+      try {
+        body = await readBody(request);
+      } catch (e) {
+        return json({ error: String(e.message ?? e) }, 400);
+      }
+      // Prepares a prefilled issue and returns it. It stores nothing, sends
+      // nothing and reads nothing, so a suggestion cannot become a database we
+      // are then holding on someone else's behalf.
+      const { status, ...rest } = suggest(body);
       return json(rest, status);
     }
 

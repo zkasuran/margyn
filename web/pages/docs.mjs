@@ -350,9 +350,12 @@ steps:
 margyn /path/to/repo
 
 Nothing hollow found. Every check this tool knows how to test held up.</pre>
-<p>Then your verification layer held up on the five things this tool knows how to test, which is worth
+<p>Then your verification layer held up on the six things this tool knows how to test, which is worth
   knowing and cost you one command. It is a narrow tool on purpose. It has six checks, it says so,
-  and it does not invent a sixth to make a report look busy.</p>
+  and it does not invent a seventh to make a report look busy.</p>
+<p>If it missed something it should have caught, or reported something that was fine, say so in
+  <a href="/suggest">the suggestion box</a>. A false positive is treated as a defect here rather
+  than as a tuning preference, so those are the most useful messages we get.</p>
 <p class="sm"><a href="/pricing">Pricing</a> &middot; <a href="/security">Security model</a> &middot;
   <a href="https://github.com/zkasuran/margyn">Source on GitHub</a></p>
 

@@ -111,7 +111,7 @@ export default {
     </li>
   </ul>
   <p class="sm" style="margin-top:22px"><a href="/docs#checks">What fires each check, what
-    deliberately does not</a></p>
+    deliberately does not</a> &middot; <a href="/suggest">Ask for a check that does not exist</a></p>
 </div></section>
 
 <section><div class="wrap">

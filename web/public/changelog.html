@@ -4,13 +4,13 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Margyn changelog</title>
-<meta name="description" content="What shipped and when. Six checks, an offline licence, a Cloudflare Worker with no scan endpoint, then the site and the first npm release.">
+<meta name="description" content="What shipped and when. Six checks, a suggestion box, an offline licence, a Cloudflare Worker with no scan endpoint, then the site and the first npm release.">
 <link rel="canonical" href="https://margyn.xyz/changelog">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Margyn">
 <meta property="og:url" content="https://margyn.xyz/changelog">
 <meta property="og:title" content="Margyn changelog">
-<meta property="og:description" content="What shipped and when. Six checks, an offline licence, a Cloudflare Worker with no scan endpoint, then the site and the first npm release.">
+<meta property="og:description" content="What shipped and when. Six checks, a suggestion box, an offline licence, a Cloudflare Worker with no scan endpoint, then the site and the first npm release.">
 <meta property="og:image" content="https://margyn.xyz/og.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
@@ -313,6 +313,40 @@ footer nav a { color: var(--mut); text-decoration: none }
 footer nav a:hover { color: var(--accent) }
 .footnote { margin: 34px 0 0; padding-top: 18px; border-top: 1px solid var(--line) }
 
+/* ---- the two forms: the fix intake and the suggestion box ----
+   Both pages shipped on browser defaults, which on a dark theme means a white
+   box with a black caret in the middle of a dark page. One block, both pages, so
+   a third form cannot look like a fourth site. */
+.fixform { display: grid; gap: 6px; max-width: var(--prose) }
+.fixform label { font: 640 13.5px/1.4 var(--sans); color: var(--ink); margin-top: 14px }
+.fixform label:first-child { margin-top: 0 }
+.fixform .hint { margin: 0 0 4px; font-size: 13.5px; color: var(--mut) }
+.fixform input, .fixform select, .fixform textarea {
+  font: 400 14px/1.55 var(--sans); color: var(--ink); background: var(--card);
+  border: 1px solid var(--strong); border-radius: var(--r-in); padding: 10px 12px;
+  width: 100%; min-width: 0; appearance: none;
+}
+.fixform textarea { font-family: var(--mono); font-size: 13px; resize: vertical; min-height: 120px }
+.fixform input:focus-visible, .fixform select:focus-visible, .fixform textarea:focus-visible {
+  outline: 2px solid var(--ink); outline-offset: 1px; border-color: var(--ink);
+}
+.fixform input::placeholder, .fixform textarea::placeholder { color: var(--faint) }
+/* The chevron is drawn rather than an image, so the select matches the ink in
+   both themes and there is no asset to ship. */
+.fixform select {
+  padding-right: 34px;
+  background-image: linear-gradient(45deg, transparent 50%, var(--mut) 50%),
+                    linear-gradient(135deg, var(--mut) 50%, transparent 50%);
+  background-position: calc(100% - 18px) center, calc(100% - 13px) center;
+  background-size: 5px 5px, 5px 5px;
+  background-repeat: no-repeat;
+}
+.fixform .row { margin-top: 18px }
+.fixout { margin-top: 20px; max-width: var(--prose) }
+.fixout:empty { display: none }
+.fixout p { margin: 0 0 12px }
+.fixout .btn { margin-bottom: 10px }
+
 @media (prefers-reduced-motion: reduce) {
   /* Shortened, not removed. A state change with no transition at all reads as a
      glitch rather than as calm. */
@@ -362,6 +396,26 @@ footer nav a:hover { color: var(--accent) }
 </div></section>
 
 <section><div class="wrap">
+  <div class="rel">
+    <p class="when">2026-08-15<br>site</p>
+    <div>
+      <h3>A suggestion box, for the finding you think is wrong</h3>
+      <p><b><a href="/suggest">A box for feedback and feature requests</a>.</b> Six checks is a
+        deliberate number rather than a finished one. The most useful message this project gets is a
+        finding somebody disagrees with. So there is a form for it now: pick feedback or a feature,
+        say the thing, leave a contact if you want a reply.</p>
+      <p>It stores nothing, for the same reason <a href="/fix">the fix intake</a> stores nothing. What
+        you type is validated, given a deterministic reference and turned into a prefilled issue on
+        the public repository, which you submit under your own account. That makes the request yours
+        to watch and ours to answer in public. It also means there is no inbox on this side to fill
+        up and no database of other people's ideas to guard. The security page carries the curl that
+        shows what the endpoint returns. The privacy page now says what both forms do with what you
+        type.</p>
+      <p>The CLI did not change, so there is no new npm release. The version numbers on this page are
+        the package's.</p>
+    </div>
+  </div>
+
   <div class="rel">
     <p class="when">0.3.0<br>2026-08-15</p>
     <div>
@@ -583,6 +637,7 @@ footer nav a:hover { color: var(--accent) }
       <a href="/docs">Documentation</a>
       <a href="/pricing">Pricing</a>
       <a href="/fix">Fix flow</a>
+      <a href="/suggest">Suggestion box</a>
       <a href="/changelog">Changelog</a>
       <a href="/security">Security</a>
     </nav>
@@ -596,7 +651,8 @@ footer nav a:hover { color: var(--accent) }
     </nav>
   </div>
   <p class="sm footnote">Margyn is built and sold by <b>Asura Coding Works</b>. MIT licensed.
-    Support runs through <a href="https://github.com/zkasuran/margyn/issues">the repository issues</a>. Every number on
+    Support runs through <a href="https://github.com/zkasuran/margyn/issues">the repository issues</a>, and
+    <a href="/suggest">the suggestion box</a> prepares one for you. Every number on
     this site was measured on the shipped product rather than estimated.</p>
 </div></footer>
 <script type="module" src="/theme.mjs"></script>

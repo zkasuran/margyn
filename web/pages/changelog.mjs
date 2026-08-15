@@ -7,7 +7,7 @@ export default {
   path: "/changelog",
   title: "Margyn changelog",
   description:
-    "What shipped and when. Six checks, an offline licence, a Cloudflare Worker with no scan endpoint, then the site and the first npm release.",
+    "What shipped and when. Six checks, a suggestion box, an offline licence, a Cloudflare Worker with no scan endpoint, then the site and the first npm release.",
   body: `
 <section class="phead"><div class="wrap">
   <h1 class="prose">Changelog</h1>
@@ -17,6 +17,26 @@ export default {
 </div></section>
 
 <section><div class="wrap">
+  <div class="rel">
+    <p class="when">2026-08-15<br>site</p>
+    <div>
+      <h3>A suggestion box, for the finding you think is wrong</h3>
+      <p><b><a href="/suggest">A box for feedback and feature requests</a>.</b> Six checks is a
+        deliberate number rather than a finished one. The most useful message this project gets is a
+        finding somebody disagrees with. So there is a form for it now: pick feedback or a feature,
+        say the thing, leave a contact if you want a reply.</p>
+      <p>It stores nothing, for the same reason <a href="/fix">the fix intake</a> stores nothing. What
+        you type is validated, given a deterministic reference and turned into a prefilled issue on
+        the public repository, which you submit under your own account. That makes the request yours
+        to watch and ours to answer in public. It also means there is no inbox on this side to fill
+        up and no database of other people's ideas to guard. The security page carries the curl that
+        shows what the endpoint returns. The privacy page now says what both forms do with what you
+        type.</p>
+      <p>The CLI did not change, so there is no new npm release. The version numbers on this page are
+        the package's.</p>
+    </div>
+  </div>
+
   <div class="rel">
     <p class="when">0.3.0<br>2026-08-15</p>
     <div>

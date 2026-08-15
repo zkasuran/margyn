@@ -11,21 +11,12 @@
  * issue. The security promise on the site holds for the paid service exactly as
  * it does for the free scan.
  */
+import { reference } from "./reference.mjs";
 
 const CONTACT_MIN = 3;
 const CONTACT_MAX = 200;
 const MAX_FINDINGS = 20;
 const ISSUE_BODY_CAP = 6000;
-
-/** FNV-1a, so a reference is deterministic: the same request yields the same id. */
-function reference(input) {
-  let h = 0x811c9dc5;
-  for (let i = 0; i < input.length; i += 1) {
-    h ^= input.charCodeAt(i);
-    h = Math.imul(h, 0x01000193);
-  }
-  return `FX-${(h >>> 0).toString(36).toUpperCase().padStart(6, "0")}`;
-}
 
 /** A finding, reduced to the fields that describe a defect rather than the source. */
 function safeFields(f) {
@@ -87,7 +78,7 @@ export function intake(body = {}, opts = {}) {
 
   const findings = list.map(safeFields);
   const note = typeof body.note === "string" ? body.note.trim().slice(0, 500) : "";
-  const ref = reference(JSON.stringify({ contact, findings }));
+  const ref = reference("FX", JSON.stringify({ contact, findings }));
   const title = `Fix request ${ref}: ${(findings[0].summary ?? findings[0].check ?? "finding").slice(0, 80)}`;
   const url =
     `https://github.com/${repo}/issues/new?labels=fix-request` +

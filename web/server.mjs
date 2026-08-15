@@ -21,6 +21,7 @@ import { dirname, extname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { granted } from "../src/entitlements.mjs";
 import { intake } from "../src/fix-intake.mjs";
+import { suggest } from "../src/suggest.mjs";
 import { mintLicence } from "../src/licence.mjs";
 import { scan } from "../src/scan.mjs";
 
@@ -180,6 +181,15 @@ const server = createServer(async (req, res) => {
   if (url.pathname === "/api/fix-intake" && req.method === "POST") {
     try {
       const { status, ...rest } = intake(await readBody(req));
+      return json(res, status, rest);
+    } catch (e) {
+      return json(res, 400, { error: String(e.message ?? e) });
+    }
+  }
+
+  if (url.pathname === "/api/suggest" && req.method === "POST") {
+    try {
+      const { status, ...rest } = suggest(await readBody(req));
       return json(res, status, rest);
     } catch (e) {
       return json(res, 400, { error: String(e.message ?? e) });
