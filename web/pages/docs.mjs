@@ -1,14 +1,14 @@
 /** Documentation. Everything a paying user needs, in the order they need it. */
 export default {
   path: "/docs",
-  title: "Margyn documentation: install, the five checks, CI and licences",
+  title: "Margyn documentation: install, the six checks, CI and licences",
   ogTitle: "How to run Margyn, plus what each check actually looks for",
   description:
-    "Install with npx, read the output, wire it into CI, then see exactly what fires each of the five checks and what deliberately does not.",
+    "Install with npx, read the output, wire it into CI, then see exactly what fires each of the six checks and what deliberately does not.",
   body: `
 <section class="phead"><div class="wrap">
   <h1 class="prose">Documentation</h1>
-  <p class="lede prose">One command, five checks, no configuration file. This page covers what each
+  <p class="lede prose">One command, six checks, no configuration file. This page covers what each
     check looks for, what it deliberately ignores, how the paid check is unlocked and how to make
     the whole thing a gate in CI.</p>
 </div></section>
@@ -20,7 +20,7 @@ export default {
     <a href="#install">Install</a>
     <a href="#usage">Usage</a>
     <a href="#output">Reading the output</a>
-    <a href="#checks">The five checks</a>
+    <a href="#checks">The six checks</a>
     <a href="#mutate">The mutation proof</a>
     <a href="#licence">Licences</a>
     <a href="#ci">In CI</a>
@@ -104,7 +104,7 @@ margyn [path] [options]              # once it is on your path
 <p>Findings are sorted with high first. Severity is a word, never a colour on its own, so the output
   survives being piped into a file or read by someone who does not see red.</p>
 
-<h2 id="checks">The five checks</h2>
+<h2 id="checks">The six checks</h2>
 <p>Each one says what fires it and what does not, because a scanner you cannot predict gets
   uninstalled. The precision rules below are not tuning knobs, they are fixes for false positives we
   produced and treated as defects.</p>
@@ -167,6 +167,52 @@ margyn [path] [options]              # once it is on your path
 <p>The middle two rules came from running this check over fastify, where seven tests in one file were
   reported and every one of them was wrong. <a href="/proof#public">That run is on the proof
   page</a>, before and after.</p>
+
+<h3 id="cannot-fail">cannot-fail <span class="sev high">high</span></h3>
+<p><strong>Fires when</strong> a test asserts something that cannot be false, so it reports green
+  whatever the code does. no-assertion reports an empty body; this one reports a body full of
+  assertions that hold by construction. Three shapes, each one measured on real repositories before
+  it shipped:</p>
+<ul>
+  <li><strong>A literal assertion in the catch.</strong> <code>catch (e) { expect(true).toBe(true) }</code>
+    answers the failure path with something already true, so the assertions in the try are swallowed
+    and the test passes with its subject down.</li>
+  <li><strong>A literal assertion that is the test's only one.</strong>
+    <code>it("documents the handler", () =&gt; { expect(true).toBe(true) })</code> can only fail by
+    throwing.</li>
+  <li><strong>An assertion inside a try whose catch cannot fail the test</strong>, and its variant, a
+    deliberate fail marker whose catch is satisfied by the marker's own error.
+    <code>try { await call(); expect(true).to.be.false } catch (e) { expect(e).to.exist }</code>
+    passes on both paths, because the marker throws an assertion error and the catch is happy that an
+    error arrived.</li>
+  <li><strong>A status list that spans success and failure.</strong>
+    <code>expect([200, 302, 400]).toContain(res.status)</code> cannot tell the outcomes apart, so the
+    endpoint can start failing with this test still green.</li>
+</ul>
+<p><strong>Does not fire when:</strong></p>
+<ul>
+  <li>The test declares an assertion count. Under <code>t.plan(n)</code> a swallowed assertion
+    normally changes the count and the plan goes red. Sometimes the count coincides and the test
+    really cannot fail, but which one it is depends on how many assertions each path makes, and
+    guessing that from text is how a scanner earns its reputation. This rule fired 41 times on
+    fastify before the gate and 39 of those were wrong.</li>
+  <li>The catch hands the error to code after the try. <code>catch (err) { thrown = err }</code>
+    followed by <code>expect(thrown).toBeInstanceOf(...)</code> is the correct way to assert on a
+    rejection.</li>
+  <li>The catch checks which error arrived: its message, its name, its code, its type. That
+    separates a real rejection test from a marker satisfied by its own error.</li>
+  <li>The literal assertion sits beside a real one. A "we got here" marker next to a catch that
+    calls <code>fail()</code> is not a hollow test.</li>
+  <li>The status list is all failures or all successes. A list of 400, 401 and 403 is a deliberate
+    negative test.</li>
+  <li>The vacuous code is inside a string or a comment. Comments, string contents and regex bodies
+    are blanked before anything is matched, because a suite that compiles code holds vacuous
+    snippets as data.</li>
+</ul>
+<p>Two shapes were measured and dropped rather than shipped. A top level <code>||</code> in an
+  assertion was right twice in 110 real sites, because what decides the class is what the constants
+  mean. An empty catch on its own was wrong 14 times out of 14, because the assertion normally sits
+  after the try. Neither is a tuning knob we left off; both are rules that would have cried wolf.</p>
 
 <h3 id="unrun-check">unrun-check <span class="sev med">medium</span></h3>
 <p><strong>Fires when</strong> a script whose name starts with test, lint, typecheck, check, verify,
@@ -305,7 +351,7 @@ margyn /path/to/repo
 
 Nothing hollow found. Every check this tool knows how to test held up.</pre>
 <p>Then your verification layer held up on the five things this tool knows how to test, which is worth
-  knowing and cost you one command. It is a narrow tool on purpose. It has five checks, it says so,
+  knowing and cost you one command. It is a narrow tool on purpose. It has six checks, it says so,
   and it does not invent a sixth to make a report look busy.</p>
 <p class="sm"><a href="/pricing">Pricing</a> &middot; <a href="/security">Security model</a> &middot;
   <a href="https://github.com/zkasuran/margyn">Source on GitHub</a></p>

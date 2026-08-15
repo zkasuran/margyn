@@ -1,3 +1,4 @@
+import { cannotFail } from "./checks/cannot-fail.mjs";
 import { ignoredSource } from "./checks/ignored-source.mjs";
 import { lintBlindspots } from "./checks/lint-blindspots.mjs";
 import { mutationProof } from "./checks/mutation.mjs";
@@ -8,6 +9,7 @@ import { unrunChecks } from "./checks/unrun-checks.mjs";
 export const CHECKS = [
   { name: "ignored-source", run: ignoredSource },
   { name: "no-assertion", run: noAssertion },
+  { name: "cannot-fail", run: cannotFail },
   { name: "unrun-check", run: unrunChecks },
   { name: "lint-blindspot", run: lintBlindspots },
 ];

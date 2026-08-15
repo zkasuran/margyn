@@ -1,17 +1,17 @@
 /** Pricing. One price, what is free, then the reason the paid check is paid. */
 export default {
   path: "/pricing",
-  title: "Margyn pricing: four checks free, the mutation proof from $8.99 a month",
+  title: "Margyn pricing: five checks free, the mutation proof from $8.99 a month",
   ogTitle: "Four checks are free. The fifth runs your suite, so it costs money.",
   description:
-    "The four static checks are free with no account and no licence. Watch is $8.99 a month, adds the mutation proof and mints a licence your CI verifies offline. Three days free.",
+    "The five static checks are free with no account and no licence. Watch is $8.99 a month, adds the mutation proof and mints a licence your CI verifies offline. Three days free.",
   session: true,
   body: `
 <section class="phead"><div class="wrap">
   <h1 class="prose">Four checks are free. The fifth runs your suite, so it costs money.</h1>
   <p class="lede prose">Watch is $8.99 a month for one owner's repositories. Team is $29 a month for
     an organisation. Solo Fix is $19 a month for one finding fixed, Fix flow is $79 a month for
-    three, if you would rather the findings arrived already fixed. The four static checks stay free
+    three, if you would rather the findings arrived already fixed. The five static checks stay free
     with no account, no licence and no network.</p>
 </div></section>
 

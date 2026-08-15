@@ -50,7 +50,7 @@ export default {
 
 <section><div class="wrap">
   <h2>What it writes, what it does not</h2>
-  <p class="prose">With no flags: nothing. The four static checks are read only.</p>
+  <p class="prose">With no flags: nothing. The five static checks are read only.</p>
   <p class="prose">Under <code>--mutate</code>: one file at a time, inverted at one line, only
     after your suite has passed unmutated. The original is restored in a <code>finally</code> block
     and on <code>SIGINT</code>, so a scan you interrupt with ctrl-c cannot leave a mutated tree

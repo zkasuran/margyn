@@ -4,13 +4,13 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Margyn changelog</title>
-<meta name="description" content="What shipped and when. Five checks, an offline licence, a Cloudflare Worker with no scan endpoint, then the site and the first npm release.">
+<meta name="description" content="What shipped and when. Six checks, an offline licence, a Cloudflare Worker with no scan endpoint, then the site and the first npm release.">
 <link rel="canonical" href="https://margyn.xyz/changelog">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Margyn">
 <meta property="og:url" content="https://margyn.xyz/changelog">
 <meta property="og:title" content="Margyn changelog">
-<meta property="og:description" content="What shipped and when. Five checks, an offline licence, a Cloudflare Worker with no scan endpoint, then the site and the first npm release.">
+<meta property="og:description" content="What shipped and when. Six checks, an offline licence, a Cloudflare Worker with no scan endpoint, then the site and the first npm release.">
 <meta property="og:image" content="https://margyn.xyz/og.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
@@ -362,6 +362,36 @@ footer nav a:hover { color: var(--accent) }
 </div></section>
 
 <section><div class="wrap">
+  <div class="rel">
+    <p class="when">0.3.0<br>2026-08-15</p>
+    <div>
+      <h3>A sixth check, for tests that assert something that cannot be false</h3>
+      <p><b><code>cannot-fail</code>.</b> <code>no-assertion</code> reports an empty test body. This
+        one reports the harder case, a body full of assertions that hold whatever the code does: a
+        literal answered inside a catch, an assertion swallowed by a catch that cannot fail the test,
+        a deliberate fail marker whose catch is satisfied by the marker's own error, a status list
+        that accepts both the success and the failure. Every shape was measured against real
+        repositories before it shipped, and two more were measured and dropped. A top level
+        <code>||</code> in an assertion was right twice in 110 real sites. An empty catch on its own
+        was wrong fourteen times out of fourteen. Neither is a knob left off, both are rules that
+        would have cried wolf.</p>
+      <p>The first draft reported 41 findings on fastify and 39 of them were wrong, all under
+        <code>t.plan(n)</code>, where the declared count normally catches the swallowed assertion
+        itself. That gate is in the check and in the tests. What is left on fastify is two, and both
+        are real.</p>
+      <p><b>A test title is not an assertion.</b> The loose assertion matcher read the word "should"
+        wherever it appeared, so every test whose title began "should ..." was treated as asserting.
+        Comments, string contents and regular expression bodies are now blanked before anything is
+        matched, and the title with them. That found a seventh hollow test in fastify and stopped
+        this repository's own CLI test from reporting itself, since it writes a test into a fixture
+        as a string. The proof command carried the same fault and disagreed with the check that
+        emitted it, which is how it was caught: the finding appeared and its own proof withdrew it.</p>
+      <p><b>Every mutation this tool can make is now caught by its own suite.</b> 63 tests became 93,
+        and the eight survivors it reported on itself are gone. <a href="/proof#itself">The run is on
+        the proof page</a>, with what each test pins.</p>
+    </div>
+  </div>
+
   <div class="rel">
     <p class="when">0.2.1<br>2026-08-15</p>
     <div>

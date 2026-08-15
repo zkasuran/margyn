@@ -445,6 +445,11 @@ footer nav a:hover { color: var(--accent) }
         helper count, as does a declared count like <code>t.plan(11)</code>.</p>
     </li>
     <li>
+      <div class="top"><span class="nm">cannot-fail</span><span class="sev high">high</span></div>
+      <p>Tests full of assertions that hold whatever the code does: a literal answered in a catch, a
+        swallowed assertion, a status list that accepts both the success and the failure.</p>
+    </li>
+    <li>
       <div class="top"><span class="nm">mutation</span><span class="sev high">high</span><span class="paid">part of Watch</span></div>
       <p>Inverts a line, runs your suite, then reports the suite that stayed green anyway. There is
         no arguing with a test that passed while the thing it guards was inverted.</p>
@@ -530,13 +535,13 @@ footer nav a:hover { color: var(--accent) }
 </div></section>
 
 <section id="pricing"><div class="wrap">
-  <h2>Four checks free. The fifth is $8.99 a month.</h2>
+  <h2>Five checks free. The sixth is $8.99 a month.</h2>
   <div class="tiers">
     <div class="tier">
       <p class="tag">Free scan</p>
       <p class="amt">$0<span class="per"> forever</span></p>
       <ul>
-        <li>Four static checks, no account, no licence</li>
+        <li>Five static checks, no account, no licence</li>
         <li>A reproduction under every finding</li>
         <li>Exit code 1, so it gates CI today</li>
       </ul>

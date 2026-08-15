@@ -14,6 +14,7 @@ import { ignoredSource } from "../src/checks/ignored-source.mjs";
 import { mutationProof } from "../src/checks/mutation.mjs";
 import { noAssertion } from "../src/checks/no-assertion.mjs";
 import { unrunChecks } from "../src/checks/unrun-checks.mjs";
+import { prove } from "../src/prove.mjs";
 import { scan } from "../src/scan.mjs";
 
 function repo() {
@@ -360,6 +361,32 @@ test("mutation reports a line no test observes, and restores the file", () => {
     assert.match(found[0].summary, /\(return true -> false\)/, "the label must describe the real change");
     assert.match(found[0].reproduction.join("\n"), /return\\s\+\)true/, "the reproduction applies the same mutation");
     assert.equal(readFileSync(join(r.dir, "src/a.mjs"), "utf8"), before, "the file must be restored");
+  } finally {
+    r.cleanup();
+  }
+});
+
+test("no-assertion is not fooled by the word should in the test title", () => {
+  const r = repo();
+  try {
+    // fastify's wrap-thenable.test.js shape. The loose assertion matcher read the
+    // word "should" in the title as an assertion, so this whole class went
+    // unreported until comments, strings and titles stopped being matched. The
+    // proof command had the same fault, which is how it was found: the finding
+    // appeared and its own proof retracted it.
+    r.write("test/a.test.mjs", [
+      'import { test } from "node:test";',
+      'test("should resolve immediately when the reply is hijacked", async () => {',
+      "  await new Promise((resolve) => { const reply = {}; hijack(reply); resolve(); });",
+      "});",
+    ].join("\n"));
+    r.commit();
+
+    const found = noAssertion(r.dir);
+    assert.equal(found.length, 1, "a title is not an assertion");
+    const proven = prove(r.dir, found);
+    assert.equal(proven.kept.length, 1, "the proof has to agree with the check");
+    assert.equal(proven.kept[0].proven.status, "reproduced");
   } finally {
     r.cleanup();
   }

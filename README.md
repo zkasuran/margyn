@@ -82,7 +82,7 @@ It is free, because a finding you can watch reproduce is the whole product.
 
 ## What it checks today
 
-Five checks. Four are static and safe to run anywhere. The mutation proof is
+Six checks. Five are static and safe to run anywhere. The mutation proof is
 opt-in behind `--mutate`, because it executes the real test suite once per
 mutation.
 
@@ -133,11 +133,11 @@ src/cli.mjs                     === -> !==             suite still passed
 ```
 
 On 2026-08-15 every line on that list got a test, plus `src/prove.mjs`, which had
-joined it. 63 tests became 81, and the run over every file reports this:
+joined it. 63 tests became 93, and the run over every file reports this:
 
 ```
-35 files tracked as source, 22 carry a mutation this tool knows how to make
-22 mutated, 22 caught by the suite, 0 survivors, 12 seconds
+37 files tracked as source, 24 carry a mutation this tool knows how to make
+24 mutated, 24 caught by the suite, 0 survivors, 14 seconds
 ```
 
 Each test pins the behaviour the mutation changed rather than the mutation.
@@ -174,7 +174,7 @@ was tuned for these and nothing was left out because the number was inconvenient
 | sindresorhus/execa | `8017b27` | 0 |
 | sindresorhus/got | `e3924aa` | 1 unrun gate |
 | expressjs/express | `a371447` | 3 unrun gates |
-| fastify/fastify | `39e87e8` | 6 tests with no assertion, 4 unrun gates |
+| fastify/fastify | `39e87e8` | 7 tests with no assertion, 2 that cannot fail, 4 unrun gates |
 
 ```bash
 git clone --depth 1 https://github.com/fastify/fastify.git /tmp/fastify

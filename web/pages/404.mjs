@@ -15,7 +15,7 @@ export default {
   <h2>Where you probably meant to go</h2>
   <ul class="prose">
     <li><a href="/">The product, plus a real finding from a real run</a></li>
-    <li><a href="/docs">Documentation: install, the five checks, CI, licences</a></li>
+    <li><a href="/docs">Documentation: install, the six checks, CI, licences</a></li>
     <li><a href="/pricing">Pricing</a></li>
     <li><a href="/changelog">Changelog</a></li>
     <li><a href="/security">Security model</a></li>

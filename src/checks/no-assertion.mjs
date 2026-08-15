@@ -6,11 +6,10 @@
  * the code did not crash. Deterministic to detect, so it needs no mutation run.
  */
 import { readFileSync } from "node:fs";
-import { execFileSync } from "node:child_process";
 import { join } from "node:path";
 import { shq } from "../shell.mjs";
+import { blanked, testCalls, trackedTests } from "./test-files.mjs";
 
-const TEST_FILE = /\.(test|spec)\.[mc]?[jt]sx?$/;
 // Helpers are the common case: a test whose whole body is `expectTreeError(...)`
 // does assert, the assertion just lives one call away. Any identifier containing
 // expect or assert counts, which is why this matches loosely on purpose.
@@ -58,54 +57,9 @@ function helperAsserts(span, ctx) {
   return false;
 }
 
-function tracked(root) {
-  try {
-    return execFileSync("git", ["ls-files"], { cwd: root, encoding: "utf8", maxBuffer: 64 * 1024 * 1024, stdio: ["ignore", "pipe", "ignore"] })
-      .split("\n")
-      .filter((f) => TEST_FILE.test(f));
-  } catch {
-    return [];
-  }
-}
-
-/**
- * Returns the whole balanced-paren span of each `it(...)` / `test(...)` call.
- *
- * Deliberately not trying to find the callback body: `it("x", {timeout: 1}, fn)`
- * puts an options object where the body looks like it should be, and reading
- * that object instead of the body reports every timed test as assertionless.
- * Searching the entire call span cannot make that mistake.
- */
-function testCalls(source) {
-  const calls = [];
-  const opener = /\b(?:it|test)\s*(?:\.\w+)?\s*\(\s*(['"`])(.*?)\1\s*,/g;
-  for (let m = opener.exec(source); m; m = opener.exec(source)) {
-    const open = source.indexOf("(", m.index);
-    if (open === -1) continue;
-    let depth = 0;
-    let end = open;
-    for (; end < source.length; end += 1) {
-      const c = source[end];
-      if (c === "(") depth += 1;
-      else if (c === ")") {
-        depth -= 1;
-        if (depth === 0) break;
-      }
-    }
-    calls.push({
-      name: m[2],
-      span: source.slice(open, end + 1),
-      line: source.slice(0, m.index).split("\n").length,
-      endLine: source.slice(0, end + 1).split("\n").length,
-    });
-    opener.lastIndex = end;
-  }
-  return calls;
-}
-
 export function noAssertion(root) {
   const findings = [];
-  for (const file of tracked(root)) {
+  for (const file of trackedTests(root)) {
     let source;
     try {
       source = readFileSync(join(root, file), "utf8");
@@ -113,7 +67,10 @@ export function noAssertion(root) {
       continue;
     }
     if (TYPE_ONLY.test(source)) continue;
-    for (const { name, span, line, endLine } of testCalls(source)) {
+    // Matching runs on the copy with comments and string contents blanked, so a
+    // test written down inside a string is not read as a test. This repository's
+    // own CLI test does exactly that, and it reported our own suite.
+    for (const { name, span, line, endLine } of testCalls(blanked(source), source)) {
       if (ASSERT.test(span) || PLAN.test(span)) continue;
       if (helperAsserts(span, contextName(span))) continue;
       // A body that is only a call with no assertion still might throw on
@@ -135,7 +92,7 @@ export function noAssertion(root) {
         proof: {
           verifiable: true,
           commands: [
-            `sed -n '${line},${endLine}p' ${shq(file)} | grep -Eq '(expect|assert|\\.to\\.|\\.toBe|\\.toEqual|\\.toThrow|\\.rejects|\\.resolves|should|chai|plan[[:space:]]*\\()' && echo MARGYN_HAS_ASSERT || echo MARGYN_NO_ASSERT_IN_BODY`,
+            `sed -n '${line},${endLine}p' ${shq(file)} | grep -Eq '(expect|assert|\\.to\\.|\\.toBe|\\.toEqual|\\.toThrow|\\.rejects|\\.resolves|\\.should\\b|should[[:space:]]*\\(|plan[[:space:]]*\\()' && echo MARGYN_HAS_ASSERT || echo MARGYN_NO_ASSERT_IN_BODY`,
           ],
           expect: ["MARGYN_NO_ASSERT_IN_BODY"],
         },

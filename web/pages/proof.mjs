@@ -62,7 +62,7 @@ PRESENT on disk</pre>
     <tr><td>sindresorhus/execa</td><td><code>8017b27</code></td><td>0</td></tr>
     <tr><td>sindresorhus/got</td><td><code>e3924aa</code></td><td>1 unrun gate</td></tr>
     <tr><td>expressjs/express</td><td><code>a371447</code></td><td>3 unrun gates</td></tr>
-    <tr><td>fastify/fastify</td><td><code>39e87e8</code></td><td>6 tests with no assertion, 4 unrun gates</td></tr>
+    <tr><td>fastify/fastify</td><td><code>39e87e8</code></td><td>7 tests with no assertion, 2 that cannot fail, 4 unrun gates</td></tr>
   </table>
   <p class="sm prose" style="margin-top:18px">Reproduce any row in two commands. A clone is enough,
     since the static checks need no account:</p>
@@ -120,11 +120,11 @@ src/checks/unrun-checks.mjs     !== -&gt; ===             <span class="r">suite 
 src/cli.mjs                     === -&gt; !==             <span class="r">suite still passed</span></pre>
   <p class="prose" style="margin-top:16px">Publishing that list was the easy half. On 2026-08-15 a
     test was written for every line on it, plus <code>src/prove.mjs</code>, which had joined the
-    list. The suite went from 63 tests to 81. The run now reports this:</p>
+    list. The suite went from 63 tests to 93. The run now reports this:</p>
 <pre tabindex="0" role="group" aria-label="The same proof today, over every file in the repository">$ <b>every candidate file, cap 60</b>
-35 files tracked as source, 22 carry a mutation this tool knows how to make
-22 mutated, 22 caught by the suite, <span class="g">0 survivors</span>, 12 seconds
-81 tests, 0 failing</pre>
+37 files tracked as source, 24 carry a mutation this tool knows how to make
+24 mutated, 24 caught by the suite, <span class="g">0 survivors</span>, 14 seconds
+93 tests, 0 failing</pre>
   <p class="prose" style="margin-top:16px">Each of those tests pins the behaviour the mutation
     changed, not the mutation. <code>src/cli.mjs</code> had no test at all, so its exit code, its
     JSON and its locked-licence message are now checked by running the real binary.

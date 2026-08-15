@@ -17,7 +17,7 @@ inputs:
   version:
     description: Which margyn-scan release to run. Pin it so a job cannot change under you.
     required: false
-    default: "0.2.1"
+    default: "0.3.0"
   mutate:
     description: >-
       Run the mutation proof too. Part of Watch, so it needs a licence in the
