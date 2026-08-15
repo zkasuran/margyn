@@ -7,7 +7,7 @@ export default {
   body: `
 <section class="phead"><div class="wrap">
   <h1 class="prose">Privacy</h1>
-  <p class="lede prose">Last updated 2026-08-06. The short version: the tool that reads your code
+  <p class="lede prose">Last updated 2026-08-15. The short version: the tool that reads your code
     never connects to anything, so there is no data from it to have a policy about.</p>
 </div></section>
 
@@ -35,13 +35,17 @@ export default {
 <h2 id="site">The site</h2>
 <p>The pages you are reading are static files served from a Cloudflare Worker. There is no analytics
   script, no tag manager, no session recorder and no advertising pixel on any page of this site.
-  View source and the only JavaScript is one module that switches the colour theme, copies a command
-  to your clipboard and, on two pages, loads the sign in SDK.</p>
+  View source and the JavaScript is one module that switches the colour theme, copies a command to
+  your clipboard and, on two pages, loads the sign in SDK. The fix intake and the suggestion box each
+  add a short inline module that reads their own form and posts it. Neither one loads anything from
+  another origin.</p>
 <p>If you sign in, an email address enters the picture. <a href="https://tiun.business">Tiun</a>
   holds the account and the payment record. We ask it two questions: is this browser signed in,
   and has this account bought anything. That answer is what a licence is minted from.</p>
 <p>Cloudflare sees the request itself, the way any host does: an IP address, a path, a user agent, a
-  timestamp. We do not build a profile from it and we run no reporting on it.</p>
+  timestamp. On the two forms it also carries what you typed, because the worker that builds your link
+  runs there and has to read the form to build it. We do not build a profile from any of it, we run no
+  reporting on it and none of it is written down.</p>
 
 <h2 id="forms">The two forms</h2>
 <p><a href="/fix">The fix intake</a> and <a href="/suggest">the suggestion box</a> work the same way.
@@ -49,10 +53,10 @@ export default {
   Nothing is written down on this side: no database, no queue, no inbox. The request only exists once
   you click through and submit it to the public repository under your own account, which is also what
   makes it yours to watch.</p>
-<p>So a contact address you type is only visible to us if you submit the issue carrying it. Cloudflare
-  sees that request the way it sees any request. The fix intake goes one step further and drops the
-  code snippet a finding can carry before the link is built, so your source cannot travel that way
-  even by accident.</p>
+<p>So a contact address you type does reach our code: the worker reads it to put it in the link, then
+  the request is over and no copy is kept. It only becomes public if you submit the issue carrying it.
+  The fix intake goes one step further and drops the code snippet a finding can carry before the link
+  is built, so your source cannot travel that way even by accident.</p>
 
 <h2 id="licence">What is inside a licence</h2>
 <p>A licence is a signed payload. It carries the product names it unlocks, the account email, the
@@ -70,8 +74,11 @@ export default {
 <table class="st">
   <tr><th>Tiun</th><td>Authentication, subscriptions and card handling. Holds your email and your
     payment record. We never receive card details.</td></tr>
-  <tr><th>Cloudflare</th><td>Serves every page and runs the licence endpoint, so it sees the
-    request metadata for any visit.</td></tr>
+  <tr><th>Cloudflare</th><td>Serves every page, runs the licence endpoint and runs the two form
+    routes, so it sees the request metadata for any visit plus the text you type into a form.</td></tr>
+  <tr><th>GitHub</th><td>Only when you open a link one of the two forms prepared. The text you typed
+    is in that URL, so opening it hands your suggestion to GitHub, which is the point: the issue is
+    filed there under your own account. Nothing reaches GitHub unless you click.</td></tr>
   <tr><th>esm.sh</th><td>Delivers the sign in SDK to your browser on the home page and the pricing
     page, which means it sees your IP address when one of those two pages loads. The other pages do
     not load it.</td></tr>
@@ -85,7 +92,7 @@ export default {
   what you want done. There is no dataset here to export beyond the account record and the payment
   history that Tiun keeps.</p>
 <p>We do not sell anything to anyone. There is no list, no data sharing arrangement and no third
-  party in the chain beyond the four named above.</p>
+  party in the chain beyond the five named above.</p>
 
   </div>
 </div></div>

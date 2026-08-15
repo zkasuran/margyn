@@ -1,5 +1,5 @@
 /**
- * The site is eight files generated from eight modules, so the thing that can go
+ * The site is one file generated per module, so the thing that can go
  * wrong is drift: an edited HTML file nobody regenerated, a nav entry pointing at
  * a page that was never written, a heading id renamed with the links left behind.
  *

@@ -20,15 +20,16 @@ export default {
   <p class="prose">That is not a promise, it is a missing route. The deployed worker serves the
     page, sign in, checkout, the licence endpoint and two forms that prepare a link and store
     nothing: <a href="/fix">the fix intake</a> and <a href="/suggest">the suggestion box</a>. Neither
-    of those reads a repository, and neither writes anything down. Check it yourself:</p>
+    of those reads a repository. Neither writes anything down. Check all three yourself:</p>
 <pre tabindex="0" role="group" aria-label="Proving the scan endpoint does not exist"><b>$ curl -s -o /dev/null -w '%{http_code}\\n' -X POST https://margyn.xyz/api/scan</b>
 404
 <b>$ curl -s https://margyn.xyz/api/config</b>
-{"snippetId":"...","sandbox":true,"products":[...],"scan":false}
+{"snippetId":"8fMSNIvh...","sandbox":false,"products":[{"key":"watch",...},...],"scan":false}
 <b>$ curl -s -X POST https://margyn.xyz/api/suggest -H 'content-type: application/json' \\
     -d '{"suggestion":"the suggestion box answers with a link and keeps nothing"}'</b>
 {"ok":true,"reference":"SG-1GYGD03","kind":"feedback","label":"feedback","trimmed":false,
- "issue":{"url":"https://github.com/zkasuran/margyn/issues/new?labels=feedback&amp;title=..."}}</pre>
+ "issue":{"url":"https://github.com/zkasuran/margyn/issues/new?labels=feedback&amp;title=...",
+          "title":"Feedback SG-1GYGD03: the suggestion box answers with a link and keeps nothing"}}</pre>
   <p class="sm prose" style="margin-top:14px">The local development server does have a scan route,
     because there the caller and the repository are the same machine. On a public host that route
     would take a filesystem path from a stranger and run git against it, which is a filesystem

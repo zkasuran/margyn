@@ -143,11 +143,11 @@ joined it. 63 tests became 93, and the run over every file reports this:
 Each test pins the behaviour the mutation changed rather than the mutation.
 `src/cli.mjs` had no test at all, so the real binary is now run for its exit code,
 its JSON and its locked-licence message. Inverted, `worker/index.mjs` refused a
-licence to every customer who had paid, and nothing was watching that line.
+licence to every customer who had paid. Nothing was watching that line.
 
 The proof also found something no test could have covered:
 `bin/build-pages.mjs` ran its build as a side effect of being imported, so a test
-that imported it rebuilt the site, and under a mutated mapping it wrote
+that imported it rebuilt the site. Under a mutated mapping it wrote
 `web/public/.html` and sent every page to the wrong file. It is behind a
 run-as-a-command guard now.
 
@@ -269,7 +269,7 @@ attacks fail using signatures made by the real signer.
 
 ## The site
 
-`margyn.xyz` is eight static pages built from `web/pages/*.mjs` through one shell
+`margyn.xyz` is one static page per module in `web/pages`, built through one shell
 in `web/layout.mjs`, then bundled into the Worker script. `npm run pages`
 regenerates them along with `sitemap.xml` and `robots.txt`, and
 `test/pages.test.mjs` fails if the built HTML drifts from its module or if any
@@ -280,7 +280,7 @@ npm run dev             # local, http://localhost:3000
 npm run worker:deploy   # build the pages, bundle them, deploy
 ```
 
-`worker/index.mjs` serves `/api/config`, `/api/verify` and `/api/licence`.
+`worker/index.mjs` serves `/api/config`, `/api/verify`, `/api/licence`, `/api/fix-intake` plus `/api/suggest`. The last two validate a form, answer with a prefilled GitHub issue link and store nothing.
 **There is no `/api/scan` on the deployed worker.** The local server has one,
 because there the caller and the repository are the same machine. On a public host
 that route would take a filesystem path from a stranger and run git against it,

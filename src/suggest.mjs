@@ -6,9 +6,9 @@
  * It stores nothing, for the same reason the fix intake stores nothing. A
  * suggestion becomes a prefilled issue on the public repository, filed by the
  * person who made it under their own account. So the request is trackable by
- * them, answerable in public, and we are not holding a database of other
- * people's ideas that we would then have to guard, back up and explain on the
- * privacy page. There is no inbox here to fill up and nothing to leak.
+ * them and answerable in public. It also means we are not holding a database of
+ * other people's ideas that we would then have to guard, back up and explain on
+ * the privacy page. There is no inbox here to fill up and nothing to leak.
  *
  * The text a visitor types is theirs and it goes into an issue they submit, so
  * markdown inside it is not an injection, it is formatting. Every value is
@@ -17,7 +17,7 @@
  */
 import { reference } from "./reference.mjs";
 
-/** What a suggestion can be, and the label triage sorts it by. */
+/** What a suggestion can be, with the label triage sorts it by. */
 const KINDS = {
   feedback: { label: "feedback", noun: "Feedback" },
   feature: { label: "feature-request", noun: "Feature request" },
@@ -81,8 +81,8 @@ export function suggest(body = {}, opts = {}) {
   const ref = reference("SG", JSON.stringify({ kind, text, contact }));
   const title = `${KINDS[kind].noun} ${ref}: ${oneLine(text).slice(0, 80)}`;
 
-  // Build it, then check it fits. A link that is too long to open is worse than a
-  // trimmed one, and the person still has their own text in the box either way.
+  // Build it, then check it fits. A link too long to open is worse than a trimmed
+  // one. The person still has their own text in the box either way.
   let prepared = issueBody(kind, text, contact, ref);
   let url = linkFor(repo, KINDS[kind].label, title, prepared);
   let trimmed = false;

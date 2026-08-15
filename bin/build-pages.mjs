@@ -1,10 +1,12 @@
 /**
  * Builds every page from web/pages/*.mjs through the shared shell.
  *
- * The site is eight static HTML files with inline CSS and no runtime framework.
- * This step exists so the head, the bar and the footer live in one place instead
- * of eight, which is the difference between a site and eight pages that resemble
- * each other. Output goes to web/public and the bundler carries it from there.
+ * The site is one static HTML file per module in web/pages, with inline CSS and no
+ * runtime framework. This step exists so the head, the bar and the footer live in
+ * one place rather than in every page, which is the difference between a site and a
+ * pile of pages that resemble each other. Output goes to web/public and the bundler
+ * carries it from there. No count is written down here: it would go stale the next
+ * time a page ships, which is the drift this repository reports about others.
  *
  * It also writes sitemap.xml and robots.txt from the same page list, so a new
  * page cannot be published and left out of the sitemap. A hand-maintained

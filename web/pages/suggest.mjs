@@ -4,12 +4,12 @@ export default {
   title: "Margyn suggestion box: feedback and feature requests",
   ogTitle: "Tell it what it is missing.",
   description:
-    "Send feedback or ask for a feature. Nothing is stored: the box prepares a prefilled issue on the public repository, you submit it under your own account, and you can watch the answer.",
+    "Send feedback or ask for a feature. Nothing is stored: the box prepares a prefilled issue on the public repository which you submit under your own account, so you can watch the answer.",
   body: `
 <section class="phead"><div class="wrap">
   <h1 class="prose">Tell it what it is missing.</h1>
   <p class="lede prose">Six checks is a deliberate number rather than a finished one. If Margyn
-    reported something wrong, missed something it should have caught, or needs a check that does not
+    reported something wrong, missed something it should have caught or needs a check that does not
     exist yet, this is the box for it. A false positive is treated as a defect here, so those are
     the most useful messages we get.</p>
 </div></section>
@@ -23,8 +23,8 @@ export default {
     </select>
 
     <label for="suggestion">Say it here</label>
-    <p class="hint prose">Concrete beats polite. A repository and a command we can run, or the
-      finding you disagree with, turns this into something we can act on the same day. Do not paste
+    <p class="hint prose">Concrete beats polite. A repository and a command we can run turns this
+      into something actionable the same day. So does the finding you disagree with. Do not paste
       code you would not put in a public issue: this prepares one.</p>
     <textarea id="suggestion" name="suggestion" rows="9" required minlength="12" maxlength="2000"
       placeholder="npx margyn-scan on our monorepo reports every package's dist/ as missing source. Repo is public at github.com/..., the command is ..."></textarea>
