@@ -411,6 +411,17 @@ footer nav a:hover { color: var(--accent) }
         up and no database of other people's ideas to guard. The security page carries the curl that
         shows what the endpoint returns. The privacy page now says what both forms do with what you
         type.</p>
+      <p>One detail worth writing down for anyone building the same thing. The prepared link carries a
+        title and a body and no <code>labels</code> parameter, because GitHub only honours that
+        parameter for someone who has permission to label an issue, then treats a label the
+        repository does not have as an invalid URL. Either one answers with a 404, which would have
+        made the single click this design rests on a dead end for exactly the people it is for. The
+        kind is in the title and the label is applied at triage.</p>
+      <p>The same review found three ways to reach a 500 rather than an error message, all of them in
+        the shape the fix intake had been using since it shipped: a slice that cut an emoji in half so
+        the encoder threw, a finding field that was not a string, then both calls sitting outside the
+        try that catches the body reader. Fixed in one shared module both forms now use, with the
+        crash cases as tests.</p>
       <p>The CLI did not change, so there is no new npm release. The version numbers on this page are
         the package's.</p>
     </div>
