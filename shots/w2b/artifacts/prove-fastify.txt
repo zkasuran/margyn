@@ -1,0 +1,57 @@
+[1mmargyn[0m /tmp/fastify
+
+[1m1. test "plugin required decorators" asserts nothing, so nothing but a thrown error can fail it[0m
+   [31mHIGH[0m  [2mno-assertion[0m  test/decorator.test.js:869  [32mREPRODUCED[0m
+   [2mMARGYN_NO_ASSERT_IN_BODY[0m
+
+[1m2. test "http/2 closes successfully with async await" asserts nothing, so nothing but a thrown error can fail it[0m
+   [31mHIGH[0m  [2mno-assertion[0m  test/http2/closing.test.js:118  [32mREPRODUCED[0m
+   [2mMARGYN_NO_ASSERT_IN_BODY[0m
+
+[1m3. test "https/2 closes successfully with async await" asserts nothing, so nothing but a thrown error can fail it[0m
+   [31mHIGH[0m  [2mno-assertion[0m  test/http2/closing.test.js:133  [32mREPRODUCED[0m
+   [2mMARGYN_NO_ASSERT_IN_BODY[0m
+
+[1m4. test "side effect on schema let the server crash" asserts nothing, so nothing but a thrown error can fail it[0m
+   [31mHIGH[0m  [2mno-assertion[0m  test/schema-special-usage.test.js:423  [32mREPRODUCED[0m
+   [2mMARGYN_NO_ASSERT_IN_BODY[0m
+
+[1m5. test "only response schema trigger AJV pollution" asserts nothing, so nothing but a thrown error can fail it[0m
+   [31mHIGH[0m  [2mno-assertion[0m  test/schema-special-usage.test.js:469  [32mREPRODUCED[0m
+   [2mMARGYN_NO_ASSERT_IN_BODY[0m
+
+[1m6. test "only response schema trigger AJV pollution #2" asserts nothing, so nothing but a thrown error can fail it[0m
+   [31mHIGH[0m  [2mno-assertion[0m  test/schema-special-usage.test.js:493  [32mREPRODUCED[0m
+   [2mMARGYN_NO_ASSERT_IN_BODY[0m
+
+[1m7. test "should resolve immediately when reply[kReplyHijacked] is true" asserts nothing, so nothing but a thrown error can fail it[0m
+   [31mHIGH[0m  [2mno-assertion[0m  test/wrap-thenable.test.js:8  [32mREPRODUCED[0m
+   [2mMARGYN_NO_ASSERT_IN_BODY[0m
+
+[1m8. test "start listening" has one assertion and it is on a literal, so nothing but an exception can fail it[0m
+   [31mHIGH[0m  [2mcannot-fail[0m  test/internals/server.test.js:18  [32mREPRODUCED[0m
+   [2mMARGYN_CONSTANT_TRUE_ASSERT[0m
+   [2mMARGYN_NO_PLAN[0m
+
+[1m9. test "DNS errors does not stop the main server on localhost - promise interface" has one assertion and it is on a literal, so nothing but an exception can fail it[0m
+   [31mHIGH[0m  [2mcannot-fail[0m  test/internals/server.test.js:32  [32mREPRODUCED[0m
+   [2mMARGYN_CONSTANT_TRUE_ASSERT[0m
+   [2mMARGYN_NO_PLAN[0m
+
+[1m10. script "lint:fix" is declared but no workflow or sibling script runs it[0m
+   [33mMEDIUM[0m  [2munrun-check[0m  package.json  [32mREPRODUCED[0m
+   [2mMARGYN_NOT_REFERENCED[0m
+
+[1m11. script "lint:markdown" is declared but no workflow or sibling script runs it[0m
+   [33mMEDIUM[0m  [2munrun-check[0m  package.json  [32mREPRODUCED[0m
+   [2mMARGYN_NOT_REFERENCED[0m
+
+[1m12. script "test:report" is declared but no workflow or sibling script runs it[0m
+   [33mMEDIUM[0m  [2munrun-check[0m  package.json  [32mREPRODUCED[0m
+   [2mMARGYN_NOT_REFERENCED[0m
+
+[1m13. script "test:watch" is declared but no workflow or sibling script runs it[0m
+   [33mMEDIUM[0m  [2munrun-check[0m  package.json  [32mREPRODUCED[0m
+   [2mMARGYN_NOT_REFERENCED[0m
+
+13 findings: 13 reproduced.
