@@ -18,6 +18,25 @@ export default {
 
 <section><div class="wrap">
   <div class="rel">
+    <p class="when">0.3.1<br>2026-08-17</p>
+    <div>
+      <h3>The pull-request report has a real run behind it now</h3>
+      <p>The action could post its findings on a pull request and send them to code scanning since
+        0.2.0. Neither path had ever run, because this repository never turned them on. It does now,
+        so <a href="https://github.com/zkasuran/margyn/pull/1">a demonstration request</a> carries the
+        comment, the job summary and both findings in the Security tab, off two faults planted on
+        purpose: a test that calls the scanner and asserts nothing, plus a script no workflow invokes.
+        The suite stays green with both in place, which is the claim this tool exists to make.</p>
+      <p>That run also caught something in our own writing. The finding heading joined the rule and
+        the summary with an em dash, in a comment we post on other people's repositories. It is a
+        colon now. Shipped in this release because the action installs the published package rather
+        than the checkout, so a fix that is not released is a fix nobody gets.</p>
+      <p>The suggestion box and the hardened intake forms from 2026-08-15 are in this release too.
+        They changed the site rather than the CLI, so they were left unpublished at the time.</p>
+    </div>
+  </div>
+
+  <div class="rel">
     <p class="when">2026-08-17<br>site</p>
     <div>
       <h3>The mutation numbers on the proof page were counted again</h3>
