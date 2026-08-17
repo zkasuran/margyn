@@ -18,7 +18,7 @@ function fence(lines) {
 function detail(f) {
   const where = `\`${f.file}\``;
   const badge = f.proven ? ` ${BADGE[f.proven.status] ?? ""}` : "";
-  const head = `<summary><strong>${f.check}</strong> ${where}${badge} — ${f.summary}</summary>`;
+  const head = `<summary><strong>${f.check}</strong> ${where}${badge}: ${f.summary}</summary>`;
   const parts = [head, ""];
   if (f.why) parts.push(f.why, "");
   if (f.proven?.status === "reproduced" && f.proven.output) {
