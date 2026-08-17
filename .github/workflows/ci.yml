@@ -11,6 +11,13 @@ on:
 jobs:
   gates:
     runs-on: ubuntu-latest
+    # The audit step below posts its report on the pull request and sends the same
+    # findings to code scanning, so the job needs those two write scopes. Read is
+    # spelled out because naming any permission drops the rest.
+    permissions:
+      contents: read
+      pull-requests: write
+      security-events: write
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -34,3 +41,8 @@ jobs:
         uses: ./
         with:
           path: .
+          # On a pull request the report lands as a comment on the request itself
+          # and in the Security tab. Both are the action's own code paths, so this
+          # repository is the first user of them rather than the demo of them.
+          comment: true
+          sarif: true
