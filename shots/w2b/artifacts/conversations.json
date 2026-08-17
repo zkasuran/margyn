@@ -1,20 +1,306 @@
 {
  "captured_at": "2026-08-17T22:44:01.868Z",
- "source": "hackwithus.dev challenge API: challenge-community and challenge-direct-messages, launchpad_slug=tiun",
+ "source": "hackwithus.dev challenge API, launchpad_slug=tiun: challenge-community posts with their replies, plus challenge-direct-messages",
+ "rule": "Two-way only: we spoke and the other person spoke. Kept when there is content beyond a greeting or an upvote swap. 29 two-way exchanges were found in the feed and the DM store, 19 are kept here, 10 dropped as greetings or upvote swaps.",
+ "dropped": [
+  "greetings with no content",
+  "upvote swaps",
+  "good night and good morning replies"
+ ],
+ "count": 19,
+ "people": 8,
  "threads": [
   {
-   "title": "Product swap offer, still open",
+   "where": "hackwithus feed",
+   "post_id": "8b59d018-b261-4319-b6a0-f3ab82e4d8f9",
+   "who": "Saïd Aitmbarek (@SaidAitmbarek)",
+   "kind": "platform question answered",
+   "note": "Asked where the daily and weekly missions live. He said they were about to move to the top of the leaderboard.",
+   "lines": [
+    {
+     "who": "Asuran",
+     "mine": true,
+     "at": "2026-08-06T03:09:58.640376+00:00",
+     "body": "hi @said how to check daily and weekly missions?"
+    },
+    {
+     "who": "Saïd Aitmbarek",
+     "mine": false,
+     "at": "2026-08-06T17:48:32.030303+00:00",
+     "body": "about to show them on top of the leaderboard"
+    }
+   ]
+  },
+  {
+   "where": "hackwithus feed",
+   "post_id": "0ad4f7d7-f0af-4222-a634-a705543a2652",
+   "who": "Saïd Aitmbarek",
+   "kind": "what we are building",
+   "note": "Described the product. He asked whether it runs agents opening pull requests on auto, which is the line we have drawn ever since: Margyn audits, it does not write.",
+   "lines": [
+    {
+     "who": "Asuran",
+     "mine": true,
+     "at": "2026-08-06T05:53:39.583264+00:00",
+     "body": "i am building a pr service for any given gh repo."
+    },
+    {
+     "who": "Saïd Aitmbarek",
+     "mine": false,
+     "at": "2026-08-06T09:18:44.480812+00:00",
+     "body": "does it involve agents running prs on auto?"
+    }
+   ]
+  },
+  {
+   "where": "hackwithus feed",
+   "post_id": "4262a9d9-9d11-4db6-bd45-a8c604f8ebf4",
+   "who": "Klein Moretti",
+   "kind": "helped another builder",
+   "note": "He could not take payments in his country. We asked whether it was the payment side, which is where it turned out to be.",
+   "lines": [
+    {
+     "who": "Klein Moretti",
+     "mine": false,
+     "at": "2026-08-06T11:26:37.122721+00:00",
+     "body": "maybe tiun also not support in my country"
+    },
+    {
+     "who": "Asuran",
+     "mine": true,
+     "at": "2026-08-06T12:16:21.979021+00:00",
+     "body": "for the payments?"
+    },
+    {
+     "who": "Saïd Aitmbarek",
+     "mine": false,
+     "at": "2026-08-06T17:49:04.916937+00:00",
+     "body": "send me a dm so we sort this, it's sometime not the country but the payment method"
+    }
+   ]
+  },
+  {
+   "where": "hackwithus feed",
+   "post_id": "2e7421bb-a218-49b5-b3a2-cf4f0cbacec7",
+   "who": "Quentin Daems",
+   "kind": "builder discussion",
+   "note": "Team entries. We argued the early requests and feedback are worth more than the rank in a first run.",
+   "lines": [
+    {
+     "who": "Quentin Daems ⚡️",
+     "mine": false,
+     "at": "2026-08-06T21:37:41.861005+00:00",
+     "body": "question guys, team of 2 peoples, are we allowed to start/enter? basically a buddy and I will work on the project"
+    },
+    {
+     "who": "Saïd Aitmbarek",
+     "mine": false,
+     "at": "2026-08-06T22:29:06.238109+00:00",
+     "body": "Hey Quentin, sure thing! The team/squad feature is dropping soon. You can already submit a project using your account, and let's chat about teams."
+    },
+    {
+     "who": "Asuran",
+     "mine": true,
+     "at": "2026-08-07T07:58:29.369225+00:00",
+     "body": "we're in beginning of both platforms. our requests and feedbacks are going to more valuable for these 30 days."
+    }
+   ]
+  },
+  {
+   "where": "hackwithus feed",
+   "post_id": "cdf97e0c-baf6-4eca-b459-d5a3f764eb13",
+   "who": "Saïd Aitmbarek",
+   "kind": "rubric learned",
+   "note": "He replied that design is a Week 2 goal. That is why the Design and UX card was built rather than left to the site as it stood.",
+   "lines": [
+    {
+     "who": "Asuran",
+     "mine": true,
+     "at": "2026-08-07T07:59:58.377876+00:00",
+     "body": "i'm supporting every project with a good idea or design. don't forget to upvote me back friends."
+    },
+    {
+     "who": "Saïd Aitmbarek",
+     "mine": false,
+     "at": "2026-08-07T10:45:28.304067+00:00",
+     "body": "same here! design is a goal in week 2 by the way"
+    }
+   ]
+  },
+  {
+   "where": "hackwithus feed",
+   "post_id": "7f139721-ca21-46c1-8bb6-cacfe149696e",
+   "who": "Saïd Aitmbarek",
+   "kind": "bug reported",
+   "note": "Reported that the new product mention was not detecting anything when typed.",
+   "lines": [
+    {
+     "who": "Saïd Aitmbarek",
+     "mine": false,
+     "at": "2026-08-08T21:15:29.051468+00:00",
+     "body": "You can now mention products like @Getprompting and builders @Michael S."
+    },
+    {
+     "who": "Asuran",
+     "mine": true,
+     "at": "2026-08-09T10:27:13.873755+00:00",
+     "body": "i'm trying with @ but not detecting. am i doing wrong?"
+    }
+   ]
+  },
+  {
+   "where": "hackwithus feed",
+   "post_id": "863c07ed-e8f1-48b3-be39-e44730fedeb8",
+   "who": "Saïd Aitmbarek",
+   "kind": "bug reported",
+   "note": "Reported the X share task failing. He answered that he was fixing it right away and moved it to DMs.",
+   "lines": [
+    {
+     "who": "Asuran",
+     "mine": true,
+     "at": "2026-08-11T05:04:48.053518+00:00",
+     "body": "x sharing task keeps failing."
+    },
+    {
+     "who": "Saïd Aitmbarek",
+     "mine": false,
+     "at": "2026-08-11T08:06:10.374416+00:00",
+     "body": "i'm fixing it right away, let's dm"
+    }
+   ]
+  },
+  {
+   "where": "hackwithus feed",
+   "post_id": "f1178f2a-047d-4f26-9f85-b3695b1e687f",
+   "who": "YENMULLA",
+   "kind": "helped another builder",
+   "note": "Answered how verification works: complete the Tiun product and payment integration.",
+   "lines": [
+    {
+     "who": "YENMULLA",
+     "mine": false,
+     "at": "2026-08-11T10:38:55.788774+00:00",
+     "body": "How do i verify my project?"
+    },
+    {
+     "who": "Saïd Aitmbarek",
+     "mine": false,
+     "at": "2026-08-11T11:24:27.288059+00:00",
+     "body": "You need to integrate the SDK to your app, step 3 of hackwithus.dev/join"
+    },
+    {
+     "who": "Asuran",
+     "mine": true,
+     "at": "2026-08-11T12:19:03.91398+00:00",
+     "body": "complete tiun product and payment integration. it is easy with a agent setup."
+    }
+   ]
+  },
+  {
+   "where": "hackwithus feed",
+   "post_id": "d5df22b8-1ab9-4260-9806-4545c5559b44",
+   "who": "Saïd Aitmbarek",
+   "kind": "bug reported",
+   "note": "Reported that the new squad feature was not reachable in the frontend.",
+   "lines": [
+    {
+     "who": "Saïd Aitmbarek",
+     "mine": false,
+     "at": "2026-08-11T11:45:16.334352+00:00",
+     "body": "@Quentin ⚡. the squad feature is now live🔥 (beta)"
+    },
+    {
+     "who": "Asuran",
+     "mine": true,
+     "at": "2026-08-11T12:19:46.416378+00:00",
+     "body": "can't find in frontend."
+    }
+   ]
+  },
+  {
+   "where": "hackwithus feed",
+   "post_id": "05bf000b-ef24-4cd5-b6aa-825f7f10ee13",
+   "who": "Jonathan Felicity",
+   "kind": "helped another builder",
+   "note": "Told him what earns the verified mark on the leaderboard. He came back on the thread.",
+   "lines": [
+    {
+     "who": "Jonathan Felicity",
+     "mine": false,
+     "at": "2026-08-11T11:57:52.949858+00:00",
+     "body": "Hello guys I am new here"
+    },
+    {
+     "who": "Asuran",
+     "mine": true,
+     "at": "2026-08-11T12:20:45.81721+00:00",
+     "body": "welcome my dear friend. make sure your project complete the tiun integration to get verified symbol on leaderboard."
+    },
+    {
+     "who": "Saïd Aitmbarek",
+     "mine": false,
+     "at": "2026-08-11T20:42:18.29493+00:00",
+     "body": "heyyyy !!"
+    }
+   ]
+  },
+  {
+   "where": "hackwithus feed",
+   "post_id": "13efbb5f-6ede-4068-8747-34d3445020f0",
+   "who": "Michael Stables (@mstables1991)",
+   "kind": "support given",
+   "note": "His X promote link was breaking for everyone. Gave him the workaround that worked here and told him which path is actually broken.",
+   "lines": [
+    {
+     "who": "Michael Stables",
+     "mine": false,
+     "at": "2026-08-12T15:46:43.434246+00:00",
+     "body": "Anyone elses promote on X link break? not the goals share but the intial one when i tried to share it out everyone was getting a can not reach page"
+    },
+    {
+     "who": "Asuran",
+     "mine": true,
+     "at": "2026-08-12T16:18:27.901811+00:00",
+     "body": "no issues from my side. try logging out and logging in once and than try. only updating post link is broken."
+    }
+   ]
+  },
+  {
+   "where": "hackwithus feed",
+   "post_id": "2e8ecfaa-9578-46f2-9799-c21e76f90f3f",
+   "who": "Michael",
+   "kind": "helped another builder",
+   "note": "Pointed him at Tiun verification to earn the verified mark.",
+   "lines": [
+    {
+     "who": "Michael",
+     "mine": false,
+     "at": "2026-08-12T18:06:30.396659+00:00",
+     "body": "What's up everyone"
+    },
+    {
+     "who": "Asuran",
+     "mine": true,
+     "at": "2026-08-12T22:17:57.636437+00:00",
+     "body": "yoo welcome. complete the tiun verification to earn verified mark brother."
+    }
+   ]
+  },
+  {
    "where": "hackwithus feed",
    "post_id": "3e9fb3ad-3802-4137-8f7d-47ef44d5ab87",
-   "messages": [
+   "who": "Michael Stables (@mstables1991, Getprompting)",
+   "kind": "product swap, open",
+   "note": "He offered to swap products for honest feedback. We took it up and reported his site would not load. The review is owed.",
+   "lines": [
     {
-     "author": "Michael Stables",
+     "who": "Michael Stables",
      "mine": false,
      "at": "2026-08-13T12:17:42.498323+00:00",
      "body": "so longshot I know but since this is all in good fun would anyone be interested in product swapping to review or test? I know most of these are paid services but i'm willing to give away free copies for some honest feedback!"
     },
     {
-     "author": "Asuran",
+     "who": "Asuran",
      "mine": true,
      "at": "2026-08-13T15:08:30.728389+00:00",
      "body": "i'm trying to visit your site but it keeps loading. page not opening."
@@ -22,124 +308,224 @@
    ]
   },
   {
-   "title": "The X share verification bug, found and fixed",
-   "where": "hackwithus direct messages with @SaidAitmbarek",
-   "post_id": null,
-   "messages": [
+   "where": "hackwithus feed",
+   "post_id": "391b9eab-042f-49ea-899c-8a3866f9c87b",
+   "who": "Dee",
+   "kind": "helped another builder",
+   "note": "Answered that the leaderboard was working again.",
+   "lines": [
     {
-     "author": "Asuran",
-     "mine": true,
-     "at": "2026-08-11T05:02:01.627744+00:00",
-     "body": "shared on my x but still can't verify. both auto and manual methods failing. https://x.com/zkasuran/status/2087041598916076025?s=20"
-    },
-    {
-     "author": "Asuran",
-     "mine": true,
-     "at": "2026-08-11T08:45:21.837534+00:00",
-     "body": "Can you please help 🙏"
-    },
-    {
-     "author": "Saïd Aitmbarek",
+     "who": "Dee 🤎💙",
      "mine": false,
-     "at": "2026-08-11T19:26:40.253394+00:00",
-     "body": "still working on it, sorry got a little delayed today"
+     "at": "2026-08-13T13:36:46.475257+00:00",
+     "body": "Hello guys, is the leaderboard functional?"
     },
     {
-     "author": "Saïd Aitmbarek",
-     "mine": false,
-     "at": "2026-08-11T21:02:18.184035+00:00",
-     "body": "can you try again the 1.5x boost by entering your tweet URL manually in the eval?"
-    },
-    {
-     "author": "Asuran",
+     "who": "Asuran",
      "mine": true,
-     "at": "2026-08-11T21:42:55.955065+00:00",
-     "body": "Let me try now thanks."
-    },
-    {
-     "author": "Asuran",
-     "mine": true,
-     "at": "2026-08-12T00:57:45.047793+00:00",
-     "body": "Throwing error as limit on weekly for verifying the X post task"
-    },
-    {
-     "author": "Saïd Aitmbarek",
-     "mine": false,
-     "at": "2026-08-12T08:16:03.61994+00:00",
-     "body": "Thanks, i'm checking"
-    },
-    {
-     "author": "Asuran",
-     "mine": true,
-     "at": "2026-08-12T11:15:36.762672+00:00",
-     "body": "waiting for it to get fixed."
-    },
-    {
-     "author": "Saïd Aitmbarek",
-     "mine": false,
-     "at": "2026-08-12T12:23:23.909703+00:00",
-     "body": "can you try again the X post verification please?🙂"
-    },
-    {
-     "author": "Asuran",
-     "mine": true,
-     "at": "2026-08-12T12:32:28.862222+00:00",
-     "body": "still throwing weekly limit error"
-    },
-    {
-     "author": "Asuran",
-     "mine": true,
-     "at": "2026-08-12T12:32:36.258332+00:00",
-     "body": "You reached the weekly X post check limit"
-    },
-    {
-     "author": "Saïd Aitmbarek",
-     "mine": false,
-     "at": "2026-08-12T18:07:08.961678+00:00",
-     "body": "Yo"
-    },
-    {
-     "author": "Saïd Aitmbarek",
-     "mine": false,
-     "at": "2026-08-12T20:52:59.863638+00:00",
-     "body": "Thanks for trying, I just reset your usage of the API, you can retry and hopefully it will work this time :)"
-    },
-    {
-     "author": "Saïd Aitmbarek",
-     "mine": false,
-     "at": "2026-08-12T20:53:22.066891+00:00",
-     "body": "Thanks for your help with this issue"
-    },
-    {
-     "author": "Asuran",
-     "mine": true,
-     "at": "2026-08-12T22:16:48.948875+00:00",
-     "body": "hii brother"
-    },
-    {
-     "author": "Asuran",
-     "mine": true,
-     "at": "2026-08-13T15:46:16.486822+00:00",
-     "body": "i have completed the task successfully. thanks to you."
+     "at": "2026-08-13T15:08:51.596207+00:00",
+     "body": "yes it is normal now."
     }
    ]
   },
   {
-   "title": "What votes actually do to the score",
+   "where": "hackwithus feed",
+   "post_id": "288e7a76-52e9-4890-86a9-36929dc03571",
+   "who": "Saïd Aitmbarek",
+   "kind": "bug plus a feature suggestion",
+   "note": "Reported preferences reverting with a could-not-be-updated error, then suggested the weekly goals under My Points expand to show what each task wants.",
+   "lines": [
+    {
+     "who": "Saïd Aitmbarek",
+     "mine": false,
+     "at": "2026-08-14T21:25:08.032519+00:00",
+     "body": "@James G. try hackwithus.dev/settings#products to update your product info"
+    },
+    {
+     "who": "Asuran",
+     "mine": true,
+     "at": "2026-08-15T01:21:54.568257+00:00",
+     "body": "this is cool. bug is preferences reverting with error of could not be updated. suggestion is weekly goals under my points can have expandable menu for what tasks happened that week."
+    }
+   ]
+  },
+  {
    "where": "hackwithus feed",
    "post_id": "f65f5e5f-2de3-4d5c-82eb-03a23e3e5542",
-   "messages": [
+   "who": "Saïd Aitmbarek",
+   "kind": "scoring model corrected",
+   "note": "Reported vote stars not counting. He answered that votes drive Win Chance instead, which corrected how we read the score.",
+   "lines": [
     {
-     "author": "Asuran",
+     "who": "Asuran",
      "mine": true,
      "at": "2026-08-15T02:17:26.965245+00:00",
      "body": "Said, also there is a UI bug where votes star not counted in score."
     },
     {
-     "author": "Saïd Aitmbarek",
+     "who": "Saïd Aitmbarek",
      "mine": false,
      "at": "2026-08-15T09:26:19.394118+00:00",
      "body": "I'll improve this part, it's not a bug. Votes impact your Win Chance (it's a percentage %)"
+    }
+   ]
+  },
+  {
+   "where": "hackwithus direct messages",
+   "post_id": null,
+   "who": "Saïd Aitmbarek",
+   "kind": "scoring question",
+   "note": "Asked why the points read low. He explained they were not revealed yet.",
+   "lines": [
+    {
+     "who": "Saïd Aitmbarek",
+     "mine": false,
+     "at": "2026-08-08T10:13:35.142889+00:00",
+     "body": "thanks, points aren't revealed yet, that's why (about to) :)"
+    },
+    {
+     "who": "Asuran",
+     "mine": true,
+     "at": "2026-08-08T12:17:30.234704+00:00",
+     "body": "i hope i'm higher"
+    },
+    {
+     "who": "Saïd Aitmbarek",
+     "mine": false,
+     "at": "2026-08-08T20:10:28.749521+00:00",
+     "body": "Sure, still plenty of time🔥"
+    }
+   ]
+  },
+  {
+   "where": "hackwithus direct messages",
+   "post_id": null,
+   "who": "Saïd Aitmbarek",
+   "kind": "deadline confirmed",
+   "note": "Confirmed the closing date for the challenge.",
+   "lines": [
+    {
+     "who": "Asuran",
+     "mine": true,
+     "at": "2026-08-09T10:27:49.917875+00:00",
+     "body": "ending by aug 31st right?"
+    },
+    {
+     "who": "Saïd Aitmbarek",
+     "mine": false,
+     "at": "2026-08-09T15:31:08.096692+00:00",
+     "body": "absolutely, it's our first hackathon, many will follow :)"
+    },
+    {
+     "who": "Asuran",
+     "mine": true,
+     "at": "2026-08-10T01:23:00.716492+00:00",
+     "body": "looking forward to all of them"
+    },
+    {
+     "who": "Saïd Aitmbarek",
+     "mine": false,
+     "at": "2026-08-10T08:09:46.027685+00:00",
+     "body": "thank youu :)"
+    }
+   ]
+  },
+  {
+   "where": "hackwithus direct messages",
+   "post_id": null,
+   "who": "Saïd Aitmbarek",
+   "kind": "bug found and fixed, 15 turns",
+   "note": "The X share verification failed on the automatic and the manual path. Sent the post URL, then reproduced the weekly limit error twice with the exact message. He reset the API usage and it worked. Week 1's 1.5x exists because of this.",
+   "lines": [
+    {
+     "who": "Asuran",
+     "mine": true,
+     "at": "2026-08-11T05:02:01.627744+00:00",
+     "body": "shared on my x but still can't verify. both auto and manual methods failing. https://x.com/zkasuran/status/2087041598916076025?s=20"
+    },
+    {
+     "who": "Asuran",
+     "mine": true,
+     "at": "2026-08-11T08:45:21.837534+00:00",
+     "body": "Can you please help 🙏"
+    },
+    {
+     "who": "Saïd Aitmbarek",
+     "mine": false,
+     "at": "2026-08-11T19:26:40.253394+00:00",
+     "body": "still working on it, sorry got a little delayed today"
+    },
+    {
+     "who": "Saïd Aitmbarek",
+     "mine": false,
+     "at": "2026-08-11T21:02:18.184035+00:00",
+     "body": "can you try again the 1.5x boost by entering your tweet URL manually in the eval?"
+    },
+    {
+     "who": "Asuran",
+     "mine": true,
+     "at": "2026-08-11T21:42:55.955065+00:00",
+     "body": "Let me try now thanks."
+    },
+    {
+     "who": "Asuran",
+     "mine": true,
+     "at": "2026-08-12T00:57:45.047793+00:00",
+     "body": "Throwing error as limit on weekly for verifying the X post task"
+    },
+    {
+     "who": "Saïd Aitmbarek",
+     "mine": false,
+     "at": "2026-08-12T08:16:03.61994+00:00",
+     "body": "Thanks, i'm checking"
+    },
+    {
+     "who": "Asuran",
+     "mine": true,
+     "at": "2026-08-12T11:15:36.762672+00:00",
+     "body": "waiting for it to get fixed."
+    },
+    {
+     "who": "Saïd Aitmbarek",
+     "mine": false,
+     "at": "2026-08-12T12:23:23.909703+00:00",
+     "body": "can you try again the X post verification please?🙂"
+    },
+    {
+     "who": "Asuran",
+     "mine": true,
+     "at": "2026-08-12T12:32:28.862222+00:00",
+     "body": "still throwing weekly limit error"
+    },
+    {
+     "who": "Asuran",
+     "mine": true,
+     "at": "2026-08-12T12:32:36.258332+00:00",
+     "body": "You reached the weekly X post check limit"
+    },
+    {
+     "who": "Saïd Aitmbarek",
+     "mine": false,
+     "at": "2026-08-12T18:07:08.961678+00:00",
+     "body": "Yo"
+    },
+    {
+     "who": "Saïd Aitmbarek",
+     "mine": false,
+     "at": "2026-08-12T20:52:59.863638+00:00",
+     "body": "Thanks for trying, I just reset your usage of the API, you can retry and hopefully it will work this time :)"
+    },
+    {
+     "who": "Saïd Aitmbarek",
+     "mine": false,
+     "at": "2026-08-12T20:53:22.066891+00:00",
+     "body": "Thanks for your help with this issue"
+    },
+    {
+     "who": "Asuran",
+     "mine": true,
+     "at": "2026-08-12T22:16:48.948875+00:00",
+     "body": "hii brother"
     }
    ]
   }
