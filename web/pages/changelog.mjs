@@ -18,6 +18,22 @@ export default {
 
 <section><div class="wrap">
   <div class="rel">
+    <p class="when">2026-08-17<br>site</p>
+    <div>
+      <h3>The mutation numbers on the proof page were counted again</h3>
+      <p>The suggestion box added two source files. A published count that no longer matches the
+        repository is the exact failure this tool was built to report, so the run was repeated over
+        everything now in scope: <b>40 files tracked as source, 27 carrying a mutation, 27 mutated,
+        27 caught, no survivors, across 108 tests</b>. <a href="/proof#itself">The proof page carries
+        the run.</a></p>
+      <p>The duration was wrong too. It was wrong in our favour, so it is worth naming. The page
+        said fourteen seconds. Measured end to end today the run takes <b>208 seconds</b>, because
+        every mutation runs the whole suite once. Twenty seven mutations is twenty seven test runs.
+        That is the reason the default cap is four rather than every file.</p>
+    </div>
+  </div>
+
+  <div class="rel">
     <p class="when">2026-08-15<br>site</p>
     <div>
       <h3>A suggestion box, for the finding you think is wrong</h3>

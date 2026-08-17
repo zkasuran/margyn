@@ -496,11 +496,15 @@ src/checks/unrun-checks.mjs     !== -&gt; ===             <span class="r">suite 
 src/cli.mjs                     === -&gt; !==             <span class="r">suite still passed</span></pre>
   <p class="prose" style="margin-top:16px">Publishing that list was the easy half. On 2026-08-15 a
     test was written for every line on it, plus <code>src/prove.mjs</code>, which had joined the
-    list. The suite went from 63 tests to 93. The run now reports this:</p>
-<pre tabindex="0" role="group" aria-label="The same proof today, over every file in the repository">$ <b>every candidate file, cap 60</b>
-37 files tracked as source, 24 carry a mutation this tool knows how to make
-24 mutated, 24 caught by the suite, <span class="g">0 survivors</span>, 14 seconds
-93 tests, 0 failing</pre>
+    list. The suite went from 63 tests to 93. Two more source files shipped after that, so the run
+    was measured again on 2026-08-17 over everything now in scope:</p>
+<pre tabindex="0" role="group" aria-label="The same proof today, over every file in the repository">$ <b>every candidate file, cap 80</b>
+40 files tracked as source, 27 carry a mutation this tool knows how to make
+27 mutated, 27 caught by the suite, <span class="g">0 survivors</span>, 208 seconds
+108 tests, 0 failing</pre>
+  <p class="prose" style="margin-top:16px">Three and a half minutes is the honest cost of the check.
+    Every mutation runs the whole suite once, so 27 of them is 27 test runs. That is why the default
+    cap is four and why this run has to be asked for.</p>
   <p class="prose" style="margin-top:16px">Each of those tests pins the behaviour the mutation
     changed, not the mutation. <code>src/cli.mjs</code> had no test at all, so its exit code, its
     JSON and its locked-licence message are now checked by running the real binary.

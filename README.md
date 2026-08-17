@@ -133,12 +133,17 @@ src/cli.mjs                     === -> !==             suite still passed
 ```
 
 On 2026-08-15 every line on that list got a test, plus `src/prove.mjs`, which had
-joined it. 63 tests became 93, and the run over every file reports this:
+joined it. 63 tests became 93. Two more source files shipped after that, so the
+run was measured again on 2026-08-17 over everything now in scope:
 
 ```
-37 files tracked as source, 24 carry a mutation this tool knows how to make
-24 mutated, 24 caught by the suite, 0 survivors, 14 seconds
+40 files tracked as source, 27 carry a mutation this tool knows how to make
+27 mutated, 27 caught by the suite, 0 survivors, 208 seconds
+108 tests, 0 failing
 ```
+
+That duration is the honest cost of the check. Every mutation runs the whole
+suite once, so 27 of them is 27 test runs. It is why the default cap is four.
 
 Each test pins the behaviour the mutation changed rather than the mutation.
 `src/cli.mjs` had no test at all, so the real binary is now run for its exit code,
