@@ -132,26 +132,30 @@ export default {
 </div></section>
 
 <section id="finding"><div class="wrap">
-  <p class="eyebrow">A real run</p>
-  <h2>What it found in a repository that had just gone red</h2>
-  <p class="prose">Eight vendored modules sat under a path containing <code>dist/</code>, which the
-    root ignore file excludes at any depth, so git dropped all eight while they sat on disk. Locally
-    26 tests were green. In CI two failed, reading files that had never been pushed.</p>
-<pre tabindex="0" role="group" aria-label="Terminal output from a real scan"><b>margyn /tmp/moss</b>
+  <p class="eyebrow">A real run, on a repository you know</p>
+  <h2>Two fastify tests that hold whatever the code does</h2>
+  <p class="prose">Run it yourself: <code>git clone --depth 1 https://github.com/fastify/fastify</code>
+    then <code>npx margyn-scan fastify</code>. At commit <code>6e95cb9</code> it reads 13 findings, 7
+    tests that assert nothing, 2 whose only assertion is on a literal, 4 scripts no workflow invokes.
+    This is the shape worth seeing, because the test reads as rigorous.</p>
+<pre tabindex="0" role="group" aria-label="Terminal output from a real scan of fastify"><b>margyn /tmp/fastify</b>
 
-2 findings, each with a reproduction you can run.
+13 findings, each with a reproduction you can run.
 
-<b>1. packages/protocols/aave/abis-src/dist/AaveV3Monad.mjs is read by</b>
-<b>   packages/protocols/aave/README.md but git ignores it</b>
-   <span class="r">HIGH</span>  <span class="d">ignored-source     ignore rule: .gitignore:2:dist/</span>
+<b>8. test "DNS errors does not stop the main server" has one assertion and it is</b>
+<b>   on a literal, so nothing but an exception can fail it</b>
+   <span class="r">HIGH</span>  <span class="d">cannot-fail  test/internals/server.test.js:18</span>
+   t.assert.ok(true, 'server started')
+   <span class="d">why: The assertion is about a literal, not about the code, so it reports green</span>
+   <span class="d">     with the subject broken or deleted.</span>
    <span class="d">reproduce:</span>
-     git archive HEAD | tar -t | grep -qx '&lt;path&gt;' || echo 'ABSENT from HEAD'
-     test -f '&lt;path&gt;' &amp;&amp; echo 'PRESENT on disk'</pre>
-  <p class="sm prose" style="margin-top:14px">Run those two lines and they answer <code>ABSENT from
-    HEAD</code> then <code>PRESENT on disk</code>. Two facts about one path that disagree, which is
-    what a finding is here.</p>
+     <span class="d"># the assertion holds with the subject removed entirely:</span>
+     sed -n '18p' test/internals/server.test.js</pre>
+  <p class="sm prose" style="margin-top:14px">That line is the whole finding. The test starts a
+    server, then asserts that <code>true</code> is true, so it passes with the server code deleted.
+    Nothing in a diff, a coverage number or a review shows it.</p>
   <p class="sm"><a href="/proof">The whole run, plus scans of five public repositories at named
-    commits</a></p>
+    commits and what it reports about its own suite</a></p>
 </div></section>
 
 <section><div class="wrap">
