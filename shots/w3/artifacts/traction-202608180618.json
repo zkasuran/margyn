@@ -1,0 +1,185 @@
+{
+ "taken_at": "2026-08-18T06:18:01.715Z",
+ "window": {
+  "since": "2026-08-06",
+  "until": "2026-08-18"
+ },
+ "npm": {
+  "package": "margyn-scan",
+  "latest": "0.3.1",
+  "downloads_in_window": 681,
+  "last_week": 457,
+  "last_month": 884,
+  "peak_day": {
+   "downloads": 279,
+   "day": "2026-08-15"
+  },
+  "by_day": [
+   {
+    "downloads": 190,
+    "day": "2026-08-06"
+   },
+   {
+    "downloads": 12,
+    "day": "2026-08-07"
+   },
+   {
+    "downloads": 10,
+    "day": "2026-08-08"
+   },
+   {
+    "downloads": 15,
+    "day": "2026-08-09"
+   },
+   {
+    "downloads": 7,
+    "day": "2026-08-10"
+   },
+   {
+    "downloads": 5,
+    "day": "2026-08-11"
+   },
+   {
+    "downloads": 129,
+    "day": "2026-08-12"
+   },
+   {
+    "downloads": 22,
+    "day": "2026-08-13"
+   },
+   {
+    "downloads": 0,
+    "day": "2026-08-14"
+   },
+   {
+    "downloads": 279,
+    "day": "2026-08-15"
+   },
+   {
+    "downloads": 12,
+    "day": "2026-08-16"
+   },
+   {
+    "downloads": 0,
+    "day": "2026-08-17"
+   },
+   {
+    "downloads": 0,
+    "day": "2026-08-18"
+   }
+  ],
+  "caveat": "npm counts mirrors and CI runs, ours included. Quote it as package downloads rather than as users."
+ },
+ "github": {
+  "repo": "zkasuran/margyn",
+  "stars": 0,
+  "forks": 0,
+  "watchers": 0,
+  "views_14d": 1,
+  "unique_visitors_14d": 1,
+  "clones_14d": 135,
+  "unique_cloners_14d": 70,
+  "referrers": [],
+  "popular_paths": [
+   {
+    "path": "/zkasuran/placebo",
+    "views": 1,
+    "uniques": 1
+   }
+  ],
+  "caveat": "traffic is a rolling 14 day window and only the owner can read it, so a screenshot of Insights is the shareable form."
+ },
+ "site": {
+  "zone": "margyn.xyz",
+  "days": [
+   {
+    "day": "2026-08-06",
+    "requests": 934,
+    "pageViews": 313,
+    "uniques": 195
+   },
+   {
+    "day": "2026-08-07",
+    "requests": 392,
+    "pageViews": 106,
+    "uniques": 98
+   },
+   {
+    "day": "2026-08-08",
+    "requests": 233,
+    "pageViews": 70,
+    "uniques": 81
+   },
+   {
+    "day": "2026-08-09",
+    "requests": 828,
+    "pageViews": 128,
+    "uniques": 65
+   },
+   {
+    "day": "2026-08-10",
+    "requests": 519,
+    "pageViews": 79,
+    "uniques": 54
+   },
+   {
+    "day": "2026-08-11",
+    "requests": 323,
+    "pageViews": 110,
+    "uniques": 87
+   },
+   {
+    "day": "2026-08-12",
+    "requests": 1009,
+    "pageViews": 158,
+    "uniques": 128
+   },
+   {
+    "day": "2026-08-13",
+    "requests": 312,
+    "pageViews": 72,
+    "uniques": 82
+   },
+   {
+    "day": "2026-08-14",
+    "requests": 122,
+    "pageViews": 45,
+    "uniques": 59
+   },
+   {
+    "day": "2026-08-15",
+    "requests": 505,
+    "pageViews": 188,
+    "uniques": 84
+   },
+   {
+    "day": "2026-08-16",
+    "requests": 297,
+    "pageViews": 104,
+    "uniques": 65
+   },
+   {
+    "day": "2026-08-17",
+    "requests": 199,
+    "pageViews": 75,
+    "uniques": 49
+   },
+   {
+    "day": "2026-08-18",
+    "requests": 113,
+    "pageViews": 29,
+    "uniques": 14
+   }
+  ],
+  "requests": 5786,
+  "page_views": 1477,
+  "daily_uniques_summed": 1061,
+  "peak_day": {
+   "day": "2026-08-06",
+   "requests": 934,
+   "pageViews": 313,
+   "uniques": 195
+  },
+  "caveat": "Uniques are counted per day, so somebody who came back on three days counts three times. Crawlers are in there too. Page views count HTML responses rather than assets, which is the closest thing here to a person."
+ }
+}
