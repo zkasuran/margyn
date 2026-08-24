@@ -29,8 +29,8 @@ const NAV = [
   { href: "/changelog", label: "Changelog" },
 ];
 
-const MARK = `<svg width="30" height="30" viewBox="0 0 32 32" aria-hidden="true" focusable="false">
-      <rect width="32" height="32" rx="9" fill="var(--accent)"/>
+const MARK = `<svg width="24" height="24" viewBox="0 0 32 32" aria-hidden="true" focusable="false">
+      <rect width="32" height="32" rx="8" fill="var(--accent)"/>
       <path d="M12.5 8.5H9V15M9 19.5v4h3.5M19.5 8.5H23v15h-3.5" stroke="#fff"
             stroke-width="2.6" fill="none" stroke-linecap="square"/>
     </svg>`;
