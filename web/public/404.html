@@ -31,10 +31,12 @@
 if(v==="light"||v==="dark")document.documentElement.style.colorScheme=v}catch(e){}})();
 </script>
 <style>
-/* Tokens. One block for both modes: light-dark() reads the used colour scheme,
-   so there is no second media-query block that can drift out of step with this
-   one. Every pair is checked by bin/contrast.mjs, which exits 1 on a miss, and
-   test/palette.test.mjs parses these values back out and compares them. */
+/* ═══════════════════════════════════════════════════════════════════════════
+   MARGYN — Design System
+   Two modes, one source of truth: light-dark() resolves at paint time.
+   Palette checked by bin/contrast.mjs, synced by test/palette.test.mjs.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
 :root {
   color-scheme: light dark;
   --bg:      light-dark(#FBFAF8, #0E0F12);
@@ -50,346 +52,392 @@ if(v==="light"||v==="dark")document.documentElement.style.colorScheme=v}catch(e)
   --hi:      light-dark(#A33A16, #FF9366);
   --ok:      light-dark(#1F6B4A, #5FD3A3);
 
-  /* Measured across twenty developer-tool sites. Two containers, never one: a
-     paragraph that spans the page is the fastest way to look unedited. */
+  /* Layout */
   --page: 1120px;
   --prose: 680px;
   --gutter: 1.25rem;
-  --band: 72px;
-  --r: 8px;
-  --r-in: 5px;
+  --band: 80px;
+  --r: 12px;
+  --r-in: 8px;
 
-  /* Typography: Inter where installed, then the system variable font, then the
-     platform default. JetBrains Mono where installed, then system monospace. No
-     third-party font requests — privacy is the product's promise. */
+  /* Fonts: system stacks, no third-party requests */
   --sans: "Inter", "Segoe UI Variable Text", ui-sans-serif, system-ui, -apple-system,
           "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   --mono: "JetBrains Mono", ui-monospace, SFMono-Regular, "SF Mono", Menlo,
           "Cascadia Mono", Consolas, "Liberation Mono", monospace;
 
-  /* Adaptive weight: light mode uses slightly heavier body text for warmth on
-     bright backgrounds, dark mode uses lighter weight for luminance balance. */
+  /* Adaptive typography per mode */
   --body-weight: light-dark(420, 380);
-  --heading-weight: light-dark(680, 640);
-
-  /* Adaptive letter-spacing: tighter in dark mode where letterforms glow slightly,
-     looser in light mode where ink is sharper. */
-  --heading-ls: light-dark(-0.03em, -0.025em);
+  --heading-weight: light-dark(720, 660);
+  --heading-ls: light-dark(-0.035em, -0.025em);
   --body-ls: light-dark(0.005em, 0em);
 
-  /* Subtle elevation tokens: soft shadows in light, luminous borders in dark.
-     light-dark() takes two arguments separated by a comma, which conflicts with
-     the comma in multi-shadow values. So each token uses one shadow per mode. */
-  --shadow-sm: light-dark(
-    0 1px 3px rgba(23,24,28,.08),
-    0 1px 3px rgba(0,0,0,.25));
-  --shadow-md: light-dark(
-    0 4px 14px rgba(23,24,28,.09),
-    0 4px 14px rgba(0,0,0,.35));
-  --shadow-card: light-dark(
-    0 2px 8px rgba(23,24,28,.05),
-    0 0 0 1px rgba(87,201,174,.04));
+  /* Mode-specific visual layers */
+  --hero-gradient: light-dark(
+    linear-gradient(160deg, #FBFAF8 0%, #E8F5F0 40%, #F5F3EF 100%),
+    linear-gradient(160deg, #0E0F12 0%, #0A1F1A 40%, #0E0F12 100%));
+  --section-alt: light-dark(#F7F5F2, #111318);
+  --glow-accent: light-dark(
+    0 0 40px rgba(15,92,78,.12),
+    0 0 60px rgba(87,201,174,.15));
+  --glow-accent-strong: light-dark(
+    0 0 60px rgba(15,92,78,.18),
+    0 0 80px rgba(87,201,174,.25));
+  --border-glow: light-dark(
+    1px solid var(--line),
+    1px solid rgba(87,201,174,.2));
+  --card-shadow: light-dark(
+    0 4px 20px rgba(23,24,28,.08),
+    0 4px 20px rgba(0,0,0,.4));
+  --card-hover: light-dark(
+    0 8px 32px rgba(23,24,28,.12),
+    0 8px 32px rgba(87,201,174,.1));
 
-  /* Glow for interactive elements in dark mode, warm lift in light. */
-  --glow: light-dark(
-    0 2px 12px rgba(15,92,78,.08),
-    0 2px 16px rgba(87,201,174,.12));
-
-  /* Two curves, four durations, no fifth. A bespoke duration in one rule is the
-     tell that nobody owns the motion. */
+  /* Motion */
   --ease: cubic-bezier(0.22, 1, 0.36, 1);
   --t-press: 90ms;
-  --t-hover: 120ms;
-  --t-state: 200ms;
+  --t-hover: 150ms;
+  --t-state: 250ms;
 }
-@media (min-width: 560px)  { :root { --gutter: 1.5rem; --band: 80px } }
-@media (min-width: 1024px) { :root { --gutter: 2rem;   --band: 96px } }
+@media (min-width: 560px)  { :root { --gutter: 1.5rem; --band: 96px } }
+@media (min-width: 1024px) { :root { --gutter: 2rem;   --band: 112px } }
 
+/* ═══════════════════════════════════════════════════════════════════════════
+   Base reset
+   ═══════════════════════════════════════════════════════════════════════════ */
 *, *::before, *::after { box-sizing: border-box }
 html { -webkit-text-size-adjust: 100% }
 @media (prefers-reduced-motion: no-preference) { html { scroll-behavior: smooth } }
-/* `hidden` lives in the UA stylesheet, so any author display rule outranks it.
-   Every session button carried `hidden` and showed anyway. */
 [hidden] { display: none !important }
 
 body { margin: 0; background: var(--bg); color: var(--ink);
        font: var(--body-weight) 16px/1.65 var(--sans); letter-spacing: var(--body-ls);
-       -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility;
-       font-feature-settings: "cv01", "cv02", "ss01" }
+       -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility }
 .wrap { width: 100%; max-width: var(--page); margin-inline: auto;
         padding-inline: max(var(--gutter), env(safe-area-inset-left)) }
 .prose { max-width: var(--prose) }
 
-a { color: inherit; text-decoration: underline; text-underline-offset: 2.5px;
-    text-decoration-color: var(--line2); transition: color var(--t-hover) var(--ease) }
-a:hover { color: var(--accent); text-decoration-color: currentColor }
-:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; border-radius: 3px }
+/* ═══════════════════════════════════════════════════════════════════════════
+   Typography — dramatic scale, adaptive weight
+   ═══════════════════════════════════════════════════════════════════════════ */
+a { color: var(--accent); text-decoration: underline; text-underline-offset: 3px;
+    text-decoration-color: color-mix(in srgb, var(--accent) 30%, transparent);
+    transition: color var(--t-hover) var(--ease), text-decoration-color var(--t-hover) var(--ease) }
+a:hover { color: var(--accent); text-decoration-color: var(--accent) }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 4px }
 .skip { position: absolute; left: -9999px; top: 8px; z-index: 40; background: var(--card);
         border: 1px solid var(--ink); border-radius: var(--r-in); padding: 10px 14px }
 .skip:focus { left: 12px }
 .sr { position: absolute; width: 1px; height: 1px; overflow: hidden;
       clip-path: inset(50%); white-space: nowrap }
 
-code, pre, kbd { font-family: var(--mono); font-feature-settings: "liga" 0, "calt" 1 }
-code { background: var(--rais); padding: 2px 6px; border-radius: 4px; font-size: .85em;
-       font-weight: 450; border: 1px solid var(--line) }
-pre { background: var(--rais); border: 1px solid var(--line); border-radius: var(--r);
-      padding: 18px 20px; margin: 0; overflow-x: auto; font-size: 12.5px; line-height: 1.7;
-      -webkit-overflow-scrolling: touch; tab-size: 2; box-shadow: var(--shadow-sm);
-      font-weight: 400 }
-@media (min-width: 560px) { pre { font-size: 13.5px; padding: 20px 24px } }
-pre:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px }
-pre b { font-weight: 600 } pre .d { color: var(--faint) } pre .r { color: var(--hi) }
-pre .g { color: var(--ok) }
+code, pre, kbd { font-family: var(--mono) }
+code { background: var(--rais); padding: 3px 7px; border-radius: 5px; font-size: .84em;
+       font-weight: 500; border: 1px solid var(--line); color: var(--accent) }
+pre { background: var(--rais); border: var(--border-glow); border-radius: var(--r);
+      padding: 20px 24px; margin: 0; overflow-x: auto; font-size: 13px; line-height: 1.7;
+      -webkit-overflow-scrolling: touch; tab-size: 2; box-shadow: var(--card-shadow) }
+@media (min-width: 560px) { pre { font-size: 13.5px; padding: 24px 28px } }
+pre:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px }
+pre b { font-weight: 700; color: var(--ink) }
+pre .d { color: var(--faint) } pre .r { color: var(--hi) } pre .g { color: var(--ok) }
 
 h1, h2, h3 { margin: 0; font-weight: var(--heading-weight); letter-spacing: var(--heading-ls);
-             line-height: 1.1; text-wrap: balance }
-h1 { font-size: clamp(32px, 6vw, 56px) }
-h2 { font-size: clamp(23px, 3.4vw, 32px); margin-bottom: 16px }
-h3 { font-size: 17px; letter-spacing: 0; line-height: 1.4 }
+             line-height: 1.08; text-wrap: balance }
+h1 { font-size: clamp(36px, 7vw, 64px) }
+h2 { font-size: clamp(24px, 4vw, 36px); margin-bottom: 18px }
+h3 { font-size: 18px; letter-spacing: -0.01em; line-height: 1.35 }
 p { margin: 0 0 16px }
-.lede { font-size: clamp(17px, 2.2vw, 21px); line-height: 1.55; color: var(--mut);
-        font-weight: var(--body-weight) }
+.lede { font-size: clamp(18px, 2.5vw, 22px); line-height: 1.55; color: var(--mut) }
 .sm { font-size: 13.5px; color: var(--faint); line-height: 1.65 }
 section { padding: var(--band) 0; border-top: 1px solid var(--line) }
-/* Without this, tabbing to a control scrolls it under the sticky bar and a
-   keyboard user focuses something they cannot see. */
+section:nth-child(even) { background: var(--section-alt) }
 :target, a, button, input, summary { scroll-margin-top: 76px }
-.eyebrow { font-size: 11.5px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase;
-           color: var(--faint); margin: 0 0 10px }
+.eyebrow { font-size: 11px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase;
+           color: var(--accent); margin: 0 0 12px; display: flex; align-items: center; gap: 8px }
+.eyebrow::before { content: ""; width: 20px; height: 2px; background: var(--accent);
+                   border-radius: 1px }
 
-/* ---- controls ---- */
+/* ═══════════════════════════════════════════════════════════════════════════
+   Controls — bold, glowing buttons
+   ═══════════════════════════════════════════════════════════════════════════ */
 button, .btn {
-  font: var(--heading-weight) 13.5px/1 var(--sans); padding: 0 18px; min-height: 44px;
-  border: 1px solid var(--ink); border-radius: var(--r-in);
-  background: var(--ink); color: var(--bg); cursor: pointer;
+  font: 600 14px/1 var(--sans); padding: 0 22px; min-height: 48px;
+  border: none; border-radius: var(--r-in);
+  background: var(--accent); color: #FFFFFF; cursor: pointer;
   display: inline-flex; align-items: center; gap: 8px; text-decoration: none;
-  transition: opacity var(--t-hover) var(--ease), transform var(--t-press) var(--ease),
-              box-shadow var(--t-hover) var(--ease);
-  letter-spacing: 0.01em;
+  transition: transform var(--t-press) var(--ease), box-shadow var(--t-state) var(--ease),
+              background var(--t-hover) var(--ease);
+  box-shadow: var(--glow-accent); letter-spacing: 0.01em;
 }
-button:hover:not(:disabled), .btn:hover { opacity: .88; color: var(--bg); box-shadow: var(--glow) }
-button:active:not(:disabled), .btn:active { transform: translateY(1px) }
+button:hover:not(:disabled), .btn:hover { transform: translateY(-1px);
+  box-shadow: var(--glow-accent-strong); background: color-mix(in srgb, var(--accent) 85%, var(--ink)) }
+button:active:not(:disabled), .btn:active { transform: translateY(1px);
+  box-shadow: none }
 button:disabled { opacity: .4; cursor: not-allowed }
-button.ghost, .btn.ghost { background: transparent; color: var(--ink); border-color: var(--strong) }
-button.ghost:hover, .btn.ghost:hover { background: var(--rais); color: var(--ink); opacity: 1;
-                                       box-shadow: var(--shadow-sm) }
-.btn.sm { min-height: 38px; padding: 0 14px; font-size: 13px }
-/* The bar CTA is the one control that can be dropped on a phone: the hero carries
-   the same action 200 pixels below it, and the bar has to hold the theme control. */
+button.ghost, .btn.ghost { background: transparent; color: var(--ink);
+  border: 1.5px solid var(--strong); box-shadow: none }
+button.ghost:hover, .btn.ghost:hover { background: var(--rais); color: var(--ink);
+  border-color: var(--accent); box-shadow: var(--glow-accent) }
+.btn.sm { min-height: 40px; padding: 0 16px; font-size: 13px }
 .bar .btn.sm { display: none }
 @media (min-width: 560px) { .bar .btn.sm { display: inline-flex } }
-/* The copied confirmation is a state change the user asked for, so it gets
-   --t-state rather than the faster hover duration. */
-.run button { transition: background var(--t-state) var(--ease), color var(--t-hover) var(--ease) }
+.run button { transition: background var(--t-state) var(--ease), color var(--t-hover) var(--ease);
+  box-shadow: none; background: transparent; color: var(--mut); border-radius: 0 }
 .panel { transition: opacity var(--t-state) var(--ease) }
 
-/* ---- top bar ---- */
-.bar { position: sticky; top: 0; z-index: 20; background: color-mix(in srgb, var(--bg) 85%, transparent);
-       border-bottom: 1px solid var(--line); backdrop-filter: saturate(1.4) blur(16px);
-       -webkit-backdrop-filter: saturate(1.4) blur(16px) }
-.bar .wrap { display: flex; align-items: center; gap: 12px; min-height: 56px; padding-block: 8px }
-@media (min-width: 1024px) { .bar .wrap { min-height: 64px } }
+/* ═══════════════════════════════════════════════════════════════════════════
+   Top bar — frosted glass with accent underline
+   ═══════════════════════════════════════════════════════════════════════════ */
+.bar { position: sticky; top: 0; z-index: 20;
+       background: color-mix(in srgb, var(--bg) 80%, transparent);
+       border-bottom: 1px solid var(--line);
+       backdrop-filter: saturate(1.6) blur(20px);
+       -webkit-backdrop-filter: saturate(1.6) blur(20px) }
+.bar .wrap { display: flex; align-items: center; gap: 12px; min-height: 60px; padding-block: 8px }
+@media (min-width: 1024px) { .bar .wrap { min-height: 68px } }
 .brand { display: flex; align-items: center; gap: 10px; margin-right: auto;
-         font-weight: var(--heading-weight); letter-spacing: -.02em; text-decoration: none;
-         font-size: 17px }
-.brand svg { display: block; border-radius: 6px }
-.barnav { display: none; gap: 22px; margin-right: 20px }
-.barnav a { font-size: 14px; color: var(--mut); text-decoration: none; font-weight: 450;
-            transition: color var(--t-hover) var(--ease) }
+         font-weight: 700; letter-spacing: -.02em; text-decoration: none; font-size: 18px;
+         color: var(--ink) }
+.brand svg { display: block; border-radius: 7px }
+.barnav { display: none; gap: 24px; margin-right: 20px }
+.barnav a { font-size: 14px; color: var(--mut); text-decoration: none; font-weight: 480;
+            transition: color var(--t-hover) var(--ease); position: relative }
 .barnav a:hover { color: var(--ink) }
 .barnav a[aria-current="page"] { color: var(--ink); font-weight: 600 }
+.barnav a[aria-current="page"]::after { content: ""; position: absolute; left: 0; right: 0;
+  bottom: -4px; height: 2px; background: var(--accent); border-radius: 1px }
 @media (min-width: 560px) { .barnav { display: flex } }
 .who { color: var(--mut); font-size: 13px; min-height: 1.6em; display: flex; align-items: center }
 
-/* Theme control: three native radios, so System can be chosen and so the browser
-   draws real indicators under forced-colors. No ARIA to keep in sync. */
-.theme { display: flex; gap: 2px; border: 1px solid var(--line); border-radius: 999px;
+/* Theme toggle — pill with glow on selected */
+.theme { display: flex; gap: 3px; border: 1px solid var(--line); border-radius: 999px;
          padding: 3px; margin: 0; background: var(--rais) }
 .theme input { position: absolute; opacity: 0; pointer-events: none }
-.theme label { display: grid; place-items: center; width: 34px; height: 34px;
+.theme label { display: grid; place-items: center; width: 36px; height: 36px;
                border-radius: 999px; cursor: pointer; color: var(--faint);
-               transition: background var(--t-hover) var(--ease), color var(--t-hover) var(--ease),
-                           box-shadow var(--t-hover) var(--ease) }
-.theme label:hover { color: var(--ink) }
-.theme input:checked + label { background: var(--card); color: var(--ink);
-                               box-shadow: var(--shadow-sm) }
-.theme input:focus-visible + label { outline: 2px solid var(--ink); outline-offset: 2px }
-.theme svg { width: 15px; height: 15px; fill: none; stroke: currentColor; stroke-width: 1.7 }
+               transition: all var(--t-hover) var(--ease) }
+.theme label:hover { color: var(--ink); background: color-mix(in srgb, var(--accent) 8%, transparent) }
+.theme input:checked + label { background: var(--accent); color: #FFFFFF;
+                               box-shadow: var(--glow-accent) }
+.theme input:focus-visible + label { outline: 2px solid var(--accent); outline-offset: 2px }
+.theme svg { width: 15px; height: 15px; fill: none; stroke: currentColor; stroke-width: 1.8 }
 
-/* ---- hero ---- */
-.hero { padding: 64px 0 var(--band); border-top: 0 }
-@media (min-width: 560px) { .hero { padding-top: 80px } }
-.hero h1 { margin-bottom: 20px; max-width: 20ch }
+/* ═══════════════════════════════════════════════════════════════════════════
+   Hero — gradient background, large type, visual impact
+   ═══════════════════════════════════════════════════════════════════════════ */
+.hero { padding: 80px 0 var(--band); border-top: 0; background: var(--hero-gradient);
+        position: relative; overflow: hidden }
+@media (min-width: 560px) { .hero { padding-top: 100px } }
+@media (min-width: 1024px) { .hero { padding-top: 120px } }
+/* Subtle radial glow behind hero content */
+.hero::before { content: ""; position: absolute; top: -30%; right: -10%; width: 60%; height: 160%;
+  background: radial-gradient(ellipse at center, color-mix(in srgb, var(--accent) 6%, transparent), transparent 70%);
+  pointer-events: none }
+.hero h1 { margin-bottom: 24px; max-width: 18ch; position: relative }
 .hero-links { display: flex; gap: 20px; margin: 20px 0 0; flex-wrap: wrap }
 .hero-links a { text-decoration-color: var(--strong) }
-/* Facts, not decoration: each chip is one thing a buyer checks before installing. */
-.chips { list-style: none; display: flex; flex-wrap: wrap; gap: 8px; padding: 0; margin: 22px 0 0 }
-.chips li { font-size: 12px; font-weight: 550; color: var(--mut);
-            border: 1px solid var(--line2); border-radius: 999px; padding: 6px 13px;
-            background: var(--card); box-shadow: var(--shadow-sm);
-            transition: border-color var(--t-hover) var(--ease) }
-.chips li:hover { border-color: var(--strong) }
-.run { display: flex; align-items: stretch; border: 1px solid var(--strong);
+
+/* Fact chips — pill badges with accent tint */
+.chips { list-style: none; display: flex; flex-wrap: wrap; gap: 10px; padding: 0; margin: 28px 0 0 }
+.chips li { font-size: 12px; font-weight: 600; color: var(--accent);
+            border: 1px solid color-mix(in srgb, var(--accent) 25%, var(--line));
+            border-radius: 999px; padding: 7px 14px;
+            background: color-mix(in srgb, var(--accent) 5%, var(--card));
+            transition: all var(--t-hover) var(--ease) }
+.chips li:hover { background: color-mix(in srgb, var(--accent) 12%, var(--card));
+  border-color: var(--accent); box-shadow: var(--glow-accent) }
+
+/* Command runner — prominent card */
+.run { display: flex; align-items: stretch; border: var(--border-glow);
        border-radius: var(--r); background: var(--card); overflow: hidden;
-       max-width: 480px; margin: 26px 0 14px; min-width: 0; box-shadow: var(--shadow-md) }
-.run code { background: none; padding: 14px 16px; font-size: 13.5px; white-space: nowrap;
+       max-width: 500px; margin: 30px 0 16px; min-width: 0;
+       box-shadow: var(--card-shadow); transition: box-shadow var(--t-state) var(--ease) }
+.run:hover { box-shadow: var(--card-hover) }
+.run code { background: none; padding: 15px 18px; font-size: 14px; white-space: nowrap;
             overflow-x: auto; flex: 1; border-radius: 0; min-width: 0; border: 0;
-            font-weight: 450 }
+            color: var(--ink); font-weight: 500 }
 .run button { border: 0; border-left: 1px solid var(--line); border-radius: 0;
-              background: transparent; color: var(--mut); min-width: 88px; justify-content: center }
-.run button:hover { background: var(--rais); color: var(--ink); opacity: 1 }
+              background: transparent; color: var(--mut); min-width: 90px; justify-content: center;
+              min-height: 44px; font-size: 13px }
+.run button:hover { background: color-mix(in srgb, var(--accent) 8%, var(--card));
+  color: var(--accent) }
 
-/* ---- inner page header ---- */
-.phead { padding: 48px 0 38px; border-top: 0; border-bottom: 1px solid var(--line) }
-.phead h1 { font-size: clamp(28px, 4.6vw, 42px); max-width: 26ch; margin-bottom: 14px }
+/* ═══════════════════════════════════════════════════════════════════════════
+   Inner page header
+   ═══════════════════════════════════════════════════════════════════════════ */
+.phead { padding: 56px 0 44px; border-top: 0;
+         border-bottom: 1px solid var(--line); background: var(--hero-gradient) }
+.phead h1 { font-size: clamp(30px, 5vw, 44px); max-width: 24ch; margin-bottom: 14px }
 
-/* ---- questions. Native details, so it works with JS off and needs no ARIA. ---- */
+/* ═══════════════════════════════════════════════════════════════════════════
+   FAQ — accordion with accent markers
+   ═══════════════════════════════════════════════════════════════════════════ */
 .faq { margin-top: 4px }
-.faq details { border-bottom: 1px solid var(--line) }
+.faq details { border-bottom: 1px solid var(--line); transition: background var(--t-state) var(--ease) }
+.faq details[open] { background: color-mix(in srgb, var(--accent) 3%, transparent);
+  border-radius: var(--r-in); margin: 4px -12px; padding: 0 12px }
 .faq details:first-of-type { border-top: 1px solid var(--line) }
-.faq summary { cursor: pointer; padding: 13px 0; font-weight: 600; font-size: 15px;
-               list-style: none; display: flex; align-items: baseline; gap: 10px }
+.faq summary { cursor: pointer; padding: 15px 0; font-weight: 600; font-size: 15.5px;
+               list-style: none; display: flex; align-items: baseline; gap: 12px }
 .faq summary::-webkit-details-marker { display: none }
-.faq summary::before { content: "+"; color: var(--accent); font-weight: 700; width: 11px }
-.faq details[open] summary::before { content: "\2212" }
-.faq details p { margin: 0 0 15px; padding-left: 21px; color: var(--mut); font-size: 14.5px }
-.cta { margin: 0 0 9px; display: flex; gap: 9px; flex-wrap: wrap }
-/* A state the visitor is owed, so it gets the attention colour the findings use
-   rather than a new one the contrast gate has never seen. */
+.faq summary::before { content: "+"; color: var(--accent); font-weight: 700; width: 14px;
+  font-size: 18px; transition: transform var(--t-state) var(--ease) }
+.faq details[open] summary::before { content: "\2212"; transform: rotate(180deg) }
+.faq details p { margin: 0 0 15px; padding-left: 26px; color: var(--mut); font-size: 14.5px }
+.cta { margin: 0 0 9px; display: flex; gap: 10px; flex-wrap: wrap }
 .note { border-left: 3px solid var(--hi); padding-left: 12px; margin-top: 10px }
 
-/* ---- the five checks ---- */
-.checks { list-style: none; padding: 0; margin: 0 }
-.checks li { padding: 16px 0; border-bottom: 1px solid var(--line) }
-.checks li:last-child { border-bottom: 0 }
-.checks .top { display: flex; align-items: baseline; gap: 9px; flex-wrap: wrap }
-.checks .nm { font-family: var(--mono); font-size: 13.5px; font-weight: 600 }
-/* Severity is a word plus a filled or hollow glyph, never colour alone. */
-.sev { font-size: 10.5px; font-weight: 700; letter-spacing: .07em; text-transform: uppercase;
-       display: inline-flex; align-items: center; gap: 5px }
-.sev::before { content: "\25CF"; font-size: 9px; line-height: 1 }
-.sev.high { color: var(--hi) }
-.sev.med { color: var(--faint) } .sev.med::before { content: "\25CB" }
-.checks p { margin: 6px 0 0; color: var(--mut); font-size: 14.5px; max-width: var(--prose) }
-.paid { font-size: 10.5px; font-weight: 700; letter-spacing: .07em; text-transform: uppercase;
-        color: var(--accent) }
+/* ═══════════════════════════════════════════════════════════════════════════
+   The checks list — cards with severity badges
+   ═══════════════════════════════════════════════════════════════════════════ */
+.checks { list-style: none; padding: 0; margin: 0; display: grid; gap: 12px }
+.checks li { padding: 20px; border: var(--border-glow); border-radius: var(--r);
+  background: var(--card); box-shadow: var(--card-shadow);
+  transition: all var(--t-state) var(--ease) }
+.checks li:hover { box-shadow: var(--card-hover); transform: translateY(-2px) }
+.checks li:last-child { border-bottom: none }
+.checks .top { display: flex; align-items: center; gap: 10px; flex-wrap: wrap }
+.checks .nm { font-family: var(--mono); font-size: 14px; font-weight: 600; color: var(--ink) }
+.sev { font-size: 10px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase;
+       display: inline-flex; align-items: center; gap: 5px; padding: 3px 8px;
+       border-radius: 999px; background: color-mix(in srgb, var(--hi) 10%, transparent) }
+.sev::before { content: "\25CF"; font-size: 8px; line-height: 1 }
+.sev.high { color: var(--hi); background: color-mix(in srgb, var(--hi) 10%, transparent) }
+.sev.med { color: var(--faint); background: color-mix(in srgb, var(--faint) 10%, transparent) }
+.sev.med::before { content: "\25CB" }
+.checks p { margin: 8px 0 0; color: var(--mut); font-size: 14.5px; max-width: var(--prose) }
+.paid { font-size: 10px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase;
+        color: var(--accent); padding: 3px 8px; border-radius: 999px;
+        background: color-mix(in srgb, var(--accent) 10%, transparent) }
 
-/* ---- pricing ---- */
-.tiers { display: grid; gap: 16px; margin: 0; grid-template-columns: minmax(0, 1fr) }
+/* ═══════════════════════════════════════════════════════════════════════════
+   Pricing — cards with featured glow
+   ═══════════════════════════════════════════════════════════════════════════ */
+.tiers { display: grid; gap: 20px; margin: 0; grid-template-columns: minmax(0, 1fr) }
 @media (min-width: 760px) { .tiers { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) } }
-/* Three across only when there is room for three readable columns. Below that the
-   third wraps under the pair rather than squeezing all three. */
 @media (min-width: 1000px) { .tiers.three { grid-template-columns: repeat(3, minmax(0, 1fr)) } }
-/* min-width: 0 on the card and on the copy row, because the install command is
-   nowrap: its min-content size made the card 395px wide inside a 320px column. */
-.tier { background: var(--card); border: 1px solid var(--line); border-radius: var(--r);
+.tier { background: var(--card); border: var(--border-glow); border-radius: var(--r);
         padding: 22px; display: flex; flex-direction: column; min-width: 0;
-        box-shadow: var(--shadow-card); transition: box-shadow var(--t-state) var(--ease),
-                    border-color var(--t-state) var(--ease) }
-.tier:hover { box-shadow: var(--shadow-md) }
-.tier.pick { border-color: var(--accent); box-shadow: var(--glow) }
-.tier .tag { font-size: 10.5px; font-weight: 700; letter-spacing: .08em;
-             text-transform: uppercase; color: var(--faint); margin-bottom: 10px }
-.tier .amt { font-size: 32px; font-weight: var(--heading-weight); letter-spacing: -.02em }
-.tier .per { font-size: 13.5px; color: var(--faint); font-weight: 400 }
-.tier ul { list-style: none; padding: 0; margin: 16px 0 22px; font-size: 14.5px; color: var(--mut) }
-.tier li { padding: 5px 0 5px 22px; position: relative }
-.tier li::before { content: "+"; position: absolute; left: 0; color: var(--ok); font-weight: 700 }
+        box-shadow: var(--card-shadow); transition: all var(--t-state) var(--ease) }
+.tier:hover { transform: translateY(-3px); box-shadow: var(--card-hover) }
+.tier.pick { border-color: var(--accent); box-shadow: var(--glow-accent-strong);
+  position: relative; overflow: hidden }
+.tier.pick::before { content: ""; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+  background: linear-gradient(90deg, var(--accent), var(--ok)) }
+.tier .tag { font-size: 10.5px; font-weight: 700; letter-spacing: .1em;
+             text-transform: uppercase; color: var(--faint); margin-bottom: 12px }
+.tier .amt { font-size: 36px; font-weight: var(--heading-weight); letter-spacing: -.03em;
+             color: var(--ink) }
+.tier .per { font-size: 14px; color: var(--faint); font-weight: 400 }
+.tier ul { list-style: none; padding: 0; margin: 18px 0 24px; font-size: 14.5px; color: var(--mut) }
+.tier li { padding: 6px 0 6px 24px; position: relative }
+.tier li::before { content: "✓"; position: absolute; left: 0; color: var(--ok); font-weight: 700 }
 .tier .fill { flex: 1 }
 
-/* ---- numbered steps ---- */
-.steps { counter-reset: s; list-style: none; padding: 0; margin: 0 }
-.steps li { counter-increment: s; position: relative; padding: 0 0 18px 42px; color: var(--mut) }
-.steps li::before { content: counter(s); position: absolute; left: 0; top: 1px;
-                    width: 27px; height: 27px; display: grid; place-items: center;
-                    border: 1.5px solid var(--line2); border-radius: 999px;
-                    font: 700 12px/1 var(--sans); color: var(--ink);
-                    background: var(--card); box-shadow: var(--shadow-sm) }
+/* ═══════════════════════════════════════════════════════════════════════════
+   Numbered steps — with connected line
+   ═══════════════════════════════════════════════════════════════════════════ */
+.steps { counter-reset: s; list-style: none; padding: 0; margin: 0;
+         border-left: 2px solid var(--line); margin-left: 13px; padding-left: 32px }
+.steps li { counter-increment: s; position: relative; padding: 0 0 24px 0; color: var(--mut) }
+.steps li:last-child { padding-bottom: 0 }
+.steps li::before { content: counter(s); position: absolute; left: -45px; top: 0;
+                    width: 28px; height: 28px; display: grid; place-items: center;
+                    border: 2px solid var(--accent); border-radius: 999px;
+                    font: 700 12px/1 var(--sans); color: var(--accent);
+                    background: var(--bg) }
 .steps li b { color: var(--ink) }
-.steps + pre { margin-top: 10px }
+.steps + pre { margin-top: 12px }
 
-/* ---- panels, tables, definition rows ---- */
+/* ═══════════════════════════════════════════════════════════════════════════
+   Panels, tables
+   ═══════════════════════════════════════════════════════════════════════════ */
 .out:empty { display: none }
 .out { margin-top: 20px }
-.panel { background: var(--card); border: 1px solid var(--line); border-radius: var(--r);
-         padding: 20px; margin-bottom: 14px; box-shadow: var(--shadow-card) }
-.panel .meta { font-size: 11px; text-transform: uppercase; letter-spacing: .07em;
-               color: var(--faint); margin-bottom: 8px }
+.panel { background: var(--card); border: var(--border-glow); border-radius: var(--r);
+         padding: 22px; margin-bottom: 14px; box-shadow: var(--card-shadow) }
+.panel .meta { font-size: 11px; text-transform: uppercase; letter-spacing: .08em;
+               color: var(--accent); margin-bottom: 8px }
 .panel p { color: var(--mut); font-size: 14.5px }
 .st { width: 100%; border-collapse: collapse; font-size: 14.5px; max-width: var(--prose) }
-.st td, .st th { padding: 11px 0; border-bottom: 1px solid var(--line); vertical-align: top;
+.st td, .st th { padding: 13px 0; border-bottom: 1px solid var(--line); vertical-align: top;
                  text-align: left }
 .st td:first-child, .st th:first-child { color: var(--mut); width: 42%; padding-right: 18px }
 .st tr:last-child td { border-bottom: 0 }
-.st th { font-weight: 600; color: var(--ink) }
+.st th { font-weight: 650; color: var(--ink); font-size: 13px; text-transform: uppercase;
+         letter-spacing: .04em }
 
-/* ---- docs ---- */
-/* Two containers, never one, so `minmax(0, 1fr)` rather than `1fr`: an auto grid
-   column is sized by its items, so .docbody's 680px prose measure made the single
-   column 680 wide and the whole page scrolled sideways on a 360px screen.
-   Measured at 360 and 390 before and after. */
+/* ═══════════════════════════════════════════════════════════════════════════
+   Docs
+   ═══════════════════════════════════════════════════════════════════════════ */
 .doc { display: grid; gap: 34px; padding: var(--band) 0; grid-template-columns: minmax(0, 1fr) }
 @media (min-width: 1024px) { .doc { grid-template-columns: 200px minmax(0, 1fr); gap: 56px } }
 .toc { align-self: start; position: sticky; top: 84px; font-size: 13.5px }
-.toc p { font-size: 11.5px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase;
-         color: var(--faint); margin-bottom: 10px }
-.toc a { display: block; padding: 5px 0; color: var(--mut); text-decoration: none }
-.toc a:hover { color: var(--ink) }
+.toc p { font-size: 11px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase;
+         color: var(--accent); margin-bottom: 12px }
+.toc a { display: block; padding: 6px 0; color: var(--mut); text-decoration: none;
+  border-left: 2px solid transparent; padding-left: 12px;
+  transition: all var(--t-hover) var(--ease) }
+.toc a:hover { color: var(--ink); border-left-color: var(--accent); background: color-mix(in srgb, var(--accent) 5%, transparent) }
 .docbody { max-width: var(--prose) }
-.docbody h2 { margin-top: 44px; font-size: clamp(20px, 3vw, 25px) }
+.docbody h2 { margin-top: 48px; font-size: clamp(20px, 3vw, 26px) }
 .docbody h2:first-child { margin-top: 0 }
-.docbody h3 { margin: 26px 0 6px; font-family: var(--mono); font-size: 14px; font-weight: 600 }
-.docbody pre { margin: 12px 0 }
+.docbody h3 { margin: 28px 0 8px; font-family: var(--mono); font-size: 14px; font-weight: 600;
+  color: var(--accent) }
+.docbody pre { margin: 14px 0 }
 .docbody ul, .docbody ol { color: var(--mut); padding-left: 21px }
-.docbody li { margin: 5px 0 }
+.docbody li { margin: 6px 0 }
 
-/* ---- changelog ---- */
-.rel { display: grid; gap: 4px; padding: 18px 0; border-bottom: 1px solid var(--line) }
+/* ═══════════════════════════════════════════════════════════════════════════
+   Changelog
+   ═══════════════════════════════════════════════════════════════════════════ */
+.rel { display: grid; gap: 4px; padding: 22px 0; border-bottom: 1px solid var(--line) }
 @media (min-width: 660px) { .rel { grid-template-columns: 130px 1fr; gap: 24px } }
 .rel:last-child { border-bottom: 0 }
-.rel .when { font-family: var(--mono); font-size: 12.5px; color: var(--faint); padding-top: 3px }
-.rel h3 { margin-bottom: 4px }
+.rel .when { font-family: var(--mono); font-size: 12.5px; color: var(--accent); padding-top: 3px;
+  font-weight: 600 }
+.rel h3 { margin-bottom: 6px }
 .rel p { margin: 0; color: var(--mut); font-size: 14.5px }
 .rel code { font-size: 12px }
 
-/* ---- footer ---- */
+/* ═══════════════════════════════════════════════════════════════════════════
+   Footer — darker card feel
+   ═══════════════════════════════════════════════════════════════════════════ */
 footer { border-top: 1px solid var(--line); background: var(--card) }
-footer .wrap { padding: 48px 0 calc(48px + env(safe-area-inset-bottom));
+footer .wrap { padding: 52px 0 calc(52px + env(safe-area-inset-bottom));
                color: var(--faint); font-size: 13.5px }
-.foot { display: grid; gap: 34px }
-@media (min-width: 660px) { .foot { grid-template-columns: 1fr auto auto; gap: 52px } }
+.foot { display: grid; gap: 36px }
+@media (min-width: 660px) { .foot { grid-template-columns: 1fr auto auto; gap: 56px } }
 .footlead { max-width: 42ch }
-.footcmd { margin-bottom: 12px }
-.foothead { font-size: 11.5px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase;
-            color: var(--faint); margin: 0 0 12px }
-footer nav { display: grid; gap: 9px; align-content: start }
-footer nav a { color: var(--mut); text-decoration: none; transition: color var(--t-hover) var(--ease) }
+.footcmd { margin-bottom: 14px }
+.foothead { font-size: 11px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase;
+            color: var(--accent); margin: 0 0 14px }
+footer nav { display: grid; gap: 10px; align-content: start }
+footer nav a { color: var(--mut); text-decoration: none;
+  transition: color var(--t-hover) var(--ease) }
 footer nav a:hover { color: var(--accent) }
-.footnote { margin: 38px 0 0; padding-top: 20px; border-top: 1px solid var(--line) }
+.footnote { margin: 40px 0 0; padding-top: 22px; border-top: 1px solid var(--line) }
 
-/* ---- the two forms: the fix intake and the suggestion box ----
-   Both pages shipped on browser defaults, which on a dark theme means a white
-   box with a black caret in the middle of a dark page. One block, both pages, so
-   a third form cannot look like a fourth site. */
+/* ═══════════════════════════════════════════════════════════════════════════
+   Forms
+   ═══════════════════════════════════════════════════════════════════════════ */
 .fixform { display: grid; gap: 6px; max-width: var(--prose) }
-.fixform label { font: var(--heading-weight) 13.5px/1.4 var(--sans); color: var(--ink); margin-top: 16px }
+.fixform label { font: 600 13.5px/1.4 var(--sans); color: var(--ink); margin-top: 16px }
 .fixform label:first-child { margin-top: 0 }
 .fixform .hint { margin: 0 0 4px; font-size: 13.5px; color: var(--mut) }
 .fixform input, .fixform select, .fixform textarea {
-  font: 400 14px/1.55 var(--sans); color: var(--ink); background: var(--card);
-  border: 1px solid var(--strong); border-radius: var(--r-in); padding: 11px 14px;
+  font: 400 14px/1.55 var(--sans); color: var(--ink); background: var(--bg);
+  border: 1.5px solid var(--line2); border-radius: var(--r-in); padding: 12px 16px;
   width: 100%; min-width: 0; appearance: none;
-  transition: border-color var(--t-hover) var(--ease), box-shadow var(--t-hover) var(--ease);
+  transition: all var(--t-hover) var(--ease);
 }
-.fixform textarea { font-family: var(--mono); font-size: 13px; resize: vertical; min-height: 120px }
+.fixform textarea { font-family: var(--mono); font-size: 13px; resize: vertical; min-height: 140px }
 .fixform input:focus-visible, .fixform select:focus-visible, .fixform textarea:focus-visible {
-  outline: 2px solid var(--ink); outline-offset: 1px; border-color: var(--ink);
-  box-shadow: var(--glow);
+  outline: none; border-color: var(--accent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 15%, transparent);
 }
 .fixform input::placeholder, .fixform textarea::placeholder { color: var(--faint) }
-/* The chevron is drawn rather than an image, so the select matches the ink in
-   both themes and there is no asset to ship. */
 .fixform select {
   padding-right: 34px;
   background-image: linear-gradient(45deg, transparent 50%, var(--mut) 50%),
@@ -398,15 +446,16 @@ footer nav a:hover { color: var(--accent) }
   background-size: 5px 5px, 5px 5px;
   background-repeat: no-repeat;
 }
-.fixform .row { margin-top: 18px }
+.fixform .row { margin-top: 20px }
 .fixout { margin-top: 20px; max-width: var(--prose) }
 .fixout:empty { display: none }
 .fixout p { margin: 0 0 12px }
 .fixout .btn { margin-bottom: 10px }
 
+/* ═══════════════════════════════════════════════════════════════════════════
+   Reduced motion
+   ═══════════════════════════════════════════════════════════════════════════ */
 @media (prefers-reduced-motion: reduce) {
-  /* Shortened, not removed. A state change with no transition at all reads as a
-     glitch rather than as calm. */
   *, *::before, *::after { transition-duration: 1ms !important; animation-duration: 1ms !important }
   html { scroll-behavior: auto }
 }
