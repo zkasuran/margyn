@@ -61,7 +61,12 @@ function checkoutUnavailable(why) {
   who.textContent = why;
   const note = el("buynote");
   if (note) note.textContent = "Checkout cannot load right now. The free scan needs no account. The price is unchanged at $8.99 a month.";
-  for (const button of document.querySelectorAll("[data-buy], [data-signin]")) button.setAttribute("disabled", "");
+  for (const button of document.querySelectorAll("[data-buy], [data-signin]")) {
+    button.setAttribute("disabled", "");
+    button.removeAttribute("aria-busy");
+    button.title = "Checkout could not load";
+  }
+  mark(why === "checkout blocked" ? "blocked" : "unavailable");
 }
 
 /**
@@ -100,8 +105,42 @@ function assertSdkArrived() {
   }
 }
 
+/**
+ * The page says out loud what state its checkout is in, on the root element, so the
+ * answer is readable from outside rather than inferred. `loading` until the SDK is
+ * proven up, then `ready`, or `blocked` when the policy refused its assets and
+ * `unavailable` when it failed some other way. A gate you cannot observe is a gate
+ * you cannot trust, which is the whole argument this product makes.
+ */
+function mark(state) {
+  document.documentElement.dataset.tiunState = state;
+}
+
+/**
+ * Sign in and buy controls start dead and are woken by `paint()` once the SDK is
+ * genuinely ready. That order matters. The HTML used to ship them live, so while the
+ * module was stuck waiting on a snippet that never arrived, the pricing page offered
+ * a button that took the click and dropped it. Disabled first means the worst case is
+ * a control that is visibly not ready, never one that lies.
+ */
+function armControls(on) {
+  for (const button of document.querySelectorAll("[data-buy], [data-signin]")) {
+    if (on) {
+      button.removeAttribute("disabled");
+      button.removeAttribute("aria-busy");
+      button.removeAttribute("title");
+    } else {
+      button.setAttribute("disabled", "");
+      button.setAttribute("aria-busy", "true");
+      button.title = "Checkout is still loading";
+    }
+  }
+}
+
 const cfg = await (await fetch("/api/config")).json().catch(() => ({}));
 const who = el("who");
+mark("loading");
+armControls(false);
 
 /**
  * Says which Tiun environment the buttons are wired to. Sandbox means a card is
@@ -126,6 +165,8 @@ try {
   tiun.init({ snippetId: cfg.snippetId, sandbox: cfg.sandbox, language: "en" });
   await tiun.waitForReady();
   assertSdkArrived();
+  mark("ready");
+  armControls(true);
 } catch (err) {
   // The free scan is a CLI, so a dead CDN costs the visitor nothing they came for.
   checkoutUnavailable(err?.message === CSP_BLOCKED ? "checkout blocked" : "sign in unavailable");

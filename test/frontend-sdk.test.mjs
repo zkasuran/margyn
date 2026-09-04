@@ -87,3 +87,23 @@ test("only the directives that break checkout are treated as fatal", () => {
   assert.ok(!names.includes("font-src"));
   assert.ok(!names.includes("img-src"));
 });
+
+test("the controls start dead and are woken only once the SDK is proven up", () => {
+  // Ordering is the whole point. armControls(false) has to run before the await on
+  // the SDK, because a module that hangs there leaves whatever ran first in place.
+  const off = CODE.indexOf("armControls(false)");
+  const awaitReady = CODE.indexOf("await tiun.waitForReady()");
+  const on = CODE.indexOf("armControls(true)");
+  assert.ok(off > 0, "nothing disables the controls up front");
+  assert.ok(awaitReady > 0 && on > 0);
+  assert.ok(off < awaitReady, "the controls are armed live before the SDK is known to work");
+  assert.ok(on > awaitReady, "the controls are woken before readiness is proven");
+});
+
+test("the checkout state is published on the page, so it can be read from outside", () => {
+  assert.match(CODE, /dataset\.tiunState/);
+  for (const state of ["loading", "ready", "blocked", "unavailable"]) {
+    assert.match(CODE, new RegExp(`"${state}"`), `the ${state} state is never published`);
+  }
+});
+
