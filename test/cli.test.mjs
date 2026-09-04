@@ -41,12 +41,35 @@ function repo() {
 }
 
 /** Runs the CLI and returns its output plus its exit code, never throwing. */
-function margyn(args) {
+function margyn(args, env = {}) {
   try {
-    return { code: 0, out: execFileSync(process.execPath, [CLI, ...args], { encoding: "utf8", env: { ...process.env, NO_COLOR: "1" } }) };
+    return {
+      code: 0,
+      out: execFileSync(process.execPath, [CLI, ...args], {
+        encoding: "utf8",
+        env: { ...process.env, NO_COLOR: "1", ...env },
+      }),
+    };
   } catch (error) {
     return { code: error.status ?? 1, out: `${error.stdout ?? ""}${error.stderr ?? ""}` };
   }
+}
+
+/**
+ * A licence environment with nothing in it, for the tests that are about not
+ * holding one. Without this they inherit the developer's own licence, from
+ * MARGYN_LICENCE or from ~/.margyn/licence, and pass or fail on whose machine
+ * they run. That is exactly the shape of defect this tool reports, and it was
+ * found by pointing the paid mutation proof at this repository: the licence made
+ * the baseline suite red, so the proof refused to run.
+ *
+ * The empty strings matter. readLicence() reads `MARGYN_LICENCE ?? MARGYN_LICENSE`,
+ * and an empty string is not nullish, so it stops the inherited value without
+ * looking like a licence. MARGYN_HOME then points the file lookup at a directory
+ * that has no .margyn in it.
+ */
+function unlicensed(home) {
+  return { MARGYN_LICENCE: "", MARGYN_LICENSE: "", MARGYN_HOME: home };
 }
 
 /** A repository with exactly one finding: a test that asserts nothing. */
@@ -129,7 +152,7 @@ test("a locked mutation proof explains itself and never fails the run", () => {
   try {
     r.write("README.md", "clean\n");
     r.commit();
-    const { code, out } = margyn([r.dir, "--mutate"]);
+    const { code, out } = margyn([r.dir, "--mutate"], unlicensed(r.dir));
     assert.match(out, /locked/, "a missing licence has to say why");
     assert.match(out, /free scan, which ran in full/);
     assert.equal(code, 0, "a missing licence must never be reported as a finding");
