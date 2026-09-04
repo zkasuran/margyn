@@ -64,6 +64,42 @@ function checkoutUnavailable(why) {
   for (const button of document.querySelectorAll("[data-buy], [data-signin]")) button.setAttribute("disabled", "");
 }
 
+/**
+ * `waitForReady()` resolving is not proof the SDK works.
+ *
+ * The module comes from esm.sh, then it fetches its own stylesheet and its own
+ * runtime bundle from the API host. Block those two and `waitForReady()` still
+ * resolves, `getUser()` still answers, so every control paints as live and does
+ * nothing when clicked. That is what shipped from 2026-08-06: a page-level check
+ * that passed while the thing it checks was broken, which is the exact fault this
+ * product exists to find.
+ *
+ * A blocked subresource never reaches the Resource Timing buffer, so asking the
+ * buffer for the runtime bundle is a real answer rather than a hopeful one. The
+ * CSP violation listener names the cause when there is one, so the message on the
+ * page can say "blocked here" instead of "unavailable somewhere".
+ */
+const CSP_BLOCKED = "tiun assets blocked by this page's content security policy";
+/** A blocked font is ugly. A blocked script, style or frame is a dead checkout. */
+const FATAL_DIRECTIVES = new Set(["script-src", "style-src", "frame-src", "connect-src"]);
+let cspBlocked = null;
+document.addEventListener("securitypolicyviolation", (e) => {
+  const directive = String(e.effectiveDirective || e.violatedDirective || "");
+  if (!String(e.blockedURI || "").includes("tiun")) return;
+  if (FATAL_DIRECTIVES.has(directive)) cspBlocked = `${directive} blocked ${e.blockedURI}`;
+});
+
+function assertSdkArrived() {
+  if (cspBlocked) throw new Error(CSP_BLOCKED);
+  const loaded = performance
+    .getEntriesByType("resource")
+    .some((r) => r.name.includes("/background_js") && r.responseEnd > 0);
+  if (!loaded) throw new Error("tiun runtime bundle never loaded");
+  if (typeof tiun.login !== "function" || typeof tiun.checkout !== "function") {
+    throw new Error("tiun sdk is missing login or checkout");
+  }
+}
+
 const cfg = await (await fetch("/api/config")).json().catch(() => ({}));
 const who = el("who");
 
@@ -89,9 +125,10 @@ try {
   ({ tiun } = await import("https://esm.sh/@tiun/sdk@0.9.1"));
   tiun.init({ snippetId: cfg.snippetId, sandbox: cfg.sandbox, language: "en" });
   await tiun.waitForReady();
-} catch {
+  assertSdkArrived();
+} catch (err) {
   // The free scan is a CLI, so a dead CDN costs the visitor nothing they came for.
-  checkoutUnavailable("sign in unavailable");
+  checkoutUnavailable(err?.message === CSP_BLOCKED ? "checkout blocked" : "sign in unavailable");
   throw new Error("tiun sdk did not load");
 }
 
@@ -113,25 +150,55 @@ for (const button of document.querySelectorAll("[data-buy]")) {
   button.addEventListener("click", () => tiun.checkout({ productId: product.id }));
 }
 
-/** One place decides what the bar looks like, so the state cannot drift. */
-async function paint() {
-  const user = await tiun.getUser().catch(() => null);
-  const signedIn = Boolean(user?.isAuthenticated ?? user?.email);
-  const access = Object.keys(user?.productAccess ?? {}).length > 0;
+/**
+ * Normalises what the SDK hands back, because two things about it are easy to get
+ * wrong and we got both wrong.
+ *
+ * `getUser()` is synchronous. It returns a plain object, so `getUser().catch(...)`
+ * is a TypeError, and an async function that throws synchronously becomes a
+ * rejected promise nobody is awaiting. `paint()` failed that way on every call
+ * from 2026-08-06, which is why the top bar never resolved and why the buy
+ * controls stayed in whatever state the HTML shipped with.
+ *
+ * The shape is `{isAuthenticated, user}`, so the email and the purchases live one
+ * level down. Reading `productAccess` off the top level always gave an empty
+ * object, so the licence button could never appear, not even for someone who had
+ * paid. Both levels are read here: the nested one is what @tiun/sdk@0.9.1 sends,
+ * the flat one is a cheap hedge if a later version flattens it.
+ */
+function readUser() {
+  let raw;
+  try {
+    raw = tiun.getUser();
+  } catch {
+    return { signedIn: false, email: null, access: [] };
+  }
+  const inner = raw?.user ?? null;
+  const access = Object.keys(inner?.productAccess ?? raw?.productAccess ?? {});
+  return {
+    signedIn: Boolean(raw?.isAuthenticated ?? inner?.email ?? raw?.email),
+    email: inner?.email ?? raw?.email ?? null,
+    access,
+  };
+}
 
-  who.textContent = signedIn ? (user.email ?? "signed in") : "";
+/** One place decides what the bar looks like, so the state cannot drift. */
+function paint() {
+  const { signedIn, email, access } = readUser();
+
+  who.textContent = signedIn ? (email ?? "signed in") : "";
   el("login").hidden = signedIn;
   el("logout").hidden = !signedIn;
   // The licence is only worth offering to someone who bought something, since
   // minting one for a free account can only ever be refused.
-  el("licence").hidden = !access;
+  el("licence").hidden = access.length === 0;
   // Signed out, every buy control becomes a sign-in prompt instead, because
   // checkout needs an account and a dead button is worse than a redirect.
   for (const button of document.querySelectorAll("[data-buy]")) button.hidden = !signedIn;
   for (const button of document.querySelectorAll("[data-signin]")) button.hidden = signedIn;
   const note = el("buynote");
   if (note) {
-    note.textContent = access
+    note.textContent = access.length
       ? "You already have a plan. Get your licence from the top bar."
       : "3 days free on Watch and Team, then the price above. Checkout runs on Tiun.";
   }
@@ -177,5 +244,17 @@ el("licence").onclick = async () => {
   }
 };
 
-for (const event of ["login", "logout", "checkout:complete", "user:updated"]) tiun.on?.(event, paint);
+/**
+ * Repaint on the events the SDK actually emits.
+ *
+ * The first version listened for `checkout:complete` and `user:updated`. Neither
+ * exists. @tiun/sdk@0.9.1 emits exactly seven: ready, login, logout, userChange,
+ * paywallShow, paywallHide, error. So a completed purchase changed nothing on the
+ * page: the buy button stayed a buy button and the licence control stayed hidden
+ * until a manual reload. `userChange` is the one that carries a new purchase, and
+ * `paywallHide` is the closest thing to "the checkout closed", so both are here.
+ * test/frontend-sdk.test.mjs holds this list to the SDK's own names.
+ */
+const SDK_EVENTS = ["login", "logout", "userChange", "paywallHide"];
+for (const event of SDK_EVENTS) tiun.on?.(event, paint);
 paint();

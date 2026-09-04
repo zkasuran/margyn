@@ -4,3 +4,4 @@ node_modules/
 *.log
 .dev.vars
 .wrangler/
+shots/w4/

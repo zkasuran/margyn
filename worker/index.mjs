@@ -42,12 +42,31 @@ const LICENCE_DAYS = 31;
  * sink rather than assumed. They are here so that the day one does, it is already
  * covered. The policy is tight because the whole frontend is first party: two
  * inline modules, inline CSS, the Tiun SDK on two pages, and no other origin.
+ *
+ * The Tiun hosts are named in more than `connect-src` because the SDK is not one
+ * file. The module arrives from esm.sh, then at `init()` time it pulls its own
+ * stylesheet and its own runtime bundle from the API host as a `<link>` and a
+ * `<script>`, and renders sign in and checkout inside a frame. Those are
+ * style-src, script-src, img-src, font-src and frame-src decisions, not
+ * connect-src ones. Listing only connect-src blocked every one of them, so the
+ * checkout button on the pricing page did nothing at all from 2026-08-06 until
+ * this was found on 2026-09-04. Both hosts are named so a sandbox deploy behaves
+ * the same as a live one, and neither is widened to `https:`.
+ *
+ * `assets.tiun.dev` is a third host and it is kept separate on purpose. The
+ * stylesheet asks it for one webfont, and a font host has no business being a
+ * script or a frame source, so it appears in font-src and img-src and nowhere
+ * else. Found the same way as the first two: by watching what the browser refused.
  */
-const SECURITY_HEADERS = {
+export const TIUN_HOSTS = "https://api.tiun.live https://api-sandbox.tiun.live";
+export const TIUN_ASSETS = "https://assets.tiun.dev";
+export const SECURITY_HEADERS = {
   "content-security-policy":
-    "default-src 'self'; script-src 'self' 'unsafe-inline' https://esm.sh; " +
-    "style-src 'self' 'unsafe-inline'; img-src 'self' data:; " +
-    "connect-src 'self' https://esm.sh https://api.tiun.live https://api-sandbox.tiun.live; " +
+    `default-src 'self'; script-src 'self' 'unsafe-inline' https://esm.sh ${TIUN_HOSTS}; ` +
+    `style-src 'self' 'unsafe-inline' ${TIUN_HOSTS}; ` +
+    `img-src 'self' data: ${TIUN_HOSTS} ${TIUN_ASSETS}; ` +
+    `font-src 'self' data: ${TIUN_HOSTS} ${TIUN_ASSETS}; ` +
+    `connect-src 'self' https://esm.sh ${TIUN_HOSTS} ${TIUN_ASSETS}; frame-src ${TIUN_HOSTS}; ` +
     "frame-ancestors 'none'; base-uri 'none'; form-action 'none'; object-src 'none'",
   "referrer-policy": "strict-origin-when-cross-origin",
   "x-content-type-options": "nosniff",
