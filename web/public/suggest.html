@@ -30,8 +30,8 @@
 if(v==="light"||v==="dark")document.documentElement.style.colorScheme=v}catch(e){}})();
 </script>
 <style>
-/* MARGYN — Compact revamp. Dense, punchy, minimal scroll.
-   Palette: bin/contrast.mjs · test/palette.test.mjs */
+/* Margyn. One stylesheet, inlined into every page by web/layout.mjs.
+   Palette pairs are gated by bin/contrast.mjs and test/palette.test.mjs. */
 
 :root {
   color-scheme: light dark;
@@ -115,7 +115,8 @@ pre .d { color: var(--faint) } pre .r { color: var(--hi) } pre .g { color: var(-
 
 section { padding: var(--band) 0 }
 section + section { border-top: 1px solid var(--line) }
-:target, a, button, input, summary { scroll-margin-top: 64px }
+:target, a, button, input, summary { scroll-margin-top: 104px }
+@media (min-width: 640px) { :target, a, button, input, summary { scroll-margin-top: 68px } }
 .eyebrow { font-size: 11px; font-weight: 680; letter-spacing: .1em; text-transform: uppercase;
   color: var(--accent); margin: 0 0 8px }
 
@@ -148,18 +149,24 @@ button.ghost:hover, .btn.ghost:hover { border-color: var(--accent);
   backdrop-filter: saturate(1.5) blur(16px);
   -webkit-backdrop-filter: saturate(1.5) blur(16px);
   border-bottom: 1px solid var(--line) }
-.bar .wrap { display: flex; align-items: center; gap: 10px; min-height: 52px; padding-block: 6px }
+.bar .wrap { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; min-height: 52px;
+  padding-block: 6px }
 @media (min-width: 1024px) { .bar .wrap { min-height: 56px } }
 .brand { display: flex; align-items: center; gap: 8px; margin-right: auto;
   font-weight: 700; letter-spacing: -.02em; text-decoration: none; font-size: 16px;
   color: var(--ink) }
 .brand svg { display: block; border-radius: 6px }
-.barnav { display: none; gap: 4px; margin-right: 12px }
+/* On a phone the nav is a second row rather than gone, so Proof, Docs and Pricing
+   are one tap away instead of only in the footer. */
+.barnav { display: flex; gap: 4px; order: 10; width: 100%; margin: 0 0 0 -10px;
+  overflow-x: auto; scrollbar-width: none; -webkit-overflow-scrolling: touch }
+.barnav::-webkit-scrollbar { display: none }
 .barnav a { font-size: 13px; color: var(--mut); text-decoration: none; font-weight: 500;
-  padding: 5px 10px; border-radius: 999px; transition: all var(--t) var(--ease) }
+  padding: 5px 10px; border-radius: 999px; white-space: nowrap; transition: all var(--t) var(--ease) }
 .barnav a:hover { color: var(--ink); background: var(--rais) }
 .barnav a[aria-current="page"] { color: var(--accent); background: color-mix(in srgb, var(--accent) 8%, var(--rais)) }
-@media (min-width: 640px) { .barnav { display: flex } }
+@media (min-width: 640px) { .bar .wrap { flex-wrap: nowrap }
+  .barnav { order: 0; width: auto; margin: 0 12px 0 0; overflow: visible } }
 .who { color: var(--mut); font-size: 12px; display: flex; align-items: center }
 
 /* ── Theme toggle ── */
@@ -179,6 +186,14 @@ button.ghost:hover, .btn.ghost:hover { border-color: var(--accent);
 @media (min-width: 640px) { .hero { padding-top: 56px } }
 @media (min-width: 1024px) { .hero { padding-top: 64px } }
 .hero h1 { margin-bottom: 14px; max-width: 18ch }
+.hero-grid { display: grid; gap: 32px; grid-template-columns: minmax(0, 1fr); align-items: center }
+.hero-demo { display: none; margin: 0; min-width: 0 }
+.hero-demo pre { box-shadow: var(--shadow-lg); background: var(--card) }
+.hero-demo figcaption { margin-top: 10px }
+@media (min-width: 1024px) {
+  .hero-grid { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 48px }
+  .hero-demo { display: block }
+}
 .hero-links { display: flex; gap: 16px; margin: 14px 0 0; flex-wrap: wrap }
 .chips { list-style: none; display: flex; flex-wrap: wrap; gap: 6px; padding: 0; margin: 18px 0 0 }
 .chips li { font-size: 11px; font-weight: 600; color: var(--accent);
@@ -199,7 +214,7 @@ button.ghost:hover, .btn.ghost:hover { border-color: var(--accent);
 
 /* ── Page header ── */
 .phead { padding: 36px 0 28px; border-top: 0 }
-.phead + section { border-top: 0 }
+.phead + section { border-top: 0; padding-top: 12px }
 .phead h1 { font-size: clamp(24px, 4vw, 36px); max-width: 26ch; margin-bottom: 10px }
 
 /* ── FAQ — compact ── */
@@ -221,6 +236,7 @@ button.ghost:hover, .btn.ghost:hover { border-color: var(--accent);
 /* ── Checks — compact grid ── */
 .checks { list-style: none; padding: 0; margin: 0; display: grid; gap: 8px }
 @media (min-width: 640px) { .checks { grid-template-columns: 1fr 1fr; gap: 10px } }
+@media (min-width: 1024px) { .checks { grid-template-columns: repeat(3, minmax(0, 1fr)) } }
 .checks li { padding: 14px; border: 1px solid var(--line); border-radius: var(--r-sm);
   background: var(--card); transition: border-color var(--t) var(--ease) }
 .checks li:hover { border-color: var(--accent) }
@@ -252,9 +268,10 @@ button.ghost:hover, .btn.ghost:hover { border-color: var(--accent);
 .tier .per { font-size: 13px; color: var(--faint) }
 .tier ul { list-style: none; padding: 0; margin: 12px 0 16px; font-size: 13.5px; color: var(--mut) }
 .tier li { padding: 4px 0 4px 20px; position: relative }
-.tier li::before { content: "✓"; position: absolute; left: 0; color: var(--ok); font-weight: 700;
-  font-size: 13px }
+.tier li::before { content: ""; position: absolute; left: 3px; top: 9px; width: 9px; height: 5px;
+  border: solid var(--ok); border-width: 0 0 2px 2px; transform: rotate(-45deg) }
 .tier .fill { flex: 1 }
+.tier li code { white-space: nowrap }
 
 /* ── Steps — inline ── */
 .steps { counter-reset: s; list-style: none; padding: 0; margin: 0 }
@@ -275,12 +292,21 @@ button.ghost:hover, .btn.ghost:hover { border-color: var(--accent);
   color: var(--accent); margin-bottom: 6px; font-weight: 650 }
 .panel p { color: var(--mut); font-size: 14px }
 .st { width: 100%; border-collapse: collapse; font-size: 13.5px; max-width: var(--prose) }
+@media (min-width: 1024px) { .st { max-width: 860px } .st td:first-child, .st th:first-child { width: 32% } }
 .st td, .st th { padding: 10px 0; border-bottom: 1px solid var(--line); vertical-align: top;
   text-align: left }
 .st td:first-child, .st th:first-child { color: var(--mut); width: 38%; padding-right: 14px }
 .st tr:last-child td { border-bottom: 0 }
 .st th { font-weight: 650; color: var(--ink); font-size: 12px; letter-spacing: .04em;
   text-transform: uppercase }
+/* A label and its explanation side by side leaves about twenty characters a line on
+   a phone, so those rows stack there. Tables with a header row keep their columns. */
+@media (max-width: 639px) {
+  .st tr:has(> th + td) { display: block; padding: 10px 0; border-bottom: 1px solid var(--line) }
+  .st tr:has(> th + td):last-child { border-bottom: 0 }
+  .st.st tr:has(> th + td) > * { display: block; width: auto; padding: 0; border: 0 }
+  .st.st tr:has(> th + td) > th { margin-bottom: 4px }
+}
 
 /* ── Docs ── */
 .doc { display: grid; gap: 28px; padding: var(--band) 0; grid-template-columns: minmax(0, 1fr) }
@@ -311,9 +337,12 @@ button.ghost:hover, .btn.ghost:hover { border-color: var(--accent);
 
 /* ── Footer — compact ── */
 footer { border-top: 1px solid var(--line); background: var(--rais) }
-footer .wrap { padding: 36px 0 calc(36px + env(safe-area-inset-bottom)); font-size: 13px }
+footer .wrap { padding-block: 36px calc(36px + env(safe-area-inset-bottom)); font-size: 13px }
 .foot { display: grid; gap: 24px }
-@media (min-width: 640px) { .foot { grid-template-columns: 1fr auto auto; gap: 40px } }
+.footlead { grid-column: 1 / -1 }
+@media (max-width: 639px) { .foot { grid-template-columns: 1fr 1fr } }
+@media (min-width: 640px) { .foot { grid-template-columns: 1fr auto auto; gap: 40px }
+  .footlead { grid-column: auto } }
 .footlead { max-width: 38ch; color: var(--faint) }
 .footcmd { margin-bottom: 10px }
 .foothead { font-size: 10px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase;
@@ -435,7 +464,7 @@ footer nav a:hover { color: var(--accent) }
     the same text always produces the same one, which is what makes a duplicate obvious. It is a 32
     bit hash, so it is a label rather than an identifier to look anything up by.</p>
   <p class="sm prose">A finding you think is wrong is the highest value message on this page.
-    <a href="/proof#public">Twenty two false positives</a> were found and fixed exactly this way,
+    <a href="/changelog#v0-2-1">Twenty two false positives</a> were found and fixed exactly this way,
     by pointing the tool at repositories that were not ours and reading every finding by hand.</p>
 </div></section>
 

@@ -1,54 +1,21 @@
 /**
- * Frontend. The SDK loads from a CDN so the page needs no build step, which keeps
- * the whole app two files. Swap to `npm install @tiun/sdk` when this grows a
- * bundler.
+ * Frontend for the two pages with a session, home and pricing. The SDK loads from
+ * a CDN so the page needs no build step. Swap to `npm install @tiun/sdk` when this
+ * grows a bundler.
  *
  * Two jobs, and nothing else: resolve the session into the top bar without the
  * layout jumping, and hand a paying user their CLI licence. Scanning is not here
  * and never will be, because the scanner is a local CLI.
  */
+
+/* Theme and copy come from the module every other page uses. This file used to
+   carry its own copy of both, and that copy wired only the first Copy button, so
+   four of the five on these two pages did nothing when pressed. */
+import "./theme.mjs";
+
 const el = (id) => document.getElementById(id);
 const out = el("out");
 const escape = (s) => String(s).replace(/[&<>]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;" })[c]);
-
-/* ---- theme. The radios set color-scheme on the root and light-dark() reads it,
-   so the OS path needs no listener and a manual choice is one declaration. ---- */
-const THEME_KEY = "margyn-theme";
-const root = document.documentElement;
-let stored = null;
-try { stored = localStorage.getItem(THEME_KEY); } catch {}
-const chosen = el(stored === "light" ? "t-light" : stored === "dark" ? "t-dark" : "t-sys");
-if (chosen) chosen.checked = true;
-for (const input of document.querySelectorAll(".theme input")) {
-  input.addEventListener("change", () => {
-    const v = input.value;
-    root.style.colorScheme = v === "system" ? "" : v;
-    try { v === "system" ? localStorage.removeItem(THEME_KEY) : localStorage.setItem(THEME_KEY, v); } catch {}
-  });
-}
-
-/* ---- copy the install command. The clipboard can be unavailable or denied, so
-   the failure path tells the user what to do instead of failing silently. ---- */
-const copy = el("copy");
-copy?.addEventListener("click", async () => {
-  const text = el(copy.dataset.copy).textContent.trim();
-  const done = (label) => {
-    copy.textContent = label;
-    setTimeout(() => { copy.textContent = "Copy"; }, 1600);
-  };
-  try {
-    await navigator.clipboard.writeText(text);
-    done("Copied");
-  } catch {
-    // Select it so the keyboard shortcut works, then say so.
-    const range = document.createRange();
-    range.selectNodeContents(el(copy.dataset.copy));
-    const sel = getSelection();
-    sel.removeAllRanges();
-    sel.addRange(range);
-    done("Press Ctrl+C");
-  }
-});
 
 /* ---- session. Everything below needs the SDK, and the page is fully useful
    without it, so a CDN failure must not take the page down with it. ---- */

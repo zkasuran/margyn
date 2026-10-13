@@ -2,13 +2,13 @@
 export default {
   path: "/pricing",
   title: "Margyn pricing: five checks free, the mutation proof from $8.99 a month",
-  ogTitle: "Four checks are free. The fifth runs your suite, so it costs money.",
+  ogTitle: "Five checks are free. The sixth runs your suite, so it costs money.",
   description:
     "The five static checks are free with no account and no licence. Watch is $8.99 a month, adds the mutation proof and mints a licence your CI verifies offline. Three days free.",
   session: true,
   body: `
 <section class="phead"><div class="wrap">
-  <h1 class="prose">Four checks are free. The fifth runs your suite, so it costs money.</h1>
+  <h1 class="prose">Five checks are free. The sixth runs your suite, so it costs money.</h1>
   <p class="lede prose">Watch is $8.99 a month for one owner's repositories. Team is $29 a month for
     an organisation. Solo Fix is $19 a month for one finding fixed, Fix flow is $79 a month for
     three, if you would rather the findings arrived already fixed. The five static checks stay free
@@ -21,7 +21,8 @@ export default {
       <p class="tag">Free scan</p>
       <p class="amt">$0<span class="per"> forever</span></p>
       <ul>
-        <li>Four static checks: ignored-source, no-assertion, unrun-check, lint-blindspot</li>
+        <li>Five static checks: <code>ignored-source</code>, <code>no-assertion</code>, <code>cannot-fail</code>,
+          <code>unrun-check</code>, <code>lint-blindspot</code></li>
         <li>No account, no licence, no network call at any point</li>
         <li>Every finding carries a command that reproduces it</li>
         <li><code>--prove</code> runs each finding's own proof, then retracts anything it cannot reproduce</li>
@@ -130,7 +131,7 @@ export default {
   <h2>Why this is the one you pay for</h2>
   <p class="prose">The static checks read your tree once and finish in under a second. The mutation
     proof inverts a line, runs your entire test suite, restores the file, then does it again. That
-    is real machine time and it is the honest line between the two. The free four are not crippled
+    is real machine time and it is the honest line between the two. The free five are not crippled
     versions of anything.</p>
   <p class="prose">It is also the check with the most to go wrong, so it is bounded. A red baseline
     aborts the run instead of producing results that would mean nothing. Each run is timed out. The
@@ -148,7 +149,8 @@ export default {
     anywhere the CLI can read it:</p>
 <pre tabindex="0" role="group" aria-label="Installing a licence"><b>$ npx margyn-scan /path/to/repo --mutate</b>
 The mutation proof is part of Watch and it is locked: no licence found.
-Everything below is the free scan, which ran in full.
+<span class="d">Unlock it at https://margyn.xyz/pricing, then put the licence in ~/.margyn/licence or MARGYN_LICENCE.</span>
+<span class="d">Everything below is the free scan, which ran in full.</span>
 
 <b>$ mkdir -p ~/.margyn &amp;&amp; pbpaste &gt; ~/.margyn/licence</b>   <span class="d"># or export MARGYN_LICENCE=...</span>
 <b>$ npx margyn-scan /path/to/repo --mutate</b>
@@ -175,7 +177,7 @@ Everything below is the free scan, which ran in full.
       none, because a trial on a service is unpaid work.</td></tr>
     <tr><th>Renewal</th><td>Monthly, until you cancel.</td></tr>
     <tr><th>Cancelling</th><td>Any time. The licence on your disk keeps working until it expires
-      and the four free checks are unaffected.</td></tr>
+      and the five free checks are unaffected.</td></tr>
     <tr><th>Refunds</th><td>Ask within 14 days of a charge and it is refunded. See the
       <a href="/terms">terms</a>.</td></tr>
     <tr><th>Cards</th><td>Handled by <a href="https://tiun.business">Tiun</a>, which runs sign in
@@ -226,9 +228,11 @@ Everything below is the free scan, which ran in full.
         scan endpoint on purpose, which you can check: <code>POST /api/scan</code> answers 404.</p></details>
     <details><summary>Mutation testing already exists. Why would I pay you for it?</summary>
       <p>You would not, if a mutation score is what you want. Stryker gives that away and does it
-        better. Margyn runs a capped mutation proof as one check inside a five check audit. The
-        other four catch things a mutation framework structurally cannot: a file that is not in the
-        commit, a gate nobody invokes, a linter whose scope comes from the ignore file.</p></details>
+        better. Margyn runs a capped mutation proof as one check inside a six check audit. The
+        other five read the repository rather than run it, so they catch things a mutation framework
+        is not built to report: a file that is not in the commit, a test that asserts nothing or
+        asserts something that cannot be false, a gate nobody invokes, a linter whose scope comes
+        from the ignore file.</p></details>
     <details><summary>It edits my files?</summary>
       <p>Only under <code>--mutate</code>, only one file at a time, only after your suite has
         passed unmutated. Each file is restored in a <code>finally</code> block and on

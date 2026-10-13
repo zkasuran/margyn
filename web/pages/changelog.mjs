@@ -7,7 +7,7 @@ export default {
   path: "/changelog",
   title: "Margyn changelog",
   description:
-    "What shipped and when. Six checks, a suggestion box, an offline licence, a Cloudflare Worker with no scan endpoint, then the site and the first npm release.",
+    "What shipped and when. Six checks, proof mode, a suggestion box, an offline licence, a Cloudflare Worker with no scan endpoint, then the site and the first npm release.",
   body: `
 <section class="phead"><div class="wrap">
   <h1 class="prose">Changelog</h1>
@@ -17,7 +17,61 @@ export default {
 </div></section>
 
 <section><div class="wrap">
-  <div class="rel">
+  <div class="rel" id="site-2026-10-13">
+    <p class="when">2026-10-13<br>site</p>
+    <div>
+      <h3>Every number on the site, checked against a fresh run</h3>
+      <p>The site had drifted from the product it describes, which is the failure this tool reports
+        about other people's repositories. So every count was re-derived rather than re-read. The
+        five public repositories were scanned again at their named commits with 0.3.1 and every row
+        holds. The self audit was run again over every candidate file: <b>27 mutated, 27 caught, no
+        survivors, 130 tests, about 200 seconds</b>.</p>
+      <p>What was wrong. The pricing page said four checks were free; it has been five since
+        <code>cannot-fail</code> shipped in 0.3.0. The proof page named six hollow tests in fastify
+        under a table that says seven, and still explained a total of 10 when the run reads 13. The
+        home page quoted a fastify finding under another test's title and line. The docs showed proof
+        markers the CLI no longer prints. The security page said the scanner never runs the commands
+        inside a finding, which stopped being true when <code>--prove</code> shipped, and its example
+        link still carried the <code>labels</code> parameter removed on 2026-08-15.</p>
+      <p>What was broken. On the home and pricing pages only the first Copy button worked, because
+        those two pages carried their own copy of the script and the copy wired one button. Four of
+        five did nothing. Both pages now load the same module as every other page. On a phone the nav
+        was hidden with nothing in its place and the footer ran to the screen edge; the nav is now a
+        second row and the footer keeps its margin. Label tables stack on narrow screens, and wide
+        screens get the check grid in three columns plus a real proof run beside the hero. Measured
+        in a headless browser from 360 to 1920 pixels with no sideways scroll on any page.</p>
+    </div>
+  </div>
+
+  <div class="rel" id="site-2026-09-05">
+    <p class="when">2026-09-05<br>site</p>
+    <div>
+      <h3>The checkout never worked in production. It does now</h3>
+      <p>Three defects, each invisible from the code and each provable from the wire. Our own content
+        security policy allowed the Tiun hosts for <code>connect-src</code> only, so the SDK's
+        stylesheet, runtime bundle and sign in frame were all refused. <code>getUser()</code> is
+        synchronous, so calling <code>.catch</code> on it threw and the top bar never repainted. The
+        user object nests purchases one level down, so the licence button could never appear, not even
+        for a paying customer.</p>
+      <p>Sign in and buy controls now start disabled and are only woken once the SDK is proven to have
+        arrived, and the page publishes its checkout state on the root element as
+        <code>data-tiun-state</code>. A gate you cannot read from outside is a gate you cannot trust.
+        The suite went from 108 tests to 130. One existing test had passed or failed depending on
+        whether the machine running it held a licence; it now sets its own licence environment.</p>
+    </div>
+  </div>
+
+  <div class="rel" id="site-2026-08-24">
+    <p class="when">2026-08-24<br>site</p>
+    <div>
+      <h3>A denser design</h3>
+      <p>The site was redrawn to need less scrolling: tighter type and spacing, the hero above the
+        fold, the checks as a grid. The palette stayed behind the same contrast gate, so every text
+        pair still clears WCAG in both colour schemes.</p>
+    </div>
+  </div>
+
+  <div class="rel" id="v0-3-1">
     <p class="when">0.3.1<br>2026-08-17</p>
     <div>
       <h3>The pull-request report has a real run behind it now</h3>
@@ -83,7 +137,7 @@ export default {
     </div>
   </div>
 
-  <div class="rel">
+  <div class="rel" id="v0-3-0">
     <p class="when">0.3.0<br>2026-08-15</p>
     <div>
       <h3>A sixth check, for tests that assert something that cannot be false</h3>
@@ -113,7 +167,7 @@ export default {
     </div>
   </div>
 
-  <div class="rel">
+  <div class="rel" id="v0-2-1">
     <p class="when">0.2.1<br>2026-08-15</p>
     <div>
       <h3>Twenty two false positives, found by pointing Margyn at other people's repositories</h3>
@@ -144,7 +198,7 @@ export default {
     </div>
   </div>
 
-  <div class="rel">
+  <div class="rel" id="v0-2-0">
     <p class="when">0.2.0<br>2026-08-12</p>
     <div>
       <h3>Margyn runs its own reproductions, posts them on your PR, and gains a cheaper way in</h3>
@@ -189,7 +243,7 @@ export default {
     </div>
   </div>
 
-  <div class="rel">
+  <div class="rel" id="v0-1-2">
     <p class="when">0.1.2<br>2026-08-06</p>
     <div>
       <h3>Seven false positives found on a real repository, then fixed</h3>
@@ -210,7 +264,7 @@ export default {
     </div>
   </div>
 
-  <div class="rel">
+  <div class="rel" id="v0-1-1">
     <p class="when">0.1.1<br>2026-08-06</p>
     <div>
       <h3>First published release, plus a site instead of a page</h3>
@@ -275,7 +329,7 @@ export default {
   </div>
 </div></section>
 
-<section><div class="wrap">
+<section id="not-built"><div class="wrap">
   <h2>What is not built</h2>
   <p class="prose">Named here so the roadmap is checkable rather than implied.</p>
   <ul class="prose">

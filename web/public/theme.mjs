@@ -1,9 +1,9 @@
 /**
  * Theme and copy, for the pages that carry no session.
  *
- * The home and pricing pages load app.mjs, which does this plus the Tiun SDK.
- * Every other page needs only these two behaviours, so it does not pay for the
- * SDK import to read documentation.
+ * Every page runs this. The home and pricing pages load it through app.mjs, which
+ * adds the Tiun SDK on top. Every other page needs only these two behaviours, so
+ * it does not pay for the SDK import to read documentation.
  */
 const THEME_KEY = "margyn-theme";
 const root = document.documentElement;
