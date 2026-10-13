@@ -42,7 +42,8 @@
     "worker:dev": "npm run build && wrangler dev",
     "worker:deploy": "npm run build && wrangler deploy",
     "worker:bundle": "node bin/bundle-static.mjs",
-    "contrast": "node bin/contrast.mjs"
+    "contrast": "node bin/contrast.mjs",
+    "verify:contrast": "node bin/contrast.mjs"
   },
   "devDependencies": {
     "wrangler": "^4.118.0"
