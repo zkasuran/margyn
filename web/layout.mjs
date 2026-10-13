@@ -1,8 +1,8 @@
 /**
  * The shell every page is poured into.
  *
- * One source of truth for the head, the header and the footer, so six pages
- * cannot drift apart. This is a build-time module, not something the browser
+ * One source of truth for the head, the header and the footer, so no page can
+ * drift from the others. This is a build-time module, not something the browser
  * loads: bin/build-pages.mjs calls it and writes plain HTML into web/public,
  * which the bundler then carries into the worker. So the site is still static
  * files with inline CSS and no runtime framework.
@@ -21,7 +21,7 @@ export const SITE = {
   tagline: "Proves your checks do not check anything.",
 };
 
-/** The nav, in one place, so a new page is one entry rather than six edits. */
+/** The nav, in one place, so a new page is one entry rather than an edit per page. */
 const NAV = [
   { href: "/proof", label: "Proof" },
   { href: "/docs", label: "Docs" },
@@ -35,14 +35,14 @@ const MARK = `<svg width="24" height="24" viewBox="0 0 32 32" aria-hidden="true"
             stroke-width="2.6" fill="none" stroke-linecap="square"/>
     </svg>`;
 
-/** Only the home page carries the software schema, so it is not claimed six times. */
+/** Only the home page carries the software schema, so it is not claimed on every page. */
 const SCHEMA = `{"@context":"https://schema.org","@type":"SoftwareApplication","name":"Margyn",
 "applicationCategory":"DeveloperApplication","operatingSystem":"Linux, macOS, Windows",
 "url":"https://margyn.xyz/","codeRepository":"https://github.com/zkasuran/margyn",
-"description":"Audits the verification layer of a repository. Finds tests that assert nothing, files the repo reads that git never committed, gates no workflow invokes and linter exclusions that live in the ignore file. Every finding ships a runnable reproduction.",
+"description":"Audits the verification layer of a repository. Finds tests that assert nothing, tests whose assertions cannot be false, files the repo reads that git never committed, gates no workflow invokes and linter exclusions that live in the ignore file. Every finding ships a runnable reproduction.",
 "softwareRequirements":"Node.js 22 or newer, git","license":"https://opensource.org/licenses/MIT",
 "offers":[{"@type":"Offer","name":"Free scan","price":"0","priceCurrency":"USD",
-"description":"Four static checks, no account and no licence."},
+"description":"Five static checks, no account and no licence."},
 {"@type":"Offer","name":"Watch","price":"8.99","priceCurrency":"USD",
 "description":"Adds the mutation proof, with a 3 day free trial.",
 "priceSpecification":{"@type":"UnitPriceSpecification","price":"8.99","priceCurrency":"USD",

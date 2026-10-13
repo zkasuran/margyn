@@ -16,20 +16,24 @@ workers_dev = true
 
 # No [assets] block. The frontend is bundled into the script by
 # bin/bundle-static.mjs, because Cloudflare's assets API answered every upload
-# with a 500 on 2026-08-05 and two files with no build step fit the script
-# limit comfortably. One upload also means the page and the API can never be
-# deployed at different versions. Run `npm run worker:bundle` after editing
-# anything in web/public.
+# with a 500 on 2026-08-05, and the whole frontend fits the script limit
+# comfortably (the bundler fails the build if that stops being true). One upload
+# also means the page and the API can never be deployed at different versions.
+# `npm run build` rebuilds the pages and the bundle together.
 
-# Sandbox by default. Getting this wrong towards live charges real money, so the
-# safe value is the one you get by forgetting to set it.
+# The deployed worker charges real cards. The code treats any value other than
+# "live" as Tiun's sandbox, so a missing or misspelt TIUN_ENV fails towards the
+# environment that cannot take money. .dev.vars.example sets sandbox for local dev.
 [vars]
 TIUN_ENV = "live"
 
-# Secrets are never in this file. Set them once per environment:
-#   npx wrangler secret put TIUN_SANDBOX_API_KEY
+# Secrets are never in this file. Set them once per environment, live names shown;
+# the sandbox uses the same names with a TIUN_SANDBOX_ prefix:
+#   npx wrangler secret put TIUN_API_KEY
 #   npx wrangler secret put MARGYN_LICENCE_KEY
 # and the public ones too, since a var here would be committed:
-#   npx wrangler secret put TIUN_SANDBOX_SNIPPET_ID
-#   npx wrangler secret put TIUN_SANDBOX_PRODUCT_WATCH
-#   npx wrangler secret put TIUN_SANDBOX_PRODUCT_FIXPACK
+#   npx wrangler secret put TIUN_SNIPPET_ID
+#   npx wrangler secret put TIUN_PRODUCT_WATCH
+#   npx wrangler secret put TIUN_PRODUCT_TEAM
+#   npx wrangler secret put TIUN_PRODUCT_FIXFLOW
+#   npx wrangler secret put TIUN_PRODUCT_SOLOFIX

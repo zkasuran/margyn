@@ -20,9 +20,9 @@
  * offering a button that 404s.
  *
  * The frontend rides inside this script rather than as Workers Assets: the assets
- * API returned a 500 on every attempt on 2026-08-05, and two files with no build
- * step are far inside the script size limit. One upload also means the page and
- * the API can never be deployed at different versions.
+ * API returned a 500 on every attempt on 2026-08-05, and the whole frontend is far
+ * inside the script size limit. One upload also means the page and the API can
+ * never be deployed at different versions.
  *
  * WebCrypto signs here, `node:crypto` signs locally, and both produce the same
  * bytes because the format lives in one module. Proven by test/worker.test.mjs.

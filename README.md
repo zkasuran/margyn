@@ -70,13 +70,22 @@ The first five are static, safe to run anywhere, and **free forever**. The mutat
 Every finding ships a reproduction. `--prove` runs it:
 
 ```
-npx margyn-scan . --prove
+$ npx margyn-scan . --prove
 
-1. vendor/dist/IPool.mjs is read but git ignores it   HIGH  ignored-source  REPRODUCED
-   MARGYN_ABSENT_FROM_HEAD
+1. vendor/dist/IPool.mjs is read by scripts/abis.mjs but git ignores it, so it is not in the commit
+   HIGH  ignored-source  vendor/dist/IPool.mjs  REPRODUCED
+   MARGYN_REFERENCE_ABSENT_FROM_HEAD
    MARGYN_PRESENT_ON_DISK
 
-2 findings: 2 reproduced.
+2. test "hollow" asserts nothing, so nothing but a thrown error can fail it
+   HIGH  no-assertion  app.test.mjs:2  REPRODUCED
+   MARGYN_NO_ASSERT_IN_BODY
+
+3. script "test:online" is declared but no workflow or sibling script runs it
+   MEDIUM  unrun-check  package.json  REPRODUCED
+   MARGYN_NOT_REFERENCED
+
+3 findings: 3 reproduced.
 ```
 
 A finding that cannot be reproduced is **retracted** and dropped. A gate never fails your build on a claim the tool cannot show on your own tree.
@@ -118,10 +127,10 @@ One line, pinned to a release, exit code 1 when anything was found.
 | Input | Default | Description |
 | :--- | :---: | :--- |
 | `path` | `.` | Repository path to scan |
-| `version` | latest | Pin a specific version |
-| `mutate` | `"false"` | Run the mutation proof (needs `MARGYN_LICENCE` secret) |
+| `version` | `0.3.1` | Which `margyn-scan` release to run, pinned so a job cannot change under you |
+| `mutate` | `"false"` | Run the mutation proof (needs `MARGYN_LICENCE` in the environment) |
 | `max` | `4` | Mutation cap |
-| `json` | `"false"` | Output as JSON |
+| `json` | `"false"` | Also write the findings to `margyn.json` in the workspace |
 | `comment` | `"false"` | Post/update a PR comment (needs `pull-requests: write`) |
 | `sarif` | `"false"` | Upload to Security tab (needs `security-events: write`) |
 
@@ -133,7 +142,7 @@ The action uses the job's own `GITHUB_TOKEN`. Nothing is hosted and no secret le
 
 ## Precision, Measured
 
-Run on 2026-08-06 against a shallow clone of each, at the commit named. Nothing was tuned for these and nothing was left out:
+First run on 2026-08-06 against a clone of each, at the commit named, and re-checked with 0.3.1 on 2026-10-13. Nothing was tuned for these and nothing was left out:
 
 | Repository | Commit | Findings |
 | :--- | :---: | :--- |
@@ -144,22 +153,23 @@ Run on 2026-08-06 against a shallow clone of each, at the commit named. Nothing 
 | fastify/fastify | `39e87e8` | 7 no-assertion, 2 cannot-fail, 4 unrun gates |
 
 ```bash
-git clone --depth 1 https://github.com/fastify/fastify.git /tmp/fastify
+git clone https://github.com/fastify/fastify.git /tmp/fastify
+git -C /tmp/fastify checkout 39e87e8
 npx margyn-scan /tmp/fastify
 ```
 
-> **That run reported 17 on fastify before it reported 10.** Seven findings were wrong: the tests declare `t.plan(11)` then assert through a helper. Both rules were fixed, both directions are tested. The full before-and-after is at [margyn.xyz/proof](https://margyn.xyz/proof).
+> **The first run reported 17 on fastify.** Seven findings were wrong: the tests declare `t.plan(11)` then assert through a helper. Both rules were fixed and both directions are tested, which took it to 10. 0.3.0 then added `cannot-fail` (two findings) and stopped reading a title that starts "should" as an assertion (one more hollow test), which is how it reads 13. The full before-and-after is at [margyn.xyz/proof](https://margyn.xyz/proof).
 
 ---
 
 ## We Run It On Ourselves
 
-On 2026-08-17, measured over everything in scope:
+On 2026-10-13, measured over everything in scope:
 
 ```
 40 files tracked as source, 27 carry a mutation this tool knows how to make
-27 mutated, 27 caught by the suite, 0 survivors, 208 seconds
-108 tests, 0 failing
+27 mutated, 27 caught by the suite, 0 survivors, 201 seconds
+130 tests, 0 failing
 ```
 
 <details>
@@ -177,7 +187,7 @@ src/checks/unrun-checks.mjs     !== -> ===   suite still passed
 src/cli.mjs                     === -> !==   suite still passed
 ```
 
-Every line got a test. 63 tests became 108. Zero survivors.
+Every line got a test. 63 tests became 93, then zero survivors. The suite is 130 tests today.
 
 The proof also found something no test could have covered: `bin/build-pages.mjs` ran its build as a side effect of being imported, so a test that imported it rebuilt the site. Under a mutation it wrote every page to the wrong file. It is behind a run-as-a-command guard now.
 
@@ -244,13 +254,31 @@ The Worker serves `/api/config`, `/api/verify`, `/api/licence`, `/api/fix-intake
 
 ---
 
+## Repository Layout
+
+| Path | What lives there |
+| :--- | :--- |
+| `src/` | The CLI and the scanner: `cli.mjs`, `scan.mjs`, one module per check in `src/checks/`, proof mode, reports, licences |
+| `test/` | The suite, on `node:test` with no dependencies |
+| `web/pages/` | One module per page of margyn.xyz |
+| `web/layout.mjs`, `web/style.css` | The shared shell and the one stylesheet every page inlines |
+| `web/public/` | Built pages plus the static assets. Generated HTML: edit `web/pages/` and run `npm run pages` |
+| `worker/` | The Cloudflare Worker. `static.generated.mjs` is written by `npm run worker:bundle` |
+| `bin/` | Build scripts and the palette contrast gate |
+| `action.yml` | The GitHub Action |
+| `shots/` | Dated evidence: screenshots and raw run output kept with the product |
+
+CI fails if `web/public` or the worker bundle does not match what the build produces, so a page edit that skipped the build cannot merge.
+
+---
+
 ## Tests
 
 ```bash
 npm test
 ```
 
-108 tests, no dependencies. Each check test builds a real git repository in a temp directory, plants one defect, asserts the check finds it, then plants the fixed shape and asserts silence. The licence tests carry real signatures and prove that a flipped byte, a swapped payload, an expired licence, and a wrong-product licence are all refused with the reason named.
+130 tests, no dependencies. Each check test builds a real git repository in a temp directory, plants one defect, asserts the check finds it, then plants the fixed shape and asserts silence. The licence tests carry real signatures and prove that a flipped byte, a swapped payload, an expired licence, and a wrong-product licence are all refused with the reason named.
 
 ---
 

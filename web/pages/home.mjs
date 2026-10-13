@@ -16,7 +16,8 @@ export default {
   schema: true,
   session: true,
   body: `
-<section class="hero"><div class="wrap">
+<section class="hero"><div class="wrap hero-grid">
+  <div>
   <h1 class="prose">Your tests pass. That is not the same as working.</h1>
   <p class="lede prose">Margyn audits the machinery that is supposed to catch your bugs, then hands
     you the command that proves each finding. Point it at a repository and it answers in about a
@@ -37,6 +38,28 @@ export default {
     <li>Zero dependencies</li>
     <li>MIT licensed</li>
   </ul>
+  </div>
+  <figure class="hero-demo" aria-label="Proof mode on fastify">
+<pre tabindex="0"><b>$ npx margyn-scan /tmp/fastify --prove</b>
+
+<b>1. test "plugin required decorators" asserts nothing,</b>
+<b>   so nothing but a thrown error can fail it</b>
+   <span class="r">HIGH</span>  <span class="d">no-assertion  test/decorator.test.js:869</span>  <span class="g">REPRODUCED</span>
+   <span class="d">MARGYN_NO_ASSERT_IN_BODY</span>
+<span class="d">   ...</span>
+<b>8. test "start listening" has one assertion and it is</b>
+<b>   on a literal, so nothing but an exception can fail it</b>
+   <span class="r">HIGH</span>  <span class="d">cannot-fail  test/internals/server.test.js:18</span>  <span class="g">REPRODUCED</span>
+   <span class="d">MARGYN_CONSTANT_TRUE_ASSERT</span>
+<span class="d">   ...</span>
+<b>10. script "lint:fix" is declared but no workflow</b>
+<b>    or sibling script runs it</b>
+   <span class="d">MEDIUM  unrun-check  package.json</span>  <span class="g">REPRODUCED</span>
+<span class="d">   ...</span>
+<b>13 findings: 13 reproduced.</b></pre>
+    <figcaption class="sm">fastify at <code>39e87e8</code>, three of its 13 findings. Every one
+      reproduced on the tree. <a href="#finding">Read one in full</a></figcaption>
+  </figure>
 </div></section>
 
 <section><div class="wrap">
@@ -78,7 +101,7 @@ export default {
 
 <section id="checks"><div class="wrap">
   <h2>What it looks for</h2>
-  <ul class="checks prose">
+  <ul class="checks">
     <li>
       <div class="top"><span class="nm">ignored-source</span><span class="sev high">high</span></div>
       <p>Files the repository reads that git never committed. Green on your laptop because the file
@@ -134,26 +157,28 @@ export default {
 <section id="finding"><div class="wrap">
   <p class="eyebrow">A real run, on a repository you know</p>
   <h2>Two fastify tests that hold whatever the code does</h2>
-  <p class="prose">Run it yourself: <code>git clone --depth 1 https://github.com/fastify/fastify</code>
-    then <code>npx margyn-scan fastify</code>. At commit <code>6e95cb9</code> it reads 13 findings, 7
-    tests that assert nothing, 2 whose only assertion is on a literal, 4 scripts no workflow invokes.
+  <p class="prose">Run it yourself: <code>git clone https://github.com/fastify/fastify</code>,
+    <code>git -C fastify checkout 39e87e8</code>, then <code>npx margyn-scan fastify</code>. It reads
+    13 findings: 7 tests that assert nothing, 2 whose only assertion is on a literal, 4 scripts no
+    workflow invokes.
     This is the shape worth seeing, because the test reads as rigorous.</p>
 <pre tabindex="0" role="group" aria-label="Terminal output from a real scan of fastify"><b>margyn /tmp/fastify</b>
 
 13 findings, each with a reproduction you can run.
 
-<b>8. test "DNS errors does not stop the main server" has one assertion and it is</b>
-<b>   on a literal, so nothing but an exception can fail it</b>
-   <span class="r">HIGH</span>  <span class="d">cannot-fail  test/internals/server.test.js:18</span>
-   t.assert.ok(true, 'server started')
-   <span class="d">why: The assertion is about a literal, not about the code, so it reports green</span>
-   <span class="d">     with the subject broken or deleted.</span>
+<b>9. test "DNS errors does not stop the main server on localhost - promise interface"</b>
+<b>   has one assertion and it is on a literal, so nothing but an exception can fail it</b>
+   <span class="r">HIGH</span>  <span class="d">cannot-fail</span>  test/internals/server.test.js:32
+   <span class="d">t.assert.ok(true, 'server started')</span>
+   <span class="d">why:</span> The assertion is about a literal, not about the code, so it reports green
+        with the subject broken or deleted. A declared assertion count would make it
+        a real check, and this test declares none.
    <span class="d">reproduce:</span>
-     <span class="d"># the assertion holds with the subject removed entirely:</span>
-     sed -n '18p' test/internals/server.test.js</pre>
-  <p class="sm prose" style="margin-top:14px">That line is the whole finding. The test starts a
-    server, then asserts that <code>true</code> is true, so it passes with the server code deleted.
-    Nothing in a diff, a coverage number or a review shows it.</p>
+     # the assertion holds with the subject removed entirely:
+     sed -n '32p' test/internals/server.test.js</pre>
+  <p class="sm prose" style="margin-top:14px">That line is the whole finding. The test stubs DNS
+    to fail, starts a server, then asserts that <code>true</code> is true, so it passes with the
+    server code deleted. Nothing in a diff, a coverage number or a review shows it.</p>
   <p class="sm"><a href="/proof">The whole run, plus scans of five public repositories at named
     commits and what it reports about its own suite</a></p>
 </div></section>
@@ -228,9 +253,9 @@ export default {
         site has no scan endpoint on purpose, which you can check: <code>POST /api/scan</code>
         answers 404. The <a href="/security">security page</a> lists every process it starts.</p></details>
     <details><summary>How many false positives am I about to eat?</summary>
-      <p>On five public repositories at named commits it reported 0, 0, 1, 3 and 10 findings. That
-        run also produced seven wrong ones, all in one file, so the checker was fixed rather than the
-        number. Both the before and the after are on the <a href="/proof#public">proof
+      <p>On five public repositories at named commits it reports 0, 0, 1, 3 and 13 findings. The
+        first run also produced seven wrong ones, all in one file, so the checker was fixed rather
+        than the number. Both the before and the after are on the <a href="/proof#public">proof
         page</a>.</p></details>
     <details><summary>Does it need an account to try?</summary>
       <p>No. <code>npx margyn-scan /path/to/repo</code> needs no sign in, no key and no network. An

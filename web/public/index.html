@@ -25,10 +25,10 @@
 {"@context":"https://schema.org","@type":"SoftwareApplication","name":"Margyn",
 "applicationCategory":"DeveloperApplication","operatingSystem":"Linux, macOS, Windows",
 "url":"https://margyn.xyz/","codeRepository":"https://github.com/zkasuran/margyn",
-"description":"Audits the verification layer of a repository. Finds tests that assert nothing, files the repo reads that git never committed, gates no workflow invokes and linter exclusions that live in the ignore file. Every finding ships a runnable reproduction.",
+"description":"Audits the verification layer of a repository. Finds tests that assert nothing, tests whose assertions cannot be false, files the repo reads that git never committed, gates no workflow invokes and linter exclusions that live in the ignore file. Every finding ships a runnable reproduction.",
 "softwareRequirements":"Node.js 22 or newer, git","license":"https://opensource.org/licenses/MIT",
 "offers":[{"@type":"Offer","name":"Free scan","price":"0","priceCurrency":"USD",
-"description":"Four static checks, no account and no licence."},
+"description":"Five static checks, no account and no licence."},
 {"@type":"Offer","name":"Watch","price":"8.99","priceCurrency":"USD",
 "description":"Adds the mutation proof, with a 3 day free trial.",
 "priceSpecification":{"@type":"UnitPriceSpecification","price":"8.99","priceCurrency":"USD",
@@ -42,8 +42,8 @@
 if(v==="light"||v==="dark")document.documentElement.style.colorScheme=v}catch(e){}})();
 </script>
 <style>
-/* MARGYN — Compact revamp. Dense, punchy, minimal scroll.
-   Palette: bin/contrast.mjs · test/palette.test.mjs */
+/* Margyn. One stylesheet, inlined into every page by web/layout.mjs.
+   Palette pairs are gated by bin/contrast.mjs and test/palette.test.mjs. */
 
 :root {
   color-scheme: light dark;
@@ -127,7 +127,8 @@ pre .d { color: var(--faint) } pre .r { color: var(--hi) } pre .g { color: var(-
 
 section { padding: var(--band) 0 }
 section + section { border-top: 1px solid var(--line) }
-:target, a, button, input, summary { scroll-margin-top: 64px }
+:target, a, button, input, summary { scroll-margin-top: 104px }
+@media (min-width: 640px) { :target, a, button, input, summary { scroll-margin-top: 68px } }
 .eyebrow { font-size: 11px; font-weight: 680; letter-spacing: .1em; text-transform: uppercase;
   color: var(--accent); margin: 0 0 8px }
 
@@ -160,18 +161,24 @@ button.ghost:hover, .btn.ghost:hover { border-color: var(--accent);
   backdrop-filter: saturate(1.5) blur(16px);
   -webkit-backdrop-filter: saturate(1.5) blur(16px);
   border-bottom: 1px solid var(--line) }
-.bar .wrap { display: flex; align-items: center; gap: 10px; min-height: 52px; padding-block: 6px }
+.bar .wrap { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; min-height: 52px;
+  padding-block: 6px }
 @media (min-width: 1024px) { .bar .wrap { min-height: 56px } }
 .brand { display: flex; align-items: center; gap: 8px; margin-right: auto;
   font-weight: 700; letter-spacing: -.02em; text-decoration: none; font-size: 16px;
   color: var(--ink) }
 .brand svg { display: block; border-radius: 6px }
-.barnav { display: none; gap: 4px; margin-right: 12px }
+/* On a phone the nav is a second row rather than gone, so Proof, Docs and Pricing
+   are one tap away instead of only in the footer. */
+.barnav { display: flex; gap: 4px; order: 10; width: 100%; margin: 0 0 0 -10px;
+  overflow-x: auto; scrollbar-width: none; -webkit-overflow-scrolling: touch }
+.barnav::-webkit-scrollbar { display: none }
 .barnav a { font-size: 13px; color: var(--mut); text-decoration: none; font-weight: 500;
-  padding: 5px 10px; border-radius: 999px; transition: all var(--t) var(--ease) }
+  padding: 5px 10px; border-radius: 999px; white-space: nowrap; transition: all var(--t) var(--ease) }
 .barnav a:hover { color: var(--ink); background: var(--rais) }
 .barnav a[aria-current="page"] { color: var(--accent); background: color-mix(in srgb, var(--accent) 8%, var(--rais)) }
-@media (min-width: 640px) { .barnav { display: flex } }
+@media (min-width: 640px) { .bar .wrap { flex-wrap: nowrap }
+  .barnav { order: 0; width: auto; margin: 0 12px 0 0; overflow: visible } }
 .who { color: var(--mut); font-size: 12px; display: flex; align-items: center }
 
 /* ── Theme toggle ── */
@@ -191,6 +198,14 @@ button.ghost:hover, .btn.ghost:hover { border-color: var(--accent);
 @media (min-width: 640px) { .hero { padding-top: 56px } }
 @media (min-width: 1024px) { .hero { padding-top: 64px } }
 .hero h1 { margin-bottom: 14px; max-width: 18ch }
+.hero-grid { display: grid; gap: 32px; grid-template-columns: minmax(0, 1fr); align-items: center }
+.hero-demo { display: none; margin: 0; min-width: 0 }
+.hero-demo pre { box-shadow: var(--shadow-lg); background: var(--card) }
+.hero-demo figcaption { margin-top: 10px }
+@media (min-width: 1024px) {
+  .hero-grid { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 48px }
+  .hero-demo { display: block }
+}
 .hero-links { display: flex; gap: 16px; margin: 14px 0 0; flex-wrap: wrap }
 .chips { list-style: none; display: flex; flex-wrap: wrap; gap: 6px; padding: 0; margin: 18px 0 0 }
 .chips li { font-size: 11px; font-weight: 600; color: var(--accent);
@@ -211,7 +226,7 @@ button.ghost:hover, .btn.ghost:hover { border-color: var(--accent);
 
 /* ── Page header ── */
 .phead { padding: 36px 0 28px; border-top: 0 }
-.phead + section { border-top: 0 }
+.phead + section { border-top: 0; padding-top: 12px }
 .phead h1 { font-size: clamp(24px, 4vw, 36px); max-width: 26ch; margin-bottom: 10px }
 
 /* ── FAQ — compact ── */
@@ -233,6 +248,7 @@ button.ghost:hover, .btn.ghost:hover { border-color: var(--accent);
 /* ── Checks — compact grid ── */
 .checks { list-style: none; padding: 0; margin: 0; display: grid; gap: 8px }
 @media (min-width: 640px) { .checks { grid-template-columns: 1fr 1fr; gap: 10px } }
+@media (min-width: 1024px) { .checks { grid-template-columns: repeat(3, minmax(0, 1fr)) } }
 .checks li { padding: 14px; border: 1px solid var(--line); border-radius: var(--r-sm);
   background: var(--card); transition: border-color var(--t) var(--ease) }
 .checks li:hover { border-color: var(--accent) }
@@ -264,9 +280,10 @@ button.ghost:hover, .btn.ghost:hover { border-color: var(--accent);
 .tier .per { font-size: 13px; color: var(--faint) }
 .tier ul { list-style: none; padding: 0; margin: 12px 0 16px; font-size: 13.5px; color: var(--mut) }
 .tier li { padding: 4px 0 4px 20px; position: relative }
-.tier li::before { content: "✓"; position: absolute; left: 0; color: var(--ok); font-weight: 700;
-  font-size: 13px }
+.tier li::before { content: ""; position: absolute; left: 3px; top: 9px; width: 9px; height: 5px;
+  border: solid var(--ok); border-width: 0 0 2px 2px; transform: rotate(-45deg) }
 .tier .fill { flex: 1 }
+.tier li code { white-space: nowrap }
 
 /* ── Steps — inline ── */
 .steps { counter-reset: s; list-style: none; padding: 0; margin: 0 }
@@ -287,12 +304,21 @@ button.ghost:hover, .btn.ghost:hover { border-color: var(--accent);
   color: var(--accent); margin-bottom: 6px; font-weight: 650 }
 .panel p { color: var(--mut); font-size: 14px }
 .st { width: 100%; border-collapse: collapse; font-size: 13.5px; max-width: var(--prose) }
+@media (min-width: 1024px) { .st { max-width: 860px } .st td:first-child, .st th:first-child { width: 32% } }
 .st td, .st th { padding: 10px 0; border-bottom: 1px solid var(--line); vertical-align: top;
   text-align: left }
 .st td:first-child, .st th:first-child { color: var(--mut); width: 38%; padding-right: 14px }
 .st tr:last-child td { border-bottom: 0 }
 .st th { font-weight: 650; color: var(--ink); font-size: 12px; letter-spacing: .04em;
   text-transform: uppercase }
+/* A label and its explanation side by side leaves about twenty characters a line on
+   a phone, so those rows stack there. Tables with a header row keep their columns. */
+@media (max-width: 639px) {
+  .st tr:has(> th + td) { display: block; padding: 10px 0; border-bottom: 1px solid var(--line) }
+  .st tr:has(> th + td):last-child { border-bottom: 0 }
+  .st.st tr:has(> th + td) > * { display: block; width: auto; padding: 0; border: 0 }
+  .st.st tr:has(> th + td) > th { margin-bottom: 4px }
+}
 
 /* ── Docs ── */
 .doc { display: grid; gap: 28px; padding: var(--band) 0; grid-template-columns: minmax(0, 1fr) }
@@ -323,9 +349,12 @@ button.ghost:hover, .btn.ghost:hover { border-color: var(--accent);
 
 /* ── Footer — compact ── */
 footer { border-top: 1px solid var(--line); background: var(--rais) }
-footer .wrap { padding: 36px 0 calc(36px + env(safe-area-inset-bottom)); font-size: 13px }
+footer .wrap { padding-block: 36px calc(36px + env(safe-area-inset-bottom)); font-size: 13px }
 .foot { display: grid; gap: 24px }
-@media (min-width: 640px) { .foot { grid-template-columns: 1fr auto auto; gap: 40px } }
+.footlead { grid-column: 1 / -1 }
+@media (max-width: 639px) { .foot { grid-template-columns: 1fr 1fr } }
+@media (min-width: 640px) { .foot { grid-template-columns: 1fr auto auto; gap: 40px }
+  .footlead { grid-column: auto } }
 .footlead { max-width: 38ch; color: var(--faint) }
 .footcmd { margin-bottom: 10px }
 .foothead { font-size: 10px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase;
@@ -407,7 +436,8 @@ footer nav a:hover { color: var(--accent) }
 <main id="main">
 <div class="wrap"><div class="out" id="out" role="region" aria-label="Your licence"></div></div>
 
-<section class="hero"><div class="wrap">
+<section class="hero"><div class="wrap hero-grid">
+  <div>
   <h1 class="prose">Your tests pass. That is not the same as working.</h1>
   <p class="lede prose">Margyn audits the machinery that is supposed to catch your bugs, then hands
     you the command that proves each finding. Point it at a repository and it answers in about a
@@ -428,6 +458,28 @@ footer nav a:hover { color: var(--accent) }
     <li>Zero dependencies</li>
     <li>MIT licensed</li>
   </ul>
+  </div>
+  <figure class="hero-demo" aria-label="Proof mode on fastify">
+<pre tabindex="0"><b>$ npx margyn-scan /tmp/fastify --prove</b>
+
+<b>1. test "plugin required decorators" asserts nothing,</b>
+<b>   so nothing but a thrown error can fail it</b>
+   <span class="r">HIGH</span>  <span class="d">no-assertion  test/decorator.test.js:869</span>  <span class="g">REPRODUCED</span>
+   <span class="d">MARGYN_NO_ASSERT_IN_BODY</span>
+<span class="d">   ...</span>
+<b>8. test "start listening" has one assertion and it is</b>
+<b>   on a literal, so nothing but an exception can fail it</b>
+   <span class="r">HIGH</span>  <span class="d">cannot-fail  test/internals/server.test.js:18</span>  <span class="g">REPRODUCED</span>
+   <span class="d">MARGYN_CONSTANT_TRUE_ASSERT</span>
+<span class="d">   ...</span>
+<b>10. script "lint:fix" is declared but no workflow</b>
+<b>    or sibling script runs it</b>
+   <span class="d">MEDIUM  unrun-check  package.json</span>  <span class="g">REPRODUCED</span>
+<span class="d">   ...</span>
+<b>13 findings: 13 reproduced.</b></pre>
+    <figcaption class="sm">fastify at <code>39e87e8</code>, three of its 13 findings. Every one
+      reproduced on the tree. <a href="#finding">Read one in full</a></figcaption>
+  </figure>
 </div></section>
 
 <section><div class="wrap">
@@ -469,7 +521,7 @@ footer nav a:hover { color: var(--accent) }
 
 <section id="checks"><div class="wrap">
   <h2>What it looks for</h2>
-  <ul class="checks prose">
+  <ul class="checks">
     <li>
       <div class="top"><span class="nm">ignored-source</span><span class="sev high">high</span></div>
       <p>Files the repository reads that git never committed. Green on your laptop because the file
@@ -525,26 +577,28 @@ footer nav a:hover { color: var(--accent) }
 <section id="finding"><div class="wrap">
   <p class="eyebrow">A real run, on a repository you know</p>
   <h2>Two fastify tests that hold whatever the code does</h2>
-  <p class="prose">Run it yourself: <code>git clone --depth 1 https://github.com/fastify/fastify</code>
-    then <code>npx margyn-scan fastify</code>. At commit <code>6e95cb9</code> it reads 13 findings, 7
-    tests that assert nothing, 2 whose only assertion is on a literal, 4 scripts no workflow invokes.
+  <p class="prose">Run it yourself: <code>git clone https://github.com/fastify/fastify</code>,
+    <code>git -C fastify checkout 39e87e8</code>, then <code>npx margyn-scan fastify</code>. It reads
+    13 findings: 7 tests that assert nothing, 2 whose only assertion is on a literal, 4 scripts no
+    workflow invokes.
     This is the shape worth seeing, because the test reads as rigorous.</p>
 <pre tabindex="0" role="group" aria-label="Terminal output from a real scan of fastify"><b>margyn /tmp/fastify</b>
 
 13 findings, each with a reproduction you can run.
 
-<b>8. test "DNS errors does not stop the main server" has one assertion and it is</b>
-<b>   on a literal, so nothing but an exception can fail it</b>
-   <span class="r">HIGH</span>  <span class="d">cannot-fail  test/internals/server.test.js:18</span>
-   t.assert.ok(true, 'server started')
-   <span class="d">why: The assertion is about a literal, not about the code, so it reports green</span>
-   <span class="d">     with the subject broken or deleted.</span>
+<b>9. test "DNS errors does not stop the main server on localhost - promise interface"</b>
+<b>   has one assertion and it is on a literal, so nothing but an exception can fail it</b>
+   <span class="r">HIGH</span>  <span class="d">cannot-fail</span>  test/internals/server.test.js:32
+   <span class="d">t.assert.ok(true, 'server started')</span>
+   <span class="d">why:</span> The assertion is about a literal, not about the code, so it reports green
+        with the subject broken or deleted. A declared assertion count would make it
+        a real check, and this test declares none.
    <span class="d">reproduce:</span>
-     <span class="d"># the assertion holds with the subject removed entirely:</span>
-     sed -n '18p' test/internals/server.test.js</pre>
-  <p class="sm prose" style="margin-top:14px">That line is the whole finding. The test starts a
-    server, then asserts that <code>true</code> is true, so it passes with the server code deleted.
-    Nothing in a diff, a coverage number or a review shows it.</p>
+     # the assertion holds with the subject removed entirely:
+     sed -n '32p' test/internals/server.test.js</pre>
+  <p class="sm prose" style="margin-top:14px">That line is the whole finding. The test stubs DNS
+    to fail, starts a server, then asserts that <code>true</code> is true, so it passes with the
+    server code deleted. Nothing in a diff, a coverage number or a review shows it.</p>
   <p class="sm"><a href="/proof">The whole run, plus scans of five public repositories at named
     commits and what it reports about its own suite</a></p>
 </div></section>
@@ -619,9 +673,9 @@ footer nav a:hover { color: var(--accent) }
         site has no scan endpoint on purpose, which you can check: <code>POST /api/scan</code>
         answers 404. The <a href="/security">security page</a> lists every process it starts.</p></details>
     <details><summary>How many false positives am I about to eat?</summary>
-      <p>On five public repositories at named commits it reported 0, 0, 1, 3 and 10 findings. That
-        run also produced seven wrong ones, all in one file, so the checker was fixed rather than the
-        number. Both the before and the after are on the <a href="/proof#public">proof
+      <p>On five public repositories at named commits it reports 0, 0, 1, 3 and 13 findings. The
+        first run also produced seven wrong ones, all in one file, so the checker was fixed rather
+        than the number. Both the before and the after are on the <a href="/proof#public">proof
         page</a>.</p></details>
     <details><summary>Does it need an account to try?</summary>
       <p>No. <code>npx margyn-scan /path/to/repo</code> needs no sign in, no key and no network. An

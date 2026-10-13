@@ -28,7 +28,7 @@ export default {
 <b>$ curl -s -X POST https://margyn.xyz/api/suggest -H 'content-type: application/json' \\
     -d '{"suggestion":"the suggestion box answers with a link and keeps nothing"}'</b>
 {"ok":true,"reference":"SG-1GYGD03","kind":"feedback","label":"feedback","trimmed":false,
- "issue":{"url":"https://github.com/zkasuran/margyn/issues/new?labels=feedback&amp;title=...",
+ "issue":{"url":"https://github.com/zkasuran/margyn/issues/new?title=...&amp;body=...",
           "title":"Feedback SG-1GYGD03: the suggestion box answers with a link and keeps nothing"}}</pre>
   <p class="sm prose" style="margin-top:14px">The local development server does have a scan route,
     because there the caller and the repository are the same machine. On a public host that route
@@ -47,17 +47,24 @@ export default {
     <tr><th>your test command</th><td>Only under <code>--mutate</code>. It is whatever
       <code>npm test</code> resolves to in the repository being scanned. Nothing is inferred and
       nothing else is executed.</td></tr>
+    <tr><th>each finding's proof</th><td>Only under <code>--prove</code>. The read-only commands a
+      finding carries, run through <code>sh -c</code> in the repository: <code>git archive</code>
+      piped to <code>tar -t</code>, <code>test -f</code>, <code>grep</code>, <code>sed -n</code>.
+      Values found in the repository, such as file paths and script names, are quoted before they
+      reach the shell.</td></tr>
   </table>
   <p class="sm prose" style="margin-top:18px">That is the whole list. Files are read with
     <code>node:fs</code>, capped at 400 KB each, skipping <code>.git</code>,
     <code>node_modules</code>, build output and virtual environments. The commands printed inside a
-    finding, including <code>git archive</code>, are text for you to run. The scanner does not run
-    them.</p>
+    finding, including <code>git archive</code>, are text for you to run. The scanner only runs
+    them itself when you pass <code>--prove</code>.</p>
 </div></section>
 
 <section><div class="wrap">
   <h2>What it writes, what it does not</h2>
-  <p class="prose">With no flags: nothing. The five static checks are read only.</p>
+  <p class="prose">With no flags: nothing. The five static checks are read only, and so is
+    <code>--prove</code>. <code>--sarif-out</code> and <code>--comment-out</code> write the one file
+    you name and nothing else.</p>
   <p class="prose">Under <code>--mutate</code>: one file at a time, inverted at one line, only
     after your suite has passed unmutated. The original is restored in a <code>finally</code> block
     and on <code>SIGINT</code>, so a scan you interrupt with ctrl-c cannot leave a mutated tree

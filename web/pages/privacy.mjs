@@ -7,7 +7,7 @@ export default {
   body: `
 <section class="phead"><div class="wrap">
   <h1 class="prose">Privacy</h1>
-  <p class="lede prose">Last updated 2026-08-15. The short version: the tool that reads your code
+  <p class="lede prose">Last updated 2026-10-13. The short version: the tool that reads your code
     never connects to anything, so there is no data from it to have a policy about.</p>
 </div></section>
 
@@ -26,8 +26,9 @@ export default {
 
 <h2 id="cli">The command line tool</h2>
 <p>It collects nothing and it sends nothing. No telemetry, no version ping, no crash reporting, no
-  licence call home. It reads your working tree, shells out to git, then under
-  <code>--mutate</code> it runs your own test command. That is the whole surface.</p>
+  licence call home. It reads your working tree, shells out to git, under <code>--prove</code> it
+  runs the read-only proof each finding carries, then under <code>--mutate</code> it runs your own
+  test command. That is the whole surface.</p>
 <p>You do not have to take that on trust. It is one directory of ES modules with no runtime
   dependencies, so grep it for <code>fetch</code> and <code>http</code> and see for yourself. The
   <a href="/security">security page</a> lists every process it starts.</p>
@@ -35,8 +36,8 @@ export default {
 <h2 id="site">The site</h2>
 <p>The pages you are reading are static files served from a Cloudflare Worker. There is no analytics
   script, no tag manager, no session recorder and no advertising pixel on any page of this site.
-  View source and the JavaScript is one module that switches the colour theme, copies a command to
-  your clipboard and, on two pages, loads the sign in SDK. The fix intake and the suggestion box each
+  View source and the JavaScript is one small module that switches the colour theme and copies a
+  command to your clipboard, plus, on two pages, one that loads the sign in SDK. The fix intake and the suggestion box each
   add a short inline module that reads their own form and posts it. Neither one loads anything from
   another origin.</p>
 <p>If you sign in, an email address enters the picture. <a href="https://tiun.business">Tiun</a>

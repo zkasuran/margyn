@@ -19,11 +19,13 @@ export default {
     <a href="#requirements">Requirements</a>
     <a href="#install">Install</a>
     <a href="#usage">Usage</a>
+    <a href="#prove">Proof mode</a>
     <a href="#output">Reading the output</a>
     <a href="#checks">The six checks</a>
     <a href="#mutate">The mutation proof</a>
     <a href="#licence">Licences</a>
     <a href="#ci">In CI</a>
+    <a href="#pr">On the pull request</a>
     <a href="#json">JSON output</a>
     <a href="#nothing">When it finds nothing</a>
   </nav>
@@ -76,29 +78,43 @@ margyn [path] [options]              # once it is on your path
   on your own tree. The mutation proof is reported as <b>observed</b>, because it was already
   established by running your suite. It is free: it makes a finding undeniable, which is the whole
   product.</p>
-<pre tabindex="0" role="group" aria-label="Proof mode">npx margyn-scan . --prove
+<pre tabindex="0" role="group" aria-label="Proof mode"><b>$ npx margyn-scan . --prove</b>
 
-1. vendor/dist/IPool.mjs is read but git ignores it   <span class="r">HIGH</span>  ignored-source  <b>REPRODUCED</b>
-   MARGYN_ABSENT_FROM_HEAD
-   MARGYN_PRESENT_ON_DISK
+<b>1. vendor/dist/IPool.mjs is read by scripts/abis.mjs but git ignores it,</b>
+<b>   so it is not in the commit</b>
+   <span class="r">HIGH</span>  <span class="d">ignored-source</span>  vendor/dist/IPool.mjs  <span class="g">REPRODUCED</span>
+   <span class="d">MARGYN_REFERENCE_ABSENT_FROM_HEAD</span>
+   <span class="d">MARGYN_PRESENT_ON_DISK</span>
 
-2 findings: 2 reproduced.</pre>
+<b>2. test "hollow" asserts nothing, so nothing but a thrown error can fail it</b>
+   <span class="r">HIGH</span>  <span class="d">no-assertion</span>  app.test.mjs:2  <span class="g">REPRODUCED</span>
+   <span class="d">MARGYN_NO_ASSERT_IN_BODY</span>
+
+<b>3. script "test:online" is declared but no workflow or sibling script runs it</b>
+   MEDIUM  <span class="d">unrun-check</span>  package.json  <span class="g">REPRODUCED</span>
+   <span class="d">MARGYN_NOT_REFERENCED</span>
+
+3 findings: 3 reproduced.</pre>
+<p>The markers are what each proof printed on your tree. A retracted finding is listed apart at the
+  end with the marker that did not appear, so you can see what was withdrawn and why.</p>
 
 <h2 id="output">Reading the output</h2>
-<pre tabindex="0" role="group" aria-label="Anatomy of a finding"><b>margyn /tmp/moss</b>
+<pre tabindex="0" role="group" aria-label="Anatomy of a finding"><b>margyn /your/repo</b>
 
-2 findings, each with a reproduction you can run.
+3 findings, each with a reproduction you can run.
 
-<b>1. packages/protocols/aave/abis-src/dist/AaveV3Monad.mjs is read by</b>
-<b>   packages/protocols/aave/README.md but git ignores it</b>
-   <span class="r">HIGH</span>  <span class="d">ignored-source</span>  packages/protocols/aave/abis-src/dist/AaveV3Monad.mjs
-   <span class="d">ignore rule: .gitignore:2:dist/</span>
-   <span class="d">why:</span> A clean clone or a CI runner cannot read this file.
+<b>1. vendor/dist/IPool.mjs is read by scripts/abis.mjs but git ignores it,</b>
+<b>   so it is not in the commit</b>
+   <span class="r">HIGH</span>  <span class="d">ignored-source</span>  vendor/dist/IPool.mjs
+   <span class="d">ignore rule: .gitignore:1:dist/</span>
+   <span class="d">why:</span> A clean clone or a CI runner cannot read this file. Local runs pass
+        because the file is on your disk and untracked.
    <span class="d">reproduce:</span>
-     git -C . archive HEAD | tar -t | grep -qx '&lt;path&gt;' || echo 'ABSENT from HEAD'
-     test -f '&lt;path&gt;' &amp;&amp; echo 'PRESENT on disk'</pre>
-<p>Six parts, in this order: the summary, the severity, the check that fired, the file, the evidence
-  the check based it on, why it matters, then the reproduction. The reproduction is the part that
+     git -C . archive HEAD | tar -t | grep -qE '(^|/)dist/IPool\.mjs$' \
+       || echo 'NOTHING in HEAD answers dist/IPool.mjs'
+     test -f 'vendor/dist/IPool.mjs' &amp;&amp; echo 'PRESENT on disk: vendor/dist/IPool.mjs'</pre>
+<p>Seven parts, in this order: the summary, the severity, the check that fired, the file, the
+  evidence the check based it on, why it matters, then the reproduction. The reproduction is the part that
   makes it a finding rather than an opinion. A finding that cannot carry one is dropped instead of
   printed, so the count you see is smaller than the count we could have printed.</p>
 <p>Findings are sorted with high first. Severity is a word, never a colour on its own, so the output
@@ -171,7 +187,7 @@ margyn [path] [options]              # once it is on your path
 <h3 id="cannot-fail">cannot-fail <span class="sev high">high</span></h3>
 <p><strong>Fires when</strong> a test asserts something that cannot be false, so it reports green
   whatever the code does. no-assertion reports an empty body; this one reports a body full of
-  assertions that hold by construction. Three shapes, each one measured on real repositories before
+  assertions that hold by construction. Four shapes, each one measured on real repositories before
   it shipped:</p>
 <ul>
   <li><strong>A literal assertion in the catch.</strong> <code>catch (e) { expect(true).toBe(true) }</code>
@@ -332,16 +348,21 @@ steps:
     {
       "check": "ignored-source",
       "severity": "high",
-      "file": "packages/aave/abis-src/dist/IPool.mjs",
-      "summary": "... is read by ... but git ignores it",
-      "evidence": "ignore rule: .gitignore:2:dist/",
-      "why": "A clean clone or a CI runner cannot read this file.",
-      "reproduction": ["git -C . archive HEAD | tar -t | grep -qx ...", "test -f ..."]
+      "file": "vendor/dist/IPool.mjs",
+      "summary": "vendor/dist/IPool.mjs is read by scripts/abis.mjs but git ignores it, ...",
+      "evidence": "ignore rule: .gitignore:1:dist/",
+      "reproduction": ["git -C . archive HEAD | tar -t | grep -qE ...", "test -f ..."],
+      "proof": { "verifiable": true, "commands": ["..."], "expect": ["..."] },
+      "why": "A clean clone or a CI runner cannot read this file. ...",
+      "referencedBy": "scripts/abis.mjs",
+      "reference": "dist/IPool.mjs"
     }
   ],
   "gate": { "mutation": "locked", "reason": "no licence found" }
 }</pre>
-<p><code>gate</code> is present only when <code>--mutate</code> was asked for. It reports whether
+<p>Under <code>--prove</code> the body also carries <code>retracted</code> and a <code>proof</code>
+  tally, and each kept finding carries what its proof produced.
+  <code>gate</code> is present only when <code>--mutate</code> was asked for. It reports whether
   the paid check ran. Use it to post findings on a pull request instead of failing the job. The exit
   code is unchanged by <code>--json</code>.</p>
 

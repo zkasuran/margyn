@@ -14,7 +14,8 @@ export default {
 <section class="phead"><div class="wrap">
   <h1 class="prose">Proof, with the commands</h1>
   <p class="lede prose">Three claims hold this product up. Each one is a real run against a named
-    commit, each one followed by the command that reproduces it. Dated 2026-08-06.</p>
+    commit, each one followed by the command that reproduces it. First run 2026-08-06, the public
+    scan re-checked against 0.3.1 on 2026-10-13.</p>
 </div></section>
 
 <section id="incident"><div class="wrap">
@@ -54,8 +55,8 @@ PRESENT on disk</pre>
   <h2>What it says about five public repositories</h2>
   <p class="prose">Run on 2026-08-06 against a shallow clone of each, at the commit named. Nothing
     was tuned for these repositories and nothing was left out because the number was inconvenient.
-    Re-derived on 2026-08-15 with 0.2.1, at the same five commits: every number below still holds,
-    down to the file and line of each named finding.</p>
+    Re-derived on 2026-10-13 with 0.3.1, at the same five commits: every number below holds, down
+    to the file and line of each named finding.</p>
   <table class="st">
     <tr><th>Repository</th><th>Commit</th><th>Findings</th></tr>
     <tr><td>chalk/chalk</td><td><code>661317e</code></td><td>0</td></tr>
@@ -64,9 +65,11 @@ PRESENT on disk</pre>
     <tr><td>expressjs/express</td><td><code>a371447</code></td><td>3 unrun gates</td></tr>
     <tr><td>fastify/fastify</td><td><code>39e87e8</code></td><td>7 tests with no assertion, 2 that cannot fail, 4 unrun gates</td></tr>
   </table>
-  <p class="sm prose" style="margin-top:18px">Reproduce any row in two commands. A clone is enough,
-    since the static checks need no account:</p>
-<pre tabindex="0" role="group" aria-label="Reproducing the public scan">git clone --depth 1 https://github.com/fastify/fastify.git /tmp/fastify
+  <p class="sm prose" style="margin-top:18px">Reproduce any row in three commands. A clone is enough,
+    since the static checks need no account. Check out the named commit: the repositories have moved
+    on since, and fastify's current head reads differently.</p>
+<pre tabindex="0" role="group" aria-label="Reproducing the public scan">git clone https://github.com/fastify/fastify.git /tmp/fastify
+git -C /tmp/fastify checkout 39e87e8
 npx margyn-scan /tmp/fastify</pre>
 
   <h3 style="margin-top:34px">What a clean clone cannot show</h3>
@@ -75,31 +78,35 @@ npx margyn-scan /tmp/fastify</pre>
     exist in a fresh clone. That check fires on a working tree, which is where the moss defect
     lived. Saying so is the difference between a table and a claim.</p>
 
-  <h3 style="margin-top:30px">All six no-assertion findings, named</h3>
+  <h3 style="margin-top:30px">All seven no-assertion findings, named</h3>
   <p class="prose">Each one is a file and a line anyone can open. These are tests whose only failure
     mode is an exception: they run the code, assert nothing, then report green whatever came
-    back. The table above says six, so all six are here rather than a selection.</p>
-<pre tabindex="0" role="group" aria-label="Six named findings in fastify">fastify/fastify at 39e87e8
+    back. The table above says seven, so all seven are here rather than a selection.</p>
+<pre tabindex="0" role="group" aria-label="Seven named findings in fastify">fastify/fastify at 39e87e8
 
 test/decorator.test.js:869               plugin required decorators
 test/http2/closing.test.js:118           http/2 closes successfully with async await
 test/http2/closing.test.js:133           https/2 closes successfully with async await
 test/schema-special-usage.test.js:423    side effect on schema let the server crash
 test/schema-special-usage.test.js:469    only response schema trigger AJV pollution
-test/schema-special-usage.test.js:493    only response schema trigger AJV pollution #2</pre>
-  <p class="sm prose" style="margin-top:14px">Two of those are worth reading before you judge the
+test/schema-special-usage.test.js:493    only response schema trigger AJV pollution #2
+test/wrap-thenable.test.js:8             should resolve immediately when reply[kReplyHijacked] is true</pre>
+  <p class="sm prose" style="margin-top:14px">The seventh was hidden until 0.3.0: its title begins
+    "should", and the matcher used to read that word as an assertion. Two of the others are worth
+    reading before you judge the
     check: an <code>await close()</code> with no assertion is a deliberate smoke test in a lot of
     suites. That is why the finding says what it says rather than "cannot fail". It is reported
     with the line instead of a count for the same reason.</p>
 
   <h3 style="margin-top:30px">The same run found seven false positives, so they were fixed</h3>
-  <p class="prose">The first pass reported 17 on fastify, not 10. Seven of those were in
+  <p class="prose">The first pass, on 0.1.1, reported 17 on fastify. Seven of those were in
     <code>test/trust-proxy.test.js</code> and every one of them was wrong: the tests declare
     <code>t.plan(11)</code> then assert through a helper that takes the test context. A planned
     count fails the test when it comes up short, so a body carrying one cannot be hollow.</p>
-  <p class="prose">Both rules are now in the check and both directions are tested. That is the whole
-    reason the number above is 10. A scanner that cries wolf is hollow itself, so a false positive
-    is a defect here rather than a tuning preference.</p>
+  <p class="prose">Both rules are now in the check and both directions are tested, which took
+    fastify from 17 to 10. The other three arrived with 0.3.0: the two <code>cannot-fail</code>
+    findings from the new check, plus the seventh hollow test above. A scanner that cries wolf is
+    hollow itself, so a false positive is a defect here rather than a tuning preference.</p>
   <p class="sm"><a href="/docs#no-assertion">What fires this check, what does not</a> &middot;
     <a href="/changelog">The release it landed in</a></p>
 </div></section>
@@ -121,12 +128,13 @@ src/cli.mjs                     === -&gt; !==             <span class="r">suite 
   <p class="prose" style="margin-top:16px">Publishing that list was the easy half. On 2026-08-15 a
     test was written for every line on it, plus <code>src/prove.mjs</code>, which had joined the
     list. The suite went from 63 tests to 93. Two more source files shipped after that, so the run
-    was measured again on 2026-08-17 over everything now in scope:</p>
+    was measured again on 2026-08-17 over everything then in scope, and again on 2026-10-13 after
+    the suite grew to 130 tests:</p>
 <pre tabindex="0" role="group" aria-label="The same proof today, over every file in the repository">$ <b>every candidate file, cap 80</b>
 40 files tracked as source, 27 carry a mutation this tool knows how to make
-27 mutated, 27 caught by the suite, <span class="g">0 survivors</span>, 208 seconds
-108 tests, 0 failing</pre>
-  <p class="prose" style="margin-top:16px">Three and a half minutes is the honest cost of the check.
+27 mutated, 27 caught by the suite, <span class="g">0 survivors</span>, 201 seconds
+130 tests, 0 failing</pre>
+  <p class="prose" style="margin-top:16px">Over three minutes is the honest cost of the check.
     Every mutation runs the whole suite once, so 27 of them is 27 test runs. That is why the default
     cap is four and why this run has to be asked for.</p>
   <p class="prose" style="margin-top:16px">Each of those tests pins the behaviour the mutation

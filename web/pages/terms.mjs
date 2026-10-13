@@ -7,7 +7,7 @@ export default {
   body: `
 <section class="phead"><div class="wrap">
   <h1 class="prose">Terms of sale and use</h1>
-  <p class="lede prose">Last updated 2026-08-15. Written to be read once rather than skipped, so it
+  <p class="lede prose">Last updated 2026-10-13. Written to be read once rather than skipped, so it
     is short and it says what it means.</p>
 </div></section>
 
@@ -62,14 +62,15 @@ export default {
 
 <h2 id="price">Price and billing</h2>
 <p>Watch is 8.99 USD a month for one repository owner. Team is 29 USD a month for an organisation.
-  Fix flow is 79 USD a month. Watch and Team carry three free days first. Every one of them renews
-  monthly until you cancel it. Prices shown on the <a href="/pricing">pricing page</a> are the prices
+  Solo Fix is 19 USD a month and Fix flow is 79 USD a month. Watch and Team carry three free days
+  first; Solo Fix and Fix flow have no trial. Every one of them renews monthly until you cancel
+  it. Prices shown on the <a href="/pricing">pricing page</a> are the prices
   charged. A change to them applies from your next renewal rather than retroactively.</p>
 
 <h2 id="cancel">Cancelling</h2>
 <p>Cancel whenever you like, from your account. Three things happen, in this order: you are not
   charged again, you stop being able to mint new licences at the end of the paid period, then the
-  licence already on your disk carries on working until it expires. The four free checks are not
+  licence already on your disk carries on working until it expires. The five free checks are not
   affected by any of it.</p>
 
 <h2 id="refunds">Refunds</h2>
@@ -89,9 +90,10 @@ export default {
 <h2 id="promise">What the software promises, what it does not</h2>
 <p>It promises one thing: every finding it reports comes with a command that reproduces the finding.
   A finding that cannot be reproduced is dropped rather than printed.</p>
-<p>It does not promise that a clean result means your test suite is correct. It checks five specific
-  things. A repository that passes all five can still have a suite that misses bugs. The
-  <a href="/">home page</a> names what is not built rather than implying coverage we do not have.</p>
+<p>It does not promise that a clean result means your test suite is correct. It checks six specific
+  things, five of them without a licence. A repository that passes all six can still have a suite
+  that misses bugs. The <a href="/changelog#not-built">changelog</a> names what is not built rather
+  than implying coverage we do not have.</p>
 <p>The software is provided under the MIT licence, which includes its warranty disclaimer. Nothing
   on this page adds a warranty on top of that. Nothing on this page limits a right you have
   under consumer law where you live.</p>
@@ -103,8 +105,8 @@ export default {
 
 <h2 id="availability">Availability</h2>
 <p>There is no uptime commitment on the site. There does not need to be one. The site exists to sign
-  you in, take a payment, hand you a licence and prepare a request you file yourself. Scanning happens on your machine, so an
-  outage here cannot stop a scan or fail a build. If the site is down you cannot buy or reissue a
+  you in, take a payment, hand you a licence and prepare a request you file yourself. Scanning
+  happens on your machine, so an outage here cannot stop a scan or fail a build. If the site is down you cannot buy or reissue a
   licence until it is back.</p>
 
 <h2 id="changes">Changes to these terms</h2>

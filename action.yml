@@ -1,9 +1,9 @@
 name: Margyn
 description: >-
   Audit the verification layer of a repository. Finds tests that assert nothing,
-  files git never committed and gates nothing invokes, then fails the job with a
-  reproduction for each finding. Can post the findings on the pull request and
-  upload them to the Security tab.
+  tests that cannot fail, files git never committed and gates nothing invokes,
+  then fails the job with a reproduction for each finding. Can post the
+  findings on the pull request and upload them to the Security tab.
 author: Asura Coding Works
 branding:
   icon: alert-circle
